@@ -40,13 +40,16 @@ Goal.group_by_year(:accomplished_at).count
 The default time zone is `Time.zone`.  Pass a time zone as the second argument.
 
 ```ruby
-time_zone = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
-User.group_by_week(:created_at, time_zone).count
+User.group_by_week(:created_at, "Pacific Time (US & Canada)").count
 # {
 #   "2013-02-25 08:00:00+00" => 80,
 #   "2013-03-04 08:00:00+00" => 70,
 #   "2013-03-11 07:00:00+00" => 54
 # }
+
+# equivalently
+time_zone = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
+User.group_by_week(:created_at, time_zone).count
 ```
 
 Use it with anything you can use `group` with:
