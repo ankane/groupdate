@@ -5,16 +5,8 @@ The simplest way to group by:
 - day
 - week
 - month
-- year
 - hour
-- microseconds
-- milliseconds
-- second
-- minute
-- quarter
-- decade
-- century
-- millennium
+- *and more* (complete list at bottom)
 
 :tada: Time zones supported!!
 
@@ -36,20 +28,21 @@ Goal.group_by_year(:accomplished_at).count
 The default time zone is `Time.zone`.  Pass a time zone as the second argument.
 
 ```ruby
-User.group_by_day(:created_at, ActiveSupport::TimeZone["Pacific Time (US & Canada)"]).count
+time_zone = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
+User.group_by_week(:created_at, time_zone).count
 # => {2013-04-16 00:00:00 UTC=>80,2013-04-17 00:00:00 UTC=>70}
 ```
 
 Use it with anything that you can use `group` with:
 
 ```ruby
-User.group_by_week(:created_at).sum(:tasks_count)
+Task.completed.group_by_hour(:completed_at).average(:priority)
+```
 
-User.group_by_hour(:created_at).average(:tasks_count)
+Go nuts!
 
-User.group_by_quarter(:created_at).maximum(:tasks_count)
-
-User.group_by_second(:created_at).average(:tasks_count)
+```ruby
+Request.where(page: "/home").group_by_minute(:started_at).maximum(:request_time)
 ```
 
 ## Installation
@@ -59,6 +52,22 @@ Add this line to your application's Gemfile:
 ```ruby
 gem 'groupdate'
 ```
+
+## Complete list
+
+- microseconds
+- milliseconds
+- second
+- minute
+- hour
+- day
+- week
+- month
+- quarter
+- year
+- decade
+- century
+- millennium
 
 ## Contributing
 
