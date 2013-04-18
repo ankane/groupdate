@@ -29,9 +29,10 @@ module Groupdate
       # http://www.postgresql.org/docs/9.1/static/functions-datetime.html
       %w(microseconds milliseconds second minute hour day week month quarter year decade century millennium).each do |field|
         self.scope :"group_by_#{field}", lambda {|column, time_zone = Time.zone|
-          if time_zone.is_a?(ActiveSupport::TimeZone)
+          if defined?(ActiveSupport::TimeZone) and time_zone.is_a?(ActiveSupport::TimeZone)
             time_zone = time_zone.tzinfo.name
           end
+          time_zone ||= "Etc/UTC"
           sql = "DATE_TRUNC('#{field}', #{column}::timestamptz AT TIME ZONE ?) AT TIME ZONE ?"
           group(sanitize_sql_array([sql, time_zone, time_zone]))
         }
