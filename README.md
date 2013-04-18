@@ -33,7 +33,7 @@ User.group_by_week(:created_at, time_zone).count
 # => {2013-04-16 00:00:00 UTC=>80,2013-04-17 00:00:00 UTC=>70}
 ```
 
-Use it with anything that you can use `group` with:
+Use it with anything you can use `group` with:
 
 ```ruby
 Task.completed.group_by_hour(:completed_at).average(:priority)
