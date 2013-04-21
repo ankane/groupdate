@@ -5,7 +5,8 @@ The simplest way to group by:
 - day
 - week
 - month
-- hour
+- day of the week
+- hour of the day
 - *and more* (complete list at bottom)
 
 :tada: Time zones supported!!
@@ -52,6 +53,28 @@ time_zone = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
 User.group_by_week(:created_at, time_zone).count
 ```
 
+You can also group by the day of the week or hour of the day.
+
+```ruby
+# day of the week
+User.group_by_dow_part(:created_at).count
+# {
+#   "0" => 54,
+#   "1" => 2,
+#   ...
+#   "6" => 3
+# }
+
+# hour of the day
+User.group_by_hour_part(:created_at, "Pacific Time (US & Canada)").count
+# {
+#   "0" => 34,
+#   "1" => 61,
+#   ...
+#   "23" => 12
+# }
+```
+
 Use it with anything you can use `group` with:
 
 ```ruby
@@ -76,6 +99,8 @@ gem 'groupdate'
 
 ## Complete list
 
+group_by_?
+
 - microseconds
 - milliseconds
 - second
@@ -89,6 +114,24 @@ gem 'groupdate'
 - decade
 - century
 - millennium
+
+group_by_?_part
+
+- century
+- day
+- decade
+- dow (day of week)
+- doy (day of year)
+- microseconds
+- millennium
+- milliseconds
+- minute
+- month
+- quarter
+- second
+- week
+- year
+- hour
 
 ## Contributing
 

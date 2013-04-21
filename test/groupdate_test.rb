@@ -51,4 +51,20 @@ class TestGroupdate < MiniTest::Unit::TestCase
   def test_where
     assert_equal({"2013-04-02 00:00:00+00" => 1}, User.where("score > 2").group_by_day(:created_at).count)
   end
+
+  def test_hour_of_day
+    expected = {
+      "17" => 3
+    }
+    assert_equal expected, User.group_by_hour_part(:created_at, "Pacific Time (US & Canada)").count
+  end
+
+  def test_day_of_week
+    expected = {
+      "0" => 2,
+      "1" => 1
+    }
+    assert_equal expected, User.group_by_dow_part(:created_at, "Pacific Time (US & Canada)").count
+  end
+
 end
