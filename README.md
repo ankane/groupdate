@@ -120,7 +120,7 @@ User.group_by_day_of_week(:created_at)
 {0.0 => 1, 4.0 => 1} # Float
 ```
 
-This is due to the activerecord and the adapters, not this gem.
+This is due to inconsistencies beyond the scope of this gem.
 
 ## Installation
 
