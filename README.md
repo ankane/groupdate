@@ -105,7 +105,7 @@ User.group_by_day(:created_at).count
 {"2013-04-22 00:00:00+00" => 1} # String
 ```
 
-Another inconsistency
+Another data type inconsistency
 
 ```ruby
 User.group_by_day_of_week(:created_at).count
@@ -120,7 +120,7 @@ User.group_by_day_of_week(:created_at).count
 {0.0 => 1, 4.0 => 1} # Float
 ```
 
-This is due to inconsistencies beyond the scope of this gem.
+These are *not* a result of groupdate (and unfortunately cannot be fixed by groupdate)
 
 ## Installation
 
