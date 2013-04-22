@@ -89,7 +89,37 @@ Go nuts!
 Request.where(page: "/home").group_by_minute(:started_at).maximum(:request_time)
 ```
 
-### Note
+## Installation
+
+Add this line to your application's Gemfile:
+
+```ruby
+gem 'groupdate'
+```
+
+### MySQL only
+
+[Time zone support](http://dev.mysql.com/doc/refman/5.6/en/time-zone-support.html) must be installed on the server.
+
+```
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
+```
+
+## Complete list
+
+group_by_?
+
+- second
+- minute
+- hour
+- day
+- week
+- month
+- year
+- hour_of_day
+- day_of_week
+
+## Note
 
 activerecord <= 4.0.0.beta1 and the pg gem returns String objects instead of Time objects.
 [This is fixed on activerecord master](https://github.com/rails/rails/commit/2cc09441c2de57b024b11ba666ba1e72c2b20cfe)
@@ -121,36 +151,6 @@ User.group_by_day_of_week(:created_at).count
 ```
 
 These are *not* a result of groupdate (and unfortunately cannot be fixed by groupdate)
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'groupdate'
-```
-
-### MySQL only
-
-[Time zone support](http://dev.mysql.com/doc/refman/5.6/en/time-zone-support.html) must be installed on the server.
-
-```
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
-```
-
-## Complete list
-
-group_by_?
-
-- second
-- minute
-- hour
-- day
-- week
-- month
-- year
-- hour_of_day
-- day_of_week
 
 ## Contributing
 
