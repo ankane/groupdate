@@ -11,7 +11,7 @@ The simplest way to group by:
 
 :tada: Time zones supported!!
 
-PostgreSQL only at the moment - support for other datastores coming soon
+PostgreSQL and MySQL only at the moment - support for other datastores coming soon
 
 ## Usage
 
@@ -43,9 +43,9 @@ The default time zone is `Time.zone`.  Pass a time zone as the second argument.
 ```ruby
 User.group_by_week(:created_at, "Pacific Time (US & Canada)").count
 # {
-#   "2013-02-25 08:00:00+00" => 80,
-#   "2013-03-04 08:00:00+00" => 70,
-#   "2013-03-11 07:00:00+00" => 54
+#   "2013-03-03 08:00:00+00" => 80,
+#   "2013-03-10 08:00:00+00" => 70,
+#   "2013-03-17 07:00:00+00" => 54
 # }
 
 # equivalently
@@ -53,20 +53,22 @@ time_zone = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
 User.group_by_week(:created_at, time_zone).count
 ```
 
+**Note:** Weeks start on Sunday.
+
 You can also group by the day of the week or hour of the day.
 
 ```ruby
 # day of the week
-User.group_by_dow_part(:created_at).count
+User.group_by_day_of_week(:created_at).count
 # {
-#   "0" => 54,
-#   "1" => 2,
+#   "0" => 54, # Sunday
+#   "1" => 2,  # Monday
 #   ...
-#   "6" => 3
+#   "6" => 3   # Saturday
 # }
 
 # hour of the day
-User.group_by_hour_part(:created_at, "Pacific Time (US & Canada)").count
+User.group_by_hour_of_day(:created_at, "Pacific Time (US & Canada)").count
 # {
 #   "0" => 34,
 #   "1" => 61,
@@ -101,37 +103,15 @@ gem 'groupdate'
 
 group_by_?
 
-- microseconds
-- milliseconds
 - second
 - minute
 - hour
 - day
 - week
 - month
-- quarter
 - year
-- decade
-- century
-- millennium
-
-group_by_?_part
-
-- century
-- day
-- decade
-- dow (day of week)
-- doy (day of year)
-- microseconds
-- millennium
-- milliseconds
-- minute
-- month
-- quarter
-- second
-- week
-- year
-- hour
+- hour_of_day
+- day_of_week
 
 ## Contributing
 
