@@ -99,6 +99,14 @@ Add this line to your application's Gemfile:
 gem 'groupdate'
 ```
 
+### MySQL only
+
+[Time zone support](http://dev.mysql.com/doc/refman/5.6/en/time-zone-support.html) must be installed on the server.
+
+```
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
+```
+
 ## Complete list
 
 group_by_?
