@@ -95,7 +95,7 @@ activerecord <= 4.0.0.beta1 and the pg gem returns String objects instead of Tim
 [This is fixed on activerecord master](https://github.com/rails/rails/commit/2cc09441c2de57b024b11ba666ba1e72c2b20cfe)
 
 ```ruby
-User.group_by_day(:created_at)
+User.group_by_day(:created_at).count
 
 # mysql2
 # pg and activerecord master
@@ -108,7 +108,7 @@ User.group_by_day(:created_at)
 Another inconsistency
 
 ```ruby
-User.group_by_day_of_week(:created_at)
+User.group_by_day_of_week(:created_at).count
 
 # mysql2
 {0 => 1, 4 => 1} # Integer
