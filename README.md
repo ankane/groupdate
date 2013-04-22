@@ -18,23 +18,23 @@ PostgreSQL and MySQL only at the moment - support for other datastores coming so
 ```ruby
 User.group_by_day(:created_at).count
 # {
-#   "2013-04-16 00:00:00+00" => 50,
-#   "2013-04-17 00:00:00+00" => 100,
-#   "2013-04-18 00:00:00+00" => 34
+#   2013-04-16 00:00:00 UTC => 50,
+#   2013-04-17 00:00:00 UTC => 100,
+#   2013-04-18 00:00:00 UTC => 34
 # }
 
 Task.group_by_month(:updated_at).count
 # {
-#   "2013-02-01 00:00:00+00" => 84,
-#   "2013-03-01 00:00:00+00" => 23,
-#   "2013-04-01 00:00:00+00" => 44
+#   2013-02-01 00:00:00 UTC => 84,
+#   2013-03-01 00:00:00 UTC => 23,
+#   2013-04-01 00:00:00 UTC => 44
 # }
 
 Goal.group_by_year(:accomplished_at).count
 # {
-#   "2011-01-01 00:00:00+00" => 7,
-#   "2012-01-01 00:00:00+00" => 11,
-#   "2013-01-01 00:00:00+00" => 3
+#   2011-01-01 00:00:00 UTC => 7,
+#   2012-01-01 00:00:00 UTC => 11,
+#   2013-01-01 00:00:00 UTC => 3
 # }
 ```
 
@@ -43,9 +43,9 @@ The default time zone is `Time.zone`.  Pass a time zone as the second argument.
 ```ruby
 User.group_by_week(:created_at, "Pacific Time (US & Canada)").count
 # {
-#   "2013-03-03 08:00:00+00" => 80,
-#   "2013-03-10 08:00:00+00" => 70,
-#   "2013-03-17 07:00:00+00" => 54
+#   2013-03-03 08:00:00 UTC => 80,
+#   2013-03-10 08:00:00 UTC => 70,
+#   2013-03-17 07:00:00 UTC => 54
 # }
 
 # equivalently
@@ -61,19 +61,19 @@ You can also group by the day of the week or hour of the day.
 # day of the week
 User.group_by_day_of_week(:created_at).count
 # {
-#   "0" => 54, # Sunday
-#   "1" => 2,  # Monday
+#   0 => 54, # Sunday
+#   1 => 2,  # Monday
 #   ...
-#   "6" => 3   # Saturday
+#   6 => 3   # Saturday
 # }
 
 # hour of the day
 User.group_by_hour_of_day(:created_at, "Pacific Time (US & Canada)").count
 # {
-#   "0" => 34,
-#   "1" => 61,
+#   0 => 34,
+#   1 => 61,
 #   ...
-#   "23" => 12
+#   23 => 12
 # }
 ```
 
@@ -89,7 +89,38 @@ Go nuts!
 Request.where(page: "/home").group_by_minute(:started_at).maximum(:request_time)
 ```
 
-**Note:** On Rails 4 edge, queries return a Time object (much better!) as a result of [this commit](https://github.com/rails/rails/commit/2cc09441c2de57b024b11ba666ba1e72c2b20cfe)
+### Note
+
+activerecord <= 4.0.0.beta1 and the pg gem returns String objects instead of Time objects.
+[This is fixed on activerecord master](https://github.com/rails/rails/commit/2cc09441c2de57b024b11ba666ba1e72c2b20cfe)
+
+```ruby
+User.group_by_day(:created_at)
+
+# mysql2
+# pg and activerecord master
+{2013-04-22 00:00:00 UTC => 1} # Time object
+
+# pg and activerecord <= 4.0.0.beta1
+{"2013-04-22 00:00:00+00" => 1} # String
+```
+
+Another inconsistency
+
+```ruby
+User.group_by_day_of_week(:created_at)
+
+# mysql2
+{0 => 1, 4 => 1} # Integer
+
+# pg and activerecord <= 4.0.0.beta1
+{"0" => 1, "4" => 1} # String
+
+# pg and activerecord master
+{0.0 => 1, 4.0 => 1} # Float
+```
+
+This is due to the activerecord and the adapters, not this gem.
 
 ## Installation
 

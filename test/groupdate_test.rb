@@ -1,5 +1,5 @@
-require "minitest/spec"
 require "minitest/autorun"
+require "minitest/pride"
 require "active_record"
 require "groupdate"
 require "logger"
@@ -15,7 +15,7 @@ class User < ActiveRecord::Base
 end
 
 describe Groupdate do
-  %w(postgresql mysql mysql2).each do |adapter|
+  %w(postgresql mysql2).each do |adapter|
     describe adapter do
       before do
         ActiveRecord::Base.establish_connection adapter: adapter, database: "groupdate"
@@ -37,84 +37,88 @@ describe Groupdate do
         ].each{|u| User.create!(u) }
 
         assert_equal(
-          {"2013-04-01 00:00:00+00" => 1, "2013-04-02 00:00:00+00" => 1},
+          {"2013-04-01 00:00:00+00".to_time => 1, "2013-04-02 00:00:00+00".to_time => 1},
           User.where("score > 1").group_by_day(:created_at).count
         )
       end
 
       it "group_by_second" do
         create_user "2013-04-01 00:00:01 UTC"
-        assert_equal({"2013-04-01 00:00:01+00" => 1}, User.group_by_second(:created_at).count)
+        assert_equal({"2013-04-01 00:00:01+00".to_time => 1}, User.group_by_second(:created_at).count)
       end
 
       it "group_by_minute" do
         create_user "2013-04-01 00:01:01 UTC"
-        assert_equal({"2013-04-01 00:01:00+00" => 1}, User.group_by_minute(:created_at).count)
+        assert_equal({"2013-04-01 00:01:00+00".to_time => 1}, User.group_by_minute(:created_at).count)
       end
 
       it "group_by_hour" do
         create_user "2013-04-01 01:01:01 UTC"
-        assert_equal({"2013-04-01 01:00:00+00" => 1}, User.group_by_hour(:created_at).count)
+        assert_equal({"2013-04-01 01:00:00+00".to_time => 1}, User.group_by_hour(:created_at).count)
       end
 
       it "group_by_day" do
         create_user "2013-04-01 01:01:01 UTC"
-        assert_equal({"2013-04-01 00:00:00+00" => 1}, User.group_by_day(:created_at).count)
+        assert_equal({"2013-04-01 00:00:00+00".to_time => 1}, User.group_by_day(:created_at).count)
       end
 
       it "group_by_day with time zone" do
         create_user "2013-04-01 01:01:01 UTC"
-        assert_equal({"2013-03-31 07:00:00+00" => 1}, User.group_by_day(:created_at, "Pacific Time (US & Canada)").count)
+        assert_equal({"2013-03-31 07:00:00+00".to_time => 1}, User.group_by_day(:created_at, "Pacific Time (US & Canada)").count)
       end
 
       it "group_by_week" do
         create_user "2013-03-17 01:01:01 UTC"
-        assert_equal({"2013-03-17 00:00:00+00" => 1}, User.group_by_week(:created_at).count)
+        assert_equal({"2013-03-17 00:00:00+00".to_time => 1}, User.group_by_week(:created_at).count)
       end
 
       it "group_by_week with time zone" do # day of DST
         create_user "2013-03-17 01:01:01 UTC"
-        assert_equal({"2013-03-10 08:00:00+00" => 1}, User.group_by_week(:created_at, "Pacific Time (US & Canada)").count)
+        assert_equal({"2013-03-10 08:00:00+00".to_time => 1}, User.group_by_week(:created_at, "Pacific Time (US & Canada)").count)
       end
 
       it "group_by_month" do
         create_user "2013-04-01 01:01:01 UTC"
-        assert_equal({"2013-04-01 00:00:00+00" => 1}, User.group_by_month(:created_at).count)
+        assert_equal({"2013-04-01 00:00:00+00".to_time(:utc) => 1}, User.group_by_month(:created_at).count)
       end
 
       it "group_by_month with time zone" do
         create_user "2013-04-01 01:01:01 UTC"
-        assert_equal({"2013-03-01 08:00:00+00" => 1}, User.group_by_month(:created_at, "Pacific Time (US & Canada)").count)
+        assert_equal({"2013-03-01 08:00:00+00".to_time(:utc) => 1}, User.group_by_month(:created_at, "Pacific Time (US & Canada)").count)
       end
 
       it "group_by_year" do
         create_user "2013-01-01 01:01:01 UTC"
-        assert_equal({"2013-01-01 00:00:00+00" => 1}, User.group_by_year(:created_at).count)
+        assert_equal({"2013-01-01 00:00:00+00".to_time(:utc) => 1}, User.group_by_year(:created_at).count)
       end
 
       it "group_by_year with time zone" do
         create_user "2013-01-01 01:01:01 UTC"
-        assert_equal({"2012-01-01 08:00:00+00" => 1}, User.group_by_year(:created_at, "Pacific Time (US & Canada)").count)
+        assert_equal({"2012-01-01 08:00:00+00".to_time(:utc) => 1}, User.group_by_year(:created_at, "Pacific Time (US & Canada)").count)
       end
 
       it "group_by_hour_of_day" do
         create_user "2013-01-01 11:00:00 UTC"
-        assert_equal({"11" => 1}, User.group_by_hour_of_day(:created_at).count)
+        expected = adapter == "mysql2" ? {11 => 1} : {11.0 => 1}
+        assert_equal(expected, User.group_by_hour_of_day(:created_at).count)
       end
 
       it "group_by_hour_of_day with time zone" do
         create_user "2013-01-01 11:00:00 UTC"
-        assert_equal({"3" => 1}, User.group_by_hour_of_day(:created_at, "Pacific Time (US & Canada)").count)
+        expected = adapter == "mysql2" ? {3 => 1} : {3.0 => 1}
+        assert_equal(expected, User.group_by_hour_of_day(:created_at, "Pacific Time (US & Canada)").count)
       end
 
       it "group_by_day_of_week" do
         create_user "2013-03-03 00:00:00 UTC"
-        assert_equal({"0" => 1}, User.group_by_day_of_week(:created_at).count)
+        expected = adapter == "mysql2" ? {0 => 1} : {0.0 => 1}
+        assert_equal(expected, User.group_by_day_of_week(:created_at).count)
       end
 
       it "group_by_day_of_week with time zone" do
         create_user "2013-03-03 00:00:00 UTC"
-        assert_equal({"6" => 1}, User.group_by_day_of_week(:created_at, "Pacific Time (US & Canada)").count)
+        expected = adapter == "mysql2" ? {6 => 1} : {6.0 => 1}
+        assert_equal(expected, User.group_by_day_of_week(:created_at, "Pacific Time (US & Canada)").count)
       end
 
       # helper methods
