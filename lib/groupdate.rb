@@ -38,12 +38,14 @@ module Groupdate
             raise "Unrecognized time zone"
           end
           query =
-            if connection.adapter_name == "MySQL"
+            case connection
+            when ActiveRecord::ConnectionAdapters::AbstractMysqlAdapter
               case field
               when "day_of_week" # Sunday = 0, Monday = 1, etc
-                ["DAYOFWEEK(CONVERT_TZ(#{column}, '+00:00', ?)) - 1", time_zone]
+                # use CONCAT for consistent return type (String)
+                ["CONCAT('', DAYOFWEEK(CONVERT_TZ(#{column}, '+00:00', ?)) - 1)", time_zone]
               when "hour_of_day"
-                ["EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?))", time_zone]
+                ["CONCAT('', EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)))", time_zone]
               when "week"
                 ["CONCAT(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL (DAYOFWEEK(CONVERT_TZ(#{column}, '+00:00', ?)) - 1) DAY), '+00:00', ?), '%Y-%m-%d 00:00:00'), ?, '+00:00'), '+00')", time_zone, time_zone, time_zone]
               else
@@ -65,7 +67,7 @@ module Groupdate
 
                 ["CONCAT(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column}, '+00:00', ?), '#{format}'), ?, '+00:00'), '+00')", time_zone, time_zone]
               end
-            else
+            when ActiveRecord::ConnectionAdapters::PostgreSQLAdapter
               case field
               when "day_of_week"
                 ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ?)", time_zone]
@@ -76,6 +78,8 @@ module Groupdate
               else
                 ["DATE_TRUNC('#{field}', #{column}::timestamptz AT TIME ZONE ?) AT TIME ZONE ?", time_zone, time_zone]
               end
+            else
+              raise "Connection adapter not supported"
             end
           group(sanitize_sql_array(query))
         }

@@ -15,7 +15,7 @@ class User < ActiveRecord::Base
 end
 
 describe Groupdate do
-  %w(postgresql mysql).each do |adapter|
+  %w(postgresql mysql mysql2).each do |adapter|
     describe adapter do
       before do
         ActiveRecord::Base.establish_connection adapter: adapter, database: "groupdate"
