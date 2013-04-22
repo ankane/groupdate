@@ -9,7 +9,7 @@ The simplest way to group by:
 - hour of the day
 - *and more* (complete list at bottom)
 
-:tada: Time zones supported!!
+:tada: Time zones supported!! **The best part**
 
 Works with Rails 3.0+
 
