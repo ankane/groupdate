@@ -38,8 +38,8 @@ module Groupdate
             raise "Unrecognized time zone"
           end
           query =
-            case connection
-            when ActiveRecord::ConnectionAdapters::AbstractMysqlAdapter
+            case connection.adapter_name
+            when "MySQL", "Mysql2"
               case field
               when "day_of_week" # Sunday = 0, Monday = 1, etc
                 # use CONCAT for consistent return type (String)
@@ -67,7 +67,7 @@ module Groupdate
 
                 ["CONCAT(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column}, '+00:00', ?), '#{format}'), ?, '+00:00'), '+00')", time_zone, time_zone]
               end
-            when ActiveRecord::ConnectionAdapters::PostgreSQLAdapter
+            when "PostgreSQL"
               case field
               when "day_of_week"
                 ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ?)", time_zone]
