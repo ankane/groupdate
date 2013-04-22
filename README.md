@@ -11,6 +11,8 @@ The simplest way to group by:
 
 :tada: Time zones supported!!
 
+Works with Rails 3.0+
+
 PostgreSQL and MySQL only at the moment - support for other datastores coming soon
 
 ## Usage
