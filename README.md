@@ -7,13 +7,13 @@ The simplest way to group by:
 - month
 - day of the week
 - hour of the day
-- *and more* (complete list at bottom)
+- and more (complete list at bottom)
 
 :tada: Time zones supported!! **The best part**
 
 Works with Rails 3.0+
 
-PostgreSQL and MySQL only at the moment - support for other datastores coming soon
+Supports PostgreSQL and MySQL
 
 ## Usage
 
@@ -99,7 +99,7 @@ Add this line to your application's Gemfile:
 gem 'groupdate'
 ```
 
-### MySQL only
+#### For MySQL
 
 [Time zone support](http://dev.mysql.com/doc/refman/5.6/en/time-zone-support.html) must be installed on the server.
 
