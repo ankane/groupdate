@@ -43,58 +43,47 @@ describe Groupdate do
       end
 
       it "group_by_second" do
-        create_user "2013-04-01 00:00:01 UTC"
-        assert_equal({"2013-04-01 00:00:01+00".to_time => 1}, User.group_by_second(:created_at).count)
+        assert_group :second, "2013-04-01 00:00:01 UTC", "2013-04-01 00:00:01 UTC"
       end
 
       it "group_by_minute" do
-        create_user "2013-04-01 00:01:01 UTC"
-        assert_equal({"2013-04-01 00:01:00+00".to_time => 1}, User.group_by_minute(:created_at).count)
+        assert_group :minute, "2013-04-01 00:01:01 UTC", "2013-04-01 00:01:00 UTC"
       end
 
       it "group_by_hour" do
-        create_user "2013-04-01 01:01:01 UTC"
-        assert_equal({"2013-04-01 01:00:00+00".to_time => 1}, User.group_by_hour(:created_at).count)
+        assert_group :hour, "2013-04-01 01:01:01 UTC", "2013-04-01 01:00:00 UTC"
       end
 
       it "group_by_day" do
-        create_user "2013-04-01 01:01:01 UTC"
-        assert_equal({"2013-04-01 00:00:00+00".to_time => 1}, User.group_by_day(:created_at).count)
+        assert_group :day, "2013-04-01 01:01:01 UTC", "2013-04-01 00:00:00 UTC"
       end
 
       it "group_by_day with time zone" do
-        create_user "2013-04-01 01:01:01 UTC"
-        assert_equal({"2013-03-31 07:00:00+00".to_time => 1}, User.group_by_day(:created_at, "Pacific Time (US & Canada)").count)
+        assert_group_tz :day, "2013-04-01 01:01:01 UTC", "2013-03-31 07:00:00 UTC"
       end
 
       it "group_by_week" do
-        create_user "2013-03-17 01:01:01 UTC"
-        assert_equal({"2013-03-17 00:00:00+00".to_time => 1}, User.group_by_week(:created_at).count)
+        assert_group :week, "2013-03-17 01:01:01 UTC", "2013-03-17 00:00:00 UTC"
       end
 
       it "group_by_week with time zone" do # day of DST
-        create_user "2013-03-17 01:01:01 UTC"
-        assert_equal({"2013-03-10 08:00:00+00".to_time => 1}, User.group_by_week(:created_at, "Pacific Time (US & Canada)").count)
+        assert_group_tz :week, "2013-03-17 01:01:01 UTC", "2013-03-10 08:00:00 UTC"
       end
 
       it "group_by_month" do
-        create_user "2013-04-01 01:01:01 UTC"
-        assert_equal({"2013-04-01 00:00:00+00".to_time(:utc) => 1}, User.group_by_month(:created_at).count)
+        assert_group :month, "2013-04-01 01:01:01 UTC", "2013-04-01 00:00:00 UTC"
       end
 
       it "group_by_month with time zone" do
-        create_user "2013-04-01 01:01:01 UTC"
-        assert_equal({"2013-03-01 08:00:00+00".to_time(:utc) => 1}, User.group_by_month(:created_at, "Pacific Time (US & Canada)").count)
+        assert_group_tz :month, "2013-04-01 01:01:01 UTC", "2013-03-01 08:00:00 UTC"
       end
 
       it "group_by_year" do
-        create_user "2013-01-01 01:01:01 UTC"
-        assert_equal({"2013-01-01 00:00:00+00".to_time(:utc) => 1}, User.group_by_year(:created_at).count)
+        assert_group :year, "2013-01-01 01:01:01 UTC", "2013-01-01 00:00:00 UTC"
       end
 
       it "group_by_year with time zone" do
-        create_user "2013-01-01 01:01:01 UTC"
-        assert_equal({"2012-01-01 08:00:00+00".to_time(:utc) => 1}, User.group_by_year(:created_at, "Pacific Time (US & Canada)").count)
+        assert_group_tz :year, "2013-01-01 01:01:01 UTC", "2012-01-01 08:00:00 UTC"
       end
 
       it "group_by_hour_of_day" do
@@ -122,6 +111,15 @@ describe Groupdate do
       end
 
       # helper methods
+
+      def assert_group(method, created_at, key, time_zone = nil)
+        create_user created_at
+        assert_equal({Time.parse(key) => 1}, User.send(:"group_by_#{method}", :created_at, time_zone).count)
+      end
+
+      def assert_group_tz(method, created_at, key)
+        assert_group method, created_at, key, "Pacific Time (US & Canada)"
+      end
 
       def create_user(created_at)
         User.create!(name: "Andrew", score: 1, created_at: Time.parse(created_at))
