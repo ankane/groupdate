@@ -81,13 +81,17 @@ User.group_by_hour_of_day(:created_at, "Pacific Time (US & Canada)").count
 # }
 ```
 
-You can order results with `group_field`.
+You can order results with:
 
 ```ruby
-User.group_by_day(:created_at).order("group_field desc").limit(20).count
+User.group_by_day(:created_at).order("day asc").count
+
+User.group_by_week(:created_at).order("week desc").count
+
+User.group_by_hour_of_day(:created_at).order("hour_of_day asc").count
 ```
 
-Use it with anything you can use `group` with:
+Use it with anywhere you can use `group`.
 
 ```ruby
 Task.completed.group_by_hour(:completed_at).average(:priority)

@@ -83,13 +83,20 @@ module Groupdate
               raise "Connection adapter not supported: #{connection.adapter_name}"
             end
 
-          group(Groupdate::OrderHack.new(sanitize_sql_array(query)))
+          group(Groupdate::OrderHack.new(sanitize_sql_array(query), field))
         }
       end
     end
   end
 
-  class OrderHack < String; end
+  class OrderHack < String
+    attr_reader :field
+
+    def initialize(str, field)
+      super(str)
+      @field = field
+    end
+  end
 end
 
 ActiveRecord::Base.send :include, Groupdate
@@ -101,7 +108,7 @@ module ActiveRecord
 
     def column_alias_for_with_hack(*keys)
       if keys.first.is_a?(Groupdate::OrderHack)
-        "group_field"
+        keys.first.field
       else
         column_alias_for_without_hack(*keys)
       end

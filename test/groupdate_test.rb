@@ -53,7 +53,9 @@ describe Groupdate do
       end
 
       it "doesn't throw exception with order" do
-        assert_equal({}, User.group_by_day(:created_at).order("group_field desc").limit(20).count)
+        assert_equal({}, User.group_by_day(:created_at).order("day desc").limit(20).count)
+        assert_equal({}, User.group_by_week(:created_at).order("week asc").count)
+        assert_equal({}, User.group_by_hour_of_day(:created_at).order("hour_of_day desc").count)
       end
 
       it "group_by_second" do
