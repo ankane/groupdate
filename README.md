@@ -15,6 +15,8 @@ Works with Rails 3.0+
 
 Supports PostgreSQL and MySQL
 
+[![Build Status](https://travis-ci.org/ankane/groupdate.png)](https://travis-ci.org/ankane/groupdate)
+
 ## Usage
 
 ```ruby
