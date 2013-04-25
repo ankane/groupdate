@@ -1,0 +1,7 @@
+language: ruby
+rvm:
+  - 1.9.3
+script: bundle exec rake test
+before_script:
+  - mysql -e 'create database groupdate_test;'
+  - psql -c 'create database groupdate_test;' -U postgres

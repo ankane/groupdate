@@ -16,7 +16,7 @@ end
 
 # migrations
 %w(postgresql mysql2).each do |adapter|
-  ActiveRecord::Base.establish_connection adapter: adapter, database: "groupdate"
+  ActiveRecord::Base.establish_connection adapter: adapter, database: "groupdate_test"
 
   unless ActiveRecord::Base.connection.table_exists? "users"
     ActiveRecord::Migration.create_table :users do |t|
@@ -32,7 +32,7 @@ describe Groupdate do
     describe adapter do
 
       before do
-        ActiveRecord::Base.establish_connection adapter: adapter, database: "groupdate"
+        ActiveRecord::Base.establish_connection adapter: adapter, database: "groupdate_test"
         User.delete_all
       end
 
