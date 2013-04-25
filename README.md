@@ -125,10 +125,10 @@ Use the master version of your JDBC adapter.  You will get incorrect results for
 
 ```sh
 # postgresql
-gem "activerecord-jdbcpostgresql-adapter", github: "jruby/activerecord-jdbc-adapter"
+gem "activerecord-jdbcpostgresql-adapter", :github => "jruby/activerecord-jdbc-adapter"
 
 # mysql
-gem "activerecord-jdbcmysql-adapter", github: "jruby/activerecord-jdbc-adapter"
+gem "activerecord-jdbcmysql-adapter", :github => "jruby/activerecord-jdbc-adapter"
 ```
 
 ## Complete list

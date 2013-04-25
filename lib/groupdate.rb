@@ -30,9 +30,9 @@ module Groupdate
       # http://www.postgresql.org/docs/9.1/static/functions-datetime.html
       fields = %w(second minute hour day week month year day_of_week hour_of_day)
       fields.each do |field|
-        self.scope :"group_by_#{field}", lambda {|unsafe_column, time_zone = Time.zone|
-          column = connection.quote_column_name(unsafe_column)
-          time_zone ||= "Etc/UTC"
+        self.scope :"group_by_#{field}", lambda {|*args|
+          column = connection.quote_column_name(args[0])
+          time_zone = args[1] || Time.zone || "Etc/UTC"
           if time_zone.is_a?(ActiveSupport::TimeZone) or time_zone = ActiveSupport::TimeZone[time_zone]
             time_zone = time_zone.tzinfo.name
           else

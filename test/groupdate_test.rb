@@ -16,7 +16,7 @@ end
 
 # migrations
 %w(postgresql mysql2).each do |adapter|
-  ActiveRecord::Base.establish_connection adapter: adapter, database: "groupdate_test", username: adapter == "mysql2" ? "root" : nil
+  ActiveRecord::Base.establish_connection :adapter => adapter, :database => "groupdate_test", :username => adapter == "mysql2" ? "root" : nil
 
   unless ActiveRecord::Base.connection.table_exists? "users"
     ActiveRecord::Migration.create_table :users do |t|
@@ -32,22 +32,22 @@ describe Groupdate do
     describe adapter do
 
       before do
-        User.establish_connection adapter: adapter, database: "groupdate_test", username: adapter == "mysql2" ? "root" : nil
+        User.establish_connection :adapter => adapter, :database => "groupdate_test", :username => adapter == "mysql2" ? "root" : nil
         User.delete_all
       end
 
       it "works!" do
         [
-          {name: "Andrew", score: 1, created_at: Time.parse("2013-04-01 00:00:00 UTC")},
-          {name: "Jordan", score: 2, created_at: Time.parse("2013-04-01 00:00:00 UTC")},
-          {name: "Nick",   score: 3, created_at: Time.parse("2013-04-02 00:00:00 UTC")}
+          {:name => "Andrew", :score => 1, :created_at => Time.parse("2013-04-01 00:00:00 UTC")},
+          {:name => "Jordan", :score => 2, :created_at => Time.parse("2013-04-01 00:00:00 UTC")},
+          {:name => "Nick",   :score => 3, :created_at => Time.parse("2013-04-02 00:00:00 UTC")}
         ].each{|u| User.create!(u) }
 
         assert_equal(
-          {
+          ordered_hash({
             time_key("2013-04-01 00:00:00 UTC") => 1,
             time_key("2013-04-02 00:00:00 UTC") => 1
-          },
+          }),
           User.where("score > 1").group_by_day(:created_at).count
         )
       end
@@ -124,7 +124,7 @@ describe Groupdate do
 
   def assert_group(method, created_at, key, time_zone = nil)
     create_user created_at
-    assert_equal({time_key(key) => 1}, User.send(:"group_by_#{method}", :created_at, time_zone).count)
+    assert_equal(ordered_hash({time_key(key) => 1}), User.send(:"group_by_#{method}", :created_at, time_zone).count)
   end
 
   def assert_group_tz(method, created_at, key)
@@ -133,7 +133,7 @@ describe Groupdate do
 
   def assert_group_number(method, created_at, key, time_zone = nil)
     create_user created_at
-    assert_equal({number_key(key) => 1}, User.send(:"group_by_#{method}", :created_at, time_zone).count)
+    assert_equal(ordered_hash({number_key(key) => 1}), User.send(:"group_by_#{method}", :created_at, time_zone).count)
   end
 
   def assert_group_number_tz(method, created_at, key)
@@ -144,7 +144,7 @@ describe Groupdate do
     if RUBY_PLATFORM == "java"
       User.connection.adapter_name == "PostgreSQL" ? Time.parse(key).strftime("%Y-%m-%d %H:%M:%S%z")[0..-3] : Time.parse(key).strftime("%Y-%m-%d %H:%M:%S").gsub(/ 00\:00\:00\z/, "")
     else
-      User.connection.adapter_name == "PostgreSQL" && ActiveRecord::VERSION::MAJOR == 3 ? Time.parse(key).strftime("%Y-%m-%d %H:%M:%S%z")[0..-3] : Time.parse(key)
+      User.connection.adapter_name == "PostgreSQL" && ActiveRecord::VERSION::MAJOR == 3 ? Time.parse(key).strftime("%Y-%m-%d %H:%M:%S+00") : Time.parse(key)
     end
   end
 
@@ -156,8 +156,12 @@ describe Groupdate do
     end
   end
 
+  def ordered_hash(hash)
+    RUBY_VERSION =~ /1\.8/ ? hash.inject(ActiveSupport::OrderedHash.new){|h, (k, v)| h[k] = v; h } : hash
+  end
+
   def create_user(created_at)
-    User.create!(name: "Andrew", score: 1, created_at: Time.parse(created_at))
+    User.create!(:name => "Andrew", :score => 1, :created_at => Time.parse(created_at))
   end
 
 end
