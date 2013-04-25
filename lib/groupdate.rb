@@ -1,4 +1,5 @@
 require "groupdate/version"
+require "active_record"
 
 module Groupdate
   extend ActiveSupport::Concern

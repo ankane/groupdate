@@ -1,7 +1,7 @@
+require "bundler/setup"
+Bundler.require(:default)
 require "minitest/autorun"
 require "minitest/pride"
-require "active_record"
-require "groupdate"
 require "logger"
 
 # for debugging
@@ -37,7 +37,10 @@ describe Groupdate do
         ].each{|u| User.create!(u) }
 
         assert_equal(
-          {Time.parse("2013-04-01 00:00:00 UTC") => 1, Time.parse("2013-04-02 00:00:00 UTC") => 1},
+          {
+            time_key("2013-04-01 00:00:00 UTC") => 1,
+            time_key("2013-04-02 00:00:00 UTC") => 1
+          },
           User.where("score > 1").group_by_day(:created_at).count
         )
       end
@@ -87,19 +90,19 @@ describe Groupdate do
       end
 
       it "group_by_hour_of_day" do
-        assert_group_number :hour_of_day, "2013-01-01 11:00:00 UTC", 11, adapter
+        assert_group_number :hour_of_day, "2013-01-01 11:00:00 UTC", 11
       end
 
       it "group_by_hour_of_day with time zone" do
-        assert_group_number_tz :hour_of_day, "2013-01-01 11:00:00 UTC", 3, adapter
+        assert_group_number_tz :hour_of_day, "2013-01-01 11:00:00 UTC", 3
       end
 
       it "group_by_day_of_week" do
-        assert_group_number :day_of_week, "2013-03-03 00:00:00 UTC", 0, adapter
+        assert_group_number :day_of_week, "2013-03-03 00:00:00 UTC", 0
       end
 
       it "group_by_day_of_week with time zone" do
-        assert_group_number_tz :day_of_week, "2013-03-03 00:00:00 UTC", 6, adapter
+        assert_group_number_tz :day_of_week, "2013-03-03 00:00:00 UTC", 6
       end
     end
   end
@@ -108,21 +111,28 @@ describe Groupdate do
 
   def assert_group(method, created_at, key, time_zone = nil)
     create_user created_at
-    assert_equal({Time.parse(key) => 1}, User.send(:"group_by_#{method}", :created_at, time_zone).count)
+    assert_equal({time_key(key) => 1}, User.send(:"group_by_#{method}", :created_at, time_zone).count)
   end
 
   def assert_group_tz(method, created_at, key)
     assert_group method, created_at, key, "Pacific Time (US & Canada)"
   end
 
-  def assert_group_number(method, created_at, key, adapter, time_zone = nil)
+  def assert_group_number(method, created_at, key, time_zone = nil)
     create_user created_at
-    key = adapter == "postgresql" ? key.to_f : key
-    assert_equal({key => 1}, User.send(:"group_by_#{method}", :created_at, time_zone).count)
+    assert_equal({number_key(key) => 1}, User.send(:"group_by_#{method}", :created_at, time_zone).count)
   end
 
-  def assert_group_number_tz(method, created_at, key, adapter)
-    assert_group_number method, created_at, key, adapter, "Pacific Time (US & Canada)"
+  def assert_group_number_tz(method, created_at, key)
+    assert_group_number method, created_at, key, "Pacific Time (US & Canada)"
+  end
+
+  def time_key(key)
+    User.connection.adapter_name == "PostgreSQL" && ActiveRecord::VERSION::MAJOR == 3 ? Time.parse(key).strftime("%Y-%m-%d %H:%M:%S+00") : Time.parse(key)
+  end
+
+  def number_key(key)
+    User.connection.adapter_name == "PostgreSQL" ? (ActiveRecord::VERSION::MAJOR == 3 ? key.to_s : key.to_f) : key
   end
 
   def create_user(created_at)
