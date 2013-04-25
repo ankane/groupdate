@@ -32,7 +32,7 @@ describe Groupdate do
     describe adapter do
 
       before do
-        ActiveRecord::Base.establish_connection adapter: adapter, database: "groupdate_test"
+        User.establish_connection adapter: adapter, database: "groupdate_test"
         User.delete_all
       end
 
