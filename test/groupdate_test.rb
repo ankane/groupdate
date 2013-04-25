@@ -45,6 +45,10 @@ describe Groupdate do
         )
       end
 
+      it "doesn't throw exception with order" do
+        User.group_by_day(:created_at).order("group_field desc").limit(20).count == {}
+      end
+
       it "group_by_second" do
         assert_group :second, "2013-04-01 00:00:01 UTC", "2013-04-01 00:00:01 UTC"
       end

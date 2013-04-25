@@ -79,6 +79,12 @@ User.group_by_hour_of_day(:created_at, "Pacific Time (US & Canada)").count
 # }
 ```
 
+You can order results with `group_field`.
+
+```ruby
+User.group_by_day(:created_at).order("group_field desc").limit(20).count
+```
+
 Use it with anything you can use `group` with:
 
 ```ruby
