@@ -109,8 +109,20 @@ gem 'groupdate'
 
 [Time zone support](http://dev.mysql.com/doc/refman/5.6/en/time-zone-support.html) must be installed on the server.
 
-```
+```sh
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
+```
+
+#### For JRuby
+
+Use the master version of your JDBC adapter.  You will get incorrect results for versions before [this commit](https://github.com/jruby/activerecord-jdbc-adapter/commit/c1cdb7cec8d3f06fc54995e8d872d830bd0a4d91).
+
+```sh
+# postgresql
+gem "activerecord-jdbcpostgresql-adapter", github: "jruby/activerecord-jdbc-adapter"
+
+# mysql
+gem "activerecord-jdbcmysql-adapter", github: "jruby/activerecord-jdbc-adapter"
 ```
 
 ## Complete list
