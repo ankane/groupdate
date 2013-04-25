@@ -14,18 +14,25 @@ ActiveRecord::Base.time_zone_aware_attributes = true
 class User < ActiveRecord::Base
 end
 
+# migrations
+%w(postgresql mysql2).each do |adapter|
+  ActiveRecord::Base.establish_connection adapter: adapter, database: "groupdate"
+
+  unless ActiveRecord::Base.connection.table_exists? "users"
+    ActiveRecord::Migration.create_table :users do |t|
+      t.string :name
+      t.integer :score
+      t.timestamps
+    end
+  end
+end
+
 describe Groupdate do
   %w(postgresql mysql2).each do |adapter|
     describe adapter do
+
       before do
         ActiveRecord::Base.establish_connection adapter: adapter, database: "groupdate"
-
-        # ActiveRecord::Migration.create_table :users do |t|
-        #   t.string :name
-        #   t.integer :score
-        #   t.timestamps
-        # end
-
         User.delete_all
       end
 
