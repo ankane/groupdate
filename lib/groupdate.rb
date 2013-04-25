@@ -40,7 +40,7 @@ module Groupdate
           end
           query =
             case connection.adapter_name
-            when "Mysql2"
+            when "MySQL", "Mysql2"
               case field
               when "day_of_week" # Sunday = 0, Monday = 1, etc
                 # use CONCAT for consistent return type (String)
@@ -80,7 +80,7 @@ module Groupdate
                 ["DATE_TRUNC('#{field}', #{column}::timestamptz AT TIME ZONE ?) AT TIME ZONE ?", time_zone, time_zone]
               end
             else
-              raise "Connection adapter not supported"
+              raise "Connection adapter not supported: #{connection.adapter_name}"
             end
 
           group(Groupdate::OrderHack.new(sanitize_sql_array(query)))
