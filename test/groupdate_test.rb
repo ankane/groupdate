@@ -139,11 +139,19 @@ describe Groupdate do
   end
 
   def time_key(key)
-    User.connection.adapter_name == "PostgreSQL" && ActiveRecord::VERSION::MAJOR == 3 ? Time.parse(key).strftime("%Y-%m-%d %H:%M:%S+00") : Time.parse(key)
+    if RUBY_PLATFORM == "java"
+      User.connection.adapter_name == "PostgreSQL" ? Time.parse(key).strftime("%Y-%m-%d %H:%M:%S%z")[0..-3] : Time.parse(key).strftime("%Y-%m-%d %H:%M:%S").gsub(/ 00\:00\:00\z/, "")
+    else
+      User.connection.adapter_name == "PostgreSQL" && ActiveRecord::VERSION::MAJOR == 3 ? Time.parse(key).strftime("%Y-%m-%d %H:%M:%S%z")[0..-3] : Time.parse(key)
+    end
   end
 
   def number_key(key)
-    User.connection.adapter_name == "PostgreSQL" ? (ActiveRecord::VERSION::MAJOR == 3 ? key.to_s : key.to_f) : key
+    if RUBY_PLATFORM == "java"
+      User.connection.adapter_name == "PostgreSQL" ? key.to_f : key
+    else
+      User.connection.adapter_name == "PostgreSQL" ? (ActiveRecord::VERSION::MAJOR == 3 ? key.to_s : key.to_f) : key
+    end
   end
 
   def create_user(created_at)

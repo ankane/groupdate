@@ -4,3 +4,8 @@ source 'https://rubygems.org'
 gemspec
 
 # gem "activerecord", github: "rails/rails"
+
+platform :jruby do
+  gem "activerecord-jdbcpostgresql-adapter", github: "jruby/activerecord-jdbc-adapter"
+  gem "activerecord-jdbcmysql-adapter", github: "jruby/activerecord-jdbc-adapter"
+end
