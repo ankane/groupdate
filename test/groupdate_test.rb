@@ -58,6 +58,10 @@ describe Groupdate do
         assert_equal({}, User.group_by_hour_of_day(:created_at).order("hour_of_day desc").count)
       end
 
+      it "allows for table name" do
+        assert_equal({}, User.group_by_day("users.created_at").count)
+      end
+
       it "group_by_second" do
         assert_group :second, "2013-04-01 00:00:01 UTC", "2013-04-01 00:00:01 UTC"
       end
