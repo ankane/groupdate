@@ -124,6 +124,16 @@ describe Groupdate do
 
       describe "returns zeros" do
 
+        it "group_by_second" do
+          create_user "2013-05-01 00:00:01 UTC"
+          expected = {
+            time_key("2013-05-01 00:00:00 UTC") => 0,
+            time_key("2013-05-01 00:00:01 UTC") => 1,
+            time_key("2013-05-01 00:00:02 UTC") => 0
+          }
+          assert_equal(expected, User.group_by_second(:created_at, Time.zone, Time.parse("2013-05-01 00:00:00 UTC")..Time.parse("2013-05-01 00:00:02 UTC")).count(:created_at))
+        end
+
         it "group_by_day" do
           create_user "2013-05-01 20:00:00 UTC"
           expected = {

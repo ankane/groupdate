@@ -28,8 +28,9 @@ module Groupdate
     included do
       # Field list from
       # http://www.postgresql.org/docs/9.1/static/functions-datetime.html
-      fields = %w(second minute hour day week month year day_of_week hour_of_day)
-      fields.each do |field|
+      time_fields = %w(second minute hour day week month year)
+      number_fields = %w(day_of_week hour_of_day)
+      (time_fields + number_fields).each do |field|
         self.scope :"group_by_#{field}", lambda {|*args|
           column = connection.quote_table_name(args[0])
           time_zone = args[1] || Time.zone || "Etc/UTC"
@@ -84,6 +85,20 @@ module Groupdate
             end
 
           if args[2] # zeros
+            if time_fields.include?(field)
+              # TODO ensure range
+
+              # determine start time
+              time = args[2].first.in_time_zone(time_zone)
+              starts_at =
+                case field
+                when "second"
+                  time.change(min: 0)
+                when "day"
+                  time.beginning_of_day
+                end
+            end
+
             derived_table =
               case connection.adapter_name
               when "PostgreSQL"
@@ -91,21 +106,29 @@ module Groupdate
                 when "day_of_week", "hour_of_day"
                   max = field == "day_of_week" ? 6 : 23
                   "SELECT generate_series(0, #{max}, 1) AS #{field}"
-                when "day"
-                  starts_at = args[2].first.in_time_zone(time_zone).beginning_of_day
-                  sanitize_sql_array(["SELECT (generate_series(CAST(? AS timestamptz) AT TIME ZONE ?, ?, '1 day') AT TIME ZONE ?) AS #{field}", starts_at, time_zone, args[2].last, time_zone])
+                else
+                  sanitize_sql_array(["SELECT (generate_series(CAST(? AS timestamptz) AT TIME ZONE ?, ?, ?) AT TIME ZONE ?) AS #{field}", starts_at, time_zone, args[2].last, "1 #{field}", time_zone])
                 end
               else # MySQL
                 case field
                 when "day_of_week", "hour_of_day"
                   max = field == "day_of_week" ? 6 : 23
                   (0..max).map{|i| "SELECT #{i} AS #{field}" }.join(" UNION ")
-                when "day"
-                  starts_at = args[2].first.in_time_zone(time_zone).beginning_of_day
+                else
                   series = [starts_at]
+
+                  step =
+                    case field
+                    when "second"
+                      1.second
+                    when "day"
+                      1.day
+                    end
+
                   while series.last < args[2].last
-                    series << series.last + 1.day
+                    series << series.last + step
                   end
+
                   sanitize_sql_array([series.map{|i| "SELECT CAST(? AS DATETIME) AS #{field}" }.join(" UNION ")] + series)
                 end
               end
