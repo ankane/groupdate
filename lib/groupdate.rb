@@ -83,7 +83,26 @@ module Groupdate
               raise "Connection adapter not supported: #{connection.adapter_name}"
             end
 
-          group(Groupdate::OrderHack.new(sanitize_sql_array(query), field))
+          if args[2] # zeros
+            derived_table =
+              case connection.adapter_name
+              when "PostgreSQL"
+                case field
+                when "day_of_week", "hour_of_day"
+                  max = field == "day_of_week" ? 6 : 23
+                  "SELECT generate_series(0, #{max}, 1) AS #{field}"
+                end
+              else # MySQL
+                case field
+                when "day_of_week", "hour_of_day"
+                  max = field == "day_of_week" ? 6 : 23
+                  (0..max).map{|i| "SELECT #{i} AS #{field}" }.join(" UNION ")
+                end
+              end
+            joins("RIGHT OUTER JOIN (#{derived_table}) groupdate_series ON groupdate_series.#{field} = (#{sanitize_sql_array(query)})").group(Groupdate::OrderHack.new("groupdate_series.#{field}", field))
+          else
+            group(Groupdate::OrderHack.new(sanitize_sql_array(query), field))
+          end
         }
       end
     end
