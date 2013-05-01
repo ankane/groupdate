@@ -131,7 +131,27 @@ describe Groupdate do
             time_key("2013-05-01 00:00:01 UTC") => 1,
             time_key("2013-05-01 00:00:02 UTC") => 0
           }
-          assert_equal(expected, User.group_by_second(:created_at, Time.zone, Time.parse("2013-05-01 00:00:00 UTC")..Time.parse("2013-05-01 00:00:02 UTC")).count(:created_at))
+          assert_equal(expected, User.group_by_second(:created_at, Time.zone, Time.parse("2013-05-01 00:00:00.999 UTC")..Time.parse("2013-05-01 00:00:02 UTC")).count(:created_at))
+        end
+
+        it "group_by_minute" do
+          create_user "2013-05-01 00:01:00 UTC"
+          expected = {
+            time_key("2013-05-01 00:00:00 UTC") => 0,
+            time_key("2013-05-01 00:01:00 UTC") => 1,
+            time_key("2013-05-01 00:02:00 UTC") => 0
+          }
+          assert_equal(expected, User.group_by_minute(:created_at, Time.zone, Time.parse("2013-05-01 00:00:59 UTC")..Time.parse("2013-05-01 00:02:00 UTC")).count(:created_at))
+        end
+
+        it "group_by_hour" do
+          create_user "2013-05-01 04:01:01 UTC"
+          expected = {
+            time_key("2013-05-01 03:00:00 UTC") => 0,
+            time_key("2013-05-01 04:00:00 UTC") => 1,
+            time_key("2013-05-01 05:00:00 UTC") => 0
+          }
+          assert_equal(expected, User.group_by_hour(:created_at, Time.zone, Time.parse("2013-05-01 03:59:59 UTC")..Time.parse("2013-05-01 05:00:00 UTC")).count(:created_at))
         end
 
         it "group_by_day" do

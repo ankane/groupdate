@@ -93,7 +93,11 @@ module Groupdate
               starts_at =
                 case field
                 when "second"
-                  time.change(min: 0)
+                  time.change(sec: time.sec)
+                when "minute"
+                  time.change(min: time.min)
+                when "hour"
+                  time.change(hour: time.hour)
                 when "day"
                   time.beginning_of_day
                 end
@@ -117,13 +121,7 @@ module Groupdate
                 else
                   series = [starts_at]
 
-                  step =
-                    case field
-                    when "second"
-                      1.second
-                    when "day"
-                      1.day
-                    end
+                  step = 1.send(field)
 
                   while series.last < args[2].last
                     series << series.last + step
