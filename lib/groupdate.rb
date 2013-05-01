@@ -91,12 +91,22 @@ module Groupdate
                 when "day_of_week", "hour_of_day"
                   max = field == "day_of_week" ? 6 : 23
                   "SELECT generate_series(0, #{max}, 1) AS #{field}"
+                when "day"
+                  starts_at = args[2].first.in_time_zone(time_zone).beginning_of_day
+                  sanitize_sql_array(["SELECT generate_series(CAST(? AS timestamptz), ?, '1 day') AS #{field}", starts_at, args[2].last])
                 end
               else # MySQL
                 case field
                 when "day_of_week", "hour_of_day"
                   max = field == "day_of_week" ? 6 : 23
                   (0..max).map{|i| "SELECT #{i} AS #{field}" }.join(" UNION ")
+                when "day"
+                  starts_at = args[2].first.in_time_zone(time_zone).beginning_of_day
+                  series = [starts_at]
+                  while series.last < args[2].last
+                    series << series.last + 1.day
+                  end
+                  sanitize_sql_array([series.map{|i| "SELECT CAST(? AS DATETIME) AS #{field}" }.join(" UNION ")] + series)
                 end
               end
             joins("RIGHT OUTER JOIN (#{derived_table}) groupdate_series ON groupdate_series.#{field} = (#{sanitize_sql_array(query)})").group(Groupdate::OrderHack.new("groupdate_series.#{field}", field))

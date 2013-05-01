@@ -124,7 +124,17 @@ describe Groupdate do
 
       describe "returns zeros" do
 
-        it "day_of_week" do
+        it "group_by_day" do
+          create_user "2013-05-01 20:00:00 UTC"
+          expected = {
+            time_key("2013-04-30 00:00:00 UTC") => 0,
+            time_key("2013-05-01 00:00:00 UTC") => 1,
+            time_key("2013-05-02 00:00:00 UTC") => 0
+          }
+          assert_equal(expected, User.group_by_day(:created_at, Time.zone, Time.parse("2013-04-30 00:00:00 UTC")..Time.parse("2013-05-02 00:00:00 UTC")).count(:created_at))
+        end
+
+        it "group_by_day_of_week" do
           create_user "2013-05-01 00:00:00 UTC"
           expected = {}
           7.times do |n|
@@ -134,7 +144,7 @@ describe Groupdate do
           assert_equal(expected, User.group_by_day_of_week(:created_at, Time.zone, true).count(:created_at))
         end
 
-        it "hour_of_day" do
+        it "group_by_hour_of_day" do
           create_user "2013-05-01 20:00:00 UTC"
           expected = {}
           24.times do |n|
