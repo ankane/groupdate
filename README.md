@@ -123,7 +123,7 @@ mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 
 Use the master version of your JDBC adapter.  You will get incorrect results for versions before [this commit](https://github.com/jruby/activerecord-jdbc-adapter/commit/c1cdb7cec8d3f06fc54995e8d872d830bd0a4d91).
 
-```sh
+```ruby
 # postgresql
 gem "activerecord-jdbcpostgresql-adapter", :github => "jruby/activerecord-jdbc-adapter"
 
