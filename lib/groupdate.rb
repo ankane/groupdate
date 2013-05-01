@@ -93,7 +93,7 @@ module Groupdate
                   "SELECT generate_series(0, #{max}, 1) AS #{field}"
                 when "day"
                   starts_at = args[2].first.in_time_zone(time_zone).beginning_of_day
-                  sanitize_sql_array(["SELECT generate_series(CAST(? AS timestamptz), ?, '1 day') AS #{field}", starts_at, args[2].last])
+                  sanitize_sql_array(["SELECT (generate_series(CAST(? AS timestamptz) AT TIME ZONE ?, ?, '1 day') AT TIME ZONE ?) AS #{field}", starts_at, time_zone, args[2].last, time_zone])
                 end
               else # MySQL
                 case field

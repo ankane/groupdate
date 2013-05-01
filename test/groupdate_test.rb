@@ -134,6 +134,16 @@ describe Groupdate do
           assert_equal(expected, User.group_by_day(:created_at, Time.zone, Time.parse("2013-04-30 00:00:00 UTC")..Time.parse("2013-05-02 00:00:00 UTC")).count(:created_at))
         end
 
+        it "group_by_day with time zone" do
+          create_user "2013-05-01 20:00:00 PDT"
+          expected = {
+            time_key("2013-04-30 00:00:00 PDT") => 0,
+            time_key("2013-05-01 00:00:00 PDT") => 1,
+            time_key("2013-05-02 00:00:00 PDT") => 0
+          }
+          assert_equal(expected, User.group_by_day(:created_at, "Pacific Time (US & Canada)", Time.parse("2013-04-30 00:00:00 PDT")..Time.parse("2013-05-02 00:00:00 PDT")).count(:created_at))
+        end
+
         it "group_by_day_of_week" do
           create_user "2013-05-01 00:00:00 UTC"
           expected = {}
@@ -183,7 +193,7 @@ describe Groupdate do
     if RUBY_PLATFORM == "java"
       User.connection.adapter_name == "PostgreSQL" ? Time.parse(key).strftime("%Y-%m-%d %H:%M:%S%z")[0..-3] : Time.parse(key).strftime("%Y-%m-%d %H:%M:%S").gsub(/ 00\:00\:00\z/, "")
     else
-      User.connection.adapter_name == "PostgreSQL" && ActiveRecord::VERSION::MAJOR == 3 ? Time.parse(key).strftime("%Y-%m-%d %H:%M:%S+00") : Time.parse(key)
+      User.connection.adapter_name == "PostgreSQL" && ActiveRecord::VERSION::MAJOR == 3 ? Time.parse(key).utc.strftime("%Y-%m-%d %H:%M:%S+00") : Time.parse(key)
     end
   end
 
