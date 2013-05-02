@@ -254,6 +254,14 @@ describe Groupdate do
           assert_equal(expected, User.group_by_hour_of_day(:created_at, Time.zone, true).count(:created_at))
         end
 
+        it "excludes end" do
+          create_user "2013-05-02 00:00:00 UTC"
+          expected = {
+            time_key("2013-05-01 00:00:00 UTC") => 0
+          }
+          assert_equal(expected, User.group_by_day(:created_at, Time.zone, Time.parse("2013-05-01 00:00:00 UTC")...Time.parse("2013-05-02 00:00:00 UTC")).count(:created_at))
+        end
+
       end
 
     end

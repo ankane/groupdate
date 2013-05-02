@@ -120,7 +120,8 @@ module Groupdate
                   max = field == "day_of_week" ? 6 : 23
                   "SELECT generate_series(0, #{max}, 1) AS #{field}"
                 else
-                  sanitize_sql_array(["SELECT (generate_series(CAST(? AS timestamptz) AT TIME ZONE ?, ?, ?) AT TIME ZONE ?) AS #{field}", starts_at, time_zone, args[2].last, "1 #{field}", time_zone])
+                  ends_at = range.exclude_end? ? range.last - 1 : range.last
+                  sanitize_sql_array(["SELECT (generate_series(CAST(? AS timestamptz) AT TIME ZONE ?, ?, ?) AT TIME ZONE ?) AS #{field}", starts_at, time_zone, ends_at, "1 #{field}", time_zone])
                 end
               else # MySQL
                 case field
