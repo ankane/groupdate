@@ -141,7 +141,7 @@ describe Groupdate do
         end
 
         it "group_by_day with time zone" do
-          assert_zeros_tz :day, "2013-05-01 20:00:00 PDT", ["2013-04-30 00:00:00 PDT", "2013-05-01 00:00:00 PDT", "2013-05-02 00:00:00 PDT"], "2013-04-30 00:00:00 PDT", "2013-05-02 00:00:00 PDT"
+          assert_zeros_tz :day, "2013-05-01 20:00:00 PDT", ["2013-04-30 00:00:00 PDT", "2013-05-01 00:00:00 PDT", "2013-05-02 00:00:00 PDT"], "2013-04-30 00:00:00 PDT", "2013-05-02 23:59:59 PDT"
         end
 
         it "group_by_week" do

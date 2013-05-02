@@ -110,6 +110,14 @@ module Groupdate
                 else # year
                   time.beginning_of_year
                 end
+
+              series = [starts_at]
+
+              step = 1.send(field)
+
+              while range.cover?(series.last + step)
+                series << series.last + step
+              end
             end
 
             derived_table =
@@ -120,8 +128,7 @@ module Groupdate
                   max = field == "day_of_week" ? 6 : 23
                   "SELECT generate_series(0, #{max}, 1) AS #{field}"
                 else
-                  ends_at = range.exclude_end? ? range.last - 1 : range.last
-                  sanitize_sql_array(["SELECT (generate_series(CAST(? AS timestamptz) AT TIME ZONE ?, ?, ?) AT TIME ZONE ?) AS #{field}", starts_at, time_zone, ends_at, "1 #{field}", time_zone])
+                  sanitize_sql_array(["SELECT (generate_series(CAST(? AS timestamptz) AT TIME ZONE ?, ?, ?) AT TIME ZONE ?) AS #{field}", starts_at, time_zone, series.last, "1 #{field}", time_zone])
                 end
               else # MySQL
                 case field
@@ -129,14 +136,6 @@ module Groupdate
                   max = field == "day_of_week" ? 6 : 23
                   (0..max).map{|i| "SELECT #{i} AS #{field}" }.join(" UNION ")
                 else
-                  series = [starts_at]
-
-                  step = 1.send(field)
-
-                  while range.cover?(series.last + step)
-                    series << series.last + step
-                  end
-
                   sanitize_sql_array([series.map{|i| "SELECT CAST(? AS DATETIME) AS #{field}" }.join(" UNION ")] + series)
                 end
               end
