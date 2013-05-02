@@ -125,113 +125,47 @@ describe Groupdate do
       describe "returns zeros" do
 
         it "group_by_second" do
-          create_user "2013-05-01 00:00:01 UTC"
-          expected = {
-            time_key("2013-05-01 00:00:00 UTC") => 0,
-            time_key("2013-05-01 00:00:01 UTC") => 1,
-            time_key("2013-05-01 00:00:02 UTC") => 0
-          }
-          assert_equal(expected, User.group_by_second(:created_at, Time.zone, Time.parse("2013-05-01 00:00:00.999 UTC")..Time.parse("2013-05-01 00:00:02 UTC")).count(:created_at))
+          assert_zeros :second, "2013-05-01 00:00:01 UTC", ["2013-05-01 00:00:00 UTC", "2013-05-01 00:00:01 UTC", "2013-05-01 00:00:02 UTC"], "2013-05-01 00:00:00.999 UTC", "2013-05-01 00:00:02 UTC"
         end
 
         it "group_by_minute" do
-          create_user "2013-05-01 00:01:00 UTC"
-          expected = {
-            time_key("2013-05-01 00:00:00 UTC") => 0,
-            time_key("2013-05-01 00:01:00 UTC") => 1,
-            time_key("2013-05-01 00:02:00 UTC") => 0
-          }
-          assert_equal(expected, User.group_by_minute(:created_at, Time.zone, Time.parse("2013-05-01 00:00:59 UTC")..Time.parse("2013-05-01 00:02:00 UTC")).count(:created_at))
+          assert_zeros :minute, "2013-05-01 00:01:00 UTC", ["2013-05-01 00:00:00 UTC", "2013-05-01 00:01:00 UTC", "2013-05-01 00:02:00 UTC"], "2013-05-01 00:00:59 UTC", "2013-05-01 00:02:00 UTC"
         end
 
         it "group_by_hour" do
-          create_user "2013-05-01 04:01:01 UTC"
-          expected = {
-            time_key("2013-05-01 03:00:00 UTC") => 0,
-            time_key("2013-05-01 04:00:00 UTC") => 1,
-            time_key("2013-05-01 05:00:00 UTC") => 0
-          }
-          assert_equal(expected, User.group_by_hour(:created_at, Time.zone, Time.parse("2013-05-01 03:59:59 UTC")..Time.parse("2013-05-01 05:00:00 UTC")).count(:created_at))
+          assert_zeros :hour, "2013-05-01 04:01:01 UTC", ["2013-05-01 03:00:00 UTC", "2013-05-01 04:00:00 UTC", "2013-05-01 05:00:00 UTC"], "2013-05-01 03:59:59 UTC", "2013-05-01 05:00:00 UTC"
         end
 
         it "group_by_day" do
-          create_user "2013-05-01 20:00:00 UTC"
-          expected = {
-            time_key("2013-04-30 00:00:00 UTC") => 0,
-            time_key("2013-05-01 00:00:00 UTC") => 1,
-            time_key("2013-05-02 00:00:00 UTC") => 0
-          }
-          assert_equal(expected, User.group_by_day(:created_at, Time.zone, Time.parse("2013-04-30 00:00:00 UTC")..Time.parse("2013-05-02 00:00:00 UTC")).count(:created_at))
+          assert_zeros :day, "2013-05-01 20:00:00 UTC", ["2013-04-30 00:00:00 UTC", "2013-05-01 00:00:00 UTC", "2013-05-02 00:00:00 UTC"], "2013-04-30 00:00:00 UTC", "2013-05-02 00:00:00 UTC"
         end
 
         it "group_by_day with time zone" do
-          create_user "2013-05-01 20:00:00 PDT"
-          expected = {
-            time_key("2013-04-30 00:00:00 PDT") => 0,
-            time_key("2013-05-01 00:00:00 PDT") => 1,
-            time_key("2013-05-02 00:00:00 PDT") => 0
-          }
-          assert_equal(expected, User.group_by_day(:created_at, "Pacific Time (US & Canada)", Time.parse("2013-04-30 00:00:00 PDT")..Time.parse("2013-05-02 00:00:00 PDT")).count(:created_at))
+          assert_zeros_tz :day, "2013-05-01 20:00:00 PDT", ["2013-04-30 00:00:00 PDT", "2013-05-01 00:00:00 PDT", "2013-05-02 00:00:00 PDT"], "2013-04-30 00:00:00 PDT", "2013-05-02 00:00:00 PDT"
         end
 
         it "group_by_week" do
-          create_user "2013-05-01 20:00:00 UTC"
-          expected = {
-            time_key("2013-04-21 00:00:00 UTC") => 0,
-            time_key("2013-04-28 00:00:00 UTC") => 1,
-            time_key("2013-05-05 00:00:00 UTC") => 0
-          }
-          assert_equal(expected, User.group_by_week(:created_at, Time.zone, Time.parse("2013-04-27 00:00:00 UTC")..Time.parse("2013-05-11 00:00:00 UTC")).count(:created_at))
+          assert_zeros :week, "2013-05-01 20:00:00 UTC", ["2013-04-21 00:00:00 UTC", "2013-04-28 00:00:00 UTC", "2013-05-05 00:00:00 UTC"], "2013-04-27 00:00:00 UTC", "2013-05-11 00:00:00 UTC"
         end
 
         it "group_by_week with time zone" do
-          create_user "2013-05-01 20:00:00 PDT"
-          expected = {
-            time_key("2013-04-21 00:00:00 PDT") => 0,
-            time_key("2013-04-28 00:00:00 PDT") => 1,
-            time_key("2013-05-05 00:00:00 PDT") => 0
-          }
-          assert_equal(expected, User.group_by_week(:created_at, "Pacific Time (US & Canada)", Time.parse("2013-04-27 00:00:00 PDT")..Time.parse("2013-05-11 00:00:00 PDT")).count(:created_at))
+          assert_zeros_tz :week, "2013-05-01 20:00:00 PDT", ["2013-04-21 00:00:00 PDT", "2013-04-28 00:00:00 PDT", "2013-05-05 00:00:00 PDT"], "2013-04-27 00:00:00 PDT", "2013-05-11 00:00:00 PDT"
         end
 
         it "group_by_month" do
-          create_user "2013-04-16 20:00:00 UTC"
-          expected = {
-            time_key("2013-03-01 00:00:00 UTC") => 0,
-            time_key("2013-04-01 00:00:00 UTC") => 1,
-            time_key("2013-05-01 00:00:00 UTC") => 0
-          }
-          assert_equal(expected, User.group_by_month(:created_at, Time.zone, Time.parse("2013-03-01 00:00:00 UTC")..Time.parse("2013-05-11 00:00:00 UTC")).count(:created_at))
+          assert_zeros :month, "2013-04-16 20:00:00 UTC", ["2013-03-01 00:00:00 UTC", "2013-04-01 00:00:00 UTC", "2013-05-01 00:00:00 UTC"], "2013-03-01 00:00:00 UTC", "2013-05-11 00:00:00 UTC"
         end
 
         it "group_by_month with time zone" do
-          create_user "2013-04-16 20:00:00 PDT"
-          expected = {
-            time_key("2013-03-01 00:00:00 PST") => 0,
-            time_key("2013-04-01 00:00:00 PDT") => 1,
-            time_key("2013-05-01 00:00:00 PDT") => 0
-          }
-          assert_equal(expected, User.group_by_month(:created_at, "Pacific Time (US & Canada)", Time.parse("2013-03-01 00:00:00 PST")..Time.parse("2013-05-31 00:00:00 PDT")).count(:created_at))
+          assert_zeros_tz :month, "2013-04-16 20:00:00 PDT", ["2013-03-01 00:00:00 PST", "2013-04-01 00:00:00 PDT", "2013-05-01 00:00:00 PDT"], "2013-03-01 00:00:00 PST", "2013-05-31 00:00:00 PDT"
         end
 
         it "group_by_year" do
-          create_user "2013-04-16 20:00:00 UTC"
-          expected = {
-            time_key("2012-01-01 00:00:00 UTC") => 0,
-            time_key("2013-01-01 00:00:00 UTC") => 1,
-            time_key("2014-01-01 00:00:00 UTC") => 0
-          }
-          assert_equal(expected, User.group_by_year(:created_at, Time.zone, Time.parse("2012-03-01 00:00:00 UTC")..Time.parse("2014-05-11 00:00:00 UTC")).count(:created_at))
+          assert_zeros :year, "2013-04-16 20:00:00 UTC", ["2012-01-01 00:00:00 UTC", "2013-01-01 00:00:00 UTC", "2014-01-01 00:00:00 UTC"], "2012-03-01 00:00:00 UTC", "2014-05-11 00:00:00 UTC"
         end
 
         it "group_by_year with time zone" do
-          create_user "2013-04-16 20:00:00 PDT"
-          expected = {
-            time_key("2012-01-01 00:00:00 PST") => 0,
-            time_key("2013-01-01 00:00:00 PST") => 1,
-            time_key("2014-01-01 00:00:00 PST") => 0
-          }
-          assert_equal(expected, User.group_by_year(:created_at, "Pacific Time (US & Canada)", Time.parse("2012-03-01 00:00:00 UTC")..Time.parse("2014-05-11 00:00:00 UTC")).count(:created_at))
+          assert_zeros_tz :year, "2013-04-16 20:00:00 PDT", ["2012-01-01 00:00:00 PST", "2013-01-01 00:00:00 PST", "2014-01-01 00:00:00 PST"], "2012-03-01 00:00:00 UTC", "2014-05-11 00:00:00 UTC"
         end
 
         it "group_by_day_of_week" do
@@ -285,6 +219,19 @@ describe Groupdate do
 
   def assert_group_number_tz(method, created_at, key)
     assert_group_number method, created_at, key, "Pacific Time (US & Canada)"
+  end
+
+  def assert_zeros(method, created_at, keys, range_start, range_end, time_zone = nil)
+    create_user created_at
+    expected = {}
+    keys.each_with_index do |key, i|
+      expected[time_key(key)] = i == 1 ? 1 : 0
+    end
+    assert_equal(expected, User.send(:"group_by_#{method}", :created_at, time_zone, Time.parse(range_start)..Time.parse(range_end)).count(:created_at))
+  end
+
+  def assert_zeros_tz(method, created_at, keys, range_start, range_end)
+    assert_zeros(method, created_at, keys, range_start, range_end, "Pacific Time (US & Canada)")
   end
 
   def time_key(key)
