@@ -234,17 +234,35 @@ describe Groupdate do
 
   def time_key(key, java_hack = false)
     if RUBY_PLATFORM == "java"
-      User.connection.adapter_name == "PostgreSQL" ? Time.parse(key).utc.strftime("%Y-%m-%d %H:%M:%S%z")[0..-3] : (java_hack ? Time.parse(key).utc.strftime("%Y-%m-%d %H:%M:%S") : Time.parse(key).strftime("%Y-%m-%d %H:%M:%S").gsub(/ 00\:00\:00\z/, ""))
+      if User.connection.adapter_name == "PostgreSQL"
+        Time.parse(key).utc.strftime("%Y-%m-%d %H:%M:%S%z")[0..-3]
+      elsif java_hack
+        Time.parse(key).utc.strftime("%Y-%m-%d %H:%M:%S")
+      else
+        Time.parse(key).strftime("%Y-%m-%d %H:%M:%S").gsub(/ 00\:00\:00\z/, "")
+      end
     else
-      User.connection.adapter_name == "PostgreSQL" && ActiveRecord::VERSION::MAJOR == 3 ? Time.parse(key).utc.strftime("%Y-%m-%d %H:%M:%S+00") : Time.parse(key)
+      if User.connection.adapter_name == "PostgreSQL" and ActiveRecord::VERSION::MAJOR == 3
+        Time.parse(key).utc.strftime("%Y-%m-%d %H:%M:%S+00")
+      else
+        Time.parse(key)
+      end
     end
   end
 
   def number_key(key, java_hack = false)
     if RUBY_PLATFORM == "java"
-      User.connection.adapter_name == "PostgreSQL" && !java_hack ? key.to_f : key
+      if User.connection.adapter_name == "PostgreSQL" and !java_hack
+        key.to_f
+      else
+        key
+      end
     else
-      User.connection.adapter_name == "PostgreSQL" ? (ActiveRecord::VERSION::MAJOR == 3 ? key.to_s : key.to_f) : key
+      if User.connection.adapter_name == "PostgreSQL"
+        ActiveRecord::VERSION::MAJOR == 3 ? key.to_s : key.to_f
+      else
+        key
+      end
     end
   end
 
