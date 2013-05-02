@@ -174,6 +174,66 @@ describe Groupdate do
           assert_equal(expected, User.group_by_day(:created_at, "Pacific Time (US & Canada)", Time.parse("2013-04-30 00:00:00 PDT")..Time.parse("2013-05-02 00:00:00 PDT")).count(:created_at))
         end
 
+        it "group_by_week" do
+          create_user "2013-05-01 20:00:00 UTC"
+          expected = {
+            time_key("2013-04-21 00:00:00 UTC") => 0,
+            time_key("2013-04-28 00:00:00 UTC") => 1,
+            time_key("2013-05-05 00:00:00 UTC") => 0
+          }
+          assert_equal(expected, User.group_by_week(:created_at, Time.zone, Time.parse("2013-04-27 00:00:00 UTC")..Time.parse("2013-05-11 00:00:00 UTC")).count(:created_at))
+        end
+
+        it "group_by_week with time zone" do
+          create_user "2013-05-01 20:00:00 PDT"
+          expected = {
+            time_key("2013-04-21 00:00:00 PDT") => 0,
+            time_key("2013-04-28 00:00:00 PDT") => 1,
+            time_key("2013-05-05 00:00:00 PDT") => 0
+          }
+          assert_equal(expected, User.group_by_week(:created_at, "Pacific Time (US & Canada)", Time.parse("2013-04-27 00:00:00 PDT")..Time.parse("2013-05-11 00:00:00 PDT")).count(:created_at))
+        end
+
+        it "group_by_month" do
+          create_user "2013-04-16 20:00:00 UTC"
+          expected = {
+            time_key("2013-03-01 00:00:00 UTC") => 0,
+            time_key("2013-04-01 00:00:00 UTC") => 1,
+            time_key("2013-05-01 00:00:00 UTC") => 0
+          }
+          assert_equal(expected, User.group_by_month(:created_at, Time.zone, Time.parse("2013-03-01 00:00:00 UTC")..Time.parse("2013-05-11 00:00:00 UTC")).count(:created_at))
+        end
+
+        it "group_by_month with time zone" do
+          create_user "2013-04-16 20:00:00 PDT"
+          expected = {
+            time_key("2013-03-01 00:00:00 PST") => 0,
+            time_key("2013-04-01 00:00:00 PDT") => 1,
+            time_key("2013-05-01 00:00:00 PDT") => 0
+          }
+          assert_equal(expected, User.group_by_month(:created_at, "Pacific Time (US & Canada)", Time.parse("2013-03-01 00:00:00 PST")..Time.parse("2013-05-31 00:00:00 PDT")).count(:created_at))
+        end
+
+        it "group_by_year" do
+          create_user "2013-04-16 20:00:00 UTC"
+          expected = {
+            time_key("2012-01-01 00:00:00 UTC") => 0,
+            time_key("2013-01-01 00:00:00 UTC") => 1,
+            time_key("2014-01-01 00:00:00 UTC") => 0
+          }
+          assert_equal(expected, User.group_by_year(:created_at, Time.zone, Time.parse("2012-03-01 00:00:00 UTC")..Time.parse("2014-05-11 00:00:00 UTC")).count(:created_at))
+        end
+
+        it "group_by_year with time zone" do
+          create_user "2013-04-16 20:00:00 PDT"
+          expected = {
+            time_key("2012-01-01 00:00:00 PST") => 0,
+            time_key("2013-01-01 00:00:00 PST") => 1,
+            time_key("2014-01-01 00:00:00 PST") => 0
+          }
+          assert_equal(expected, User.group_by_year(:created_at, "Pacific Time (US & Canada)", Time.parse("2012-03-01 00:00:00 UTC")..Time.parse("2014-05-11 00:00:00 UTC")).count(:created_at))
+        end
+
         it "group_by_day_of_week" do
           create_user "2013-05-01 00:00:00 UTC"
           expected = {}

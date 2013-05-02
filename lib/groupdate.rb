@@ -86,10 +86,13 @@ module Groupdate
 
           if args[2] # zeros
             if time_fields.include?(field)
-              # TODO ensure range
+              range = args[2]
+              unless range.is_a?(Range)
+                raise "Expecting a range"
+              end
 
               # determine start time
-              time = args[2].first.in_time_zone(time_zone)
+              time = range.first.in_time_zone(time_zone)
               starts_at =
                 case field
                 when "second"
@@ -100,6 +103,12 @@ module Groupdate
                   time.change(:min => 0)
                 when "day"
                   time.beginning_of_day
+                when "week"
+                  time.beginning_of_week(:sunday)
+                when "month"
+                  time.beginning_of_month
+                else # year
+                  time.beginning_of_year
                 end
             end
 
@@ -123,13 +132,14 @@ module Groupdate
 
                   step = 1.send(field)
 
-                  while series.last < args[2].last
+                  while range.cover?(series.last + step)
                     series << series.last + step
                   end
 
                   sanitize_sql_array([series.map{|i| "SELECT CAST(? AS DATETIME) AS #{field}" }.join(" UNION ")] + series)
                 end
               end
+
             joins("RIGHT OUTER JOIN (#{derived_table}) groupdate_series ON groupdate_series.#{field} = (#{sanitize_sql_array(query)})").group(Groupdate::OrderHack.new("groupdate_series.#{field}", field))
           else
             group(Groupdate::OrderHack.new(sanitize_sql_array(query), field))
