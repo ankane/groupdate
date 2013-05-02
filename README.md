@@ -9,7 +9,9 @@ The simplest way to group by:
 - hour of the day
 - and more (complete list at bottom)
 
-:tada: Time zones supported!! **The best part**
+:tada: Time zones supported!! **the best part**
+
+:cake: Get the entire series - **the other best part**
 
 Works with Rails 3.0+
 
@@ -101,6 +103,55 @@ Go nuts!
 
 ```ruby
 Request.where(page: "/home").group_by_minute(:started_at).maximum(:request_time)
+```
+
+### Show me the series :moneybag:
+
+You have two users - one created on May 2 and one on May 5.
+
+```ruby
+User.group_by_day(:created_at).count
+# {
+#   2013-05-02 00:00:00 UTC => 1,
+#   2013-05-05 00:00:00 UTC => 1
+# }
+```
+
+Awesome, but you want to see the first week of May.  Pass a range as the third argument.
+
+```ruby
+# pretend today is May 7
+time_range = 6.days.ago..Time.now
+
+User.group_by_day(:created_at, Time.zone, time_range).count(:created_at)
+# {
+#   2013-05-01 00:00:00 UTC => 0,
+#   2013-05-02 00:00:00 UTC => 1,
+#   2013-05-03 00:00:00 UTC => 0,
+#   2013-05-04 00:00:00 UTC => 0,
+#   2013-05-05 00:00:00 UTC => 1,
+#   2013-05-06 00:00:00 UTC => 0,
+#   2013-05-07 00:00:00 UTC => 0
+# }
+```
+
+Wow, SQL magic!
+
+**Note:** Be sure to pass the column name to `count`.  Otherwise, you get `1` for empty groups.
+
+For the day of the week and hour of the day, just pass `true`.
+
+```ruby
+User.group_by_day_of_week(:created_at, Time.zone, true).count(:created_at)
+# {
+#   0 => 0,
+#   1 => 1,
+#   2 => 0,
+#   3 => 0,
+#   4 => 1,
+#   5 => 0,
+#   6 => 0
+# }
 ```
 
 ## Installation
