@@ -93,11 +93,11 @@ module Groupdate
               starts_at =
                 case field
                 when "second"
-                  time.change(sec: time.sec)
+                  time.change(:usec => 0)
                 when "minute"
-                  time.change(min: time.min)
+                  time.change(:sec => 0)
                 when "hour"
-                  time.change(hour: time.hour)
+                  time.change(:min => 0)
                 when "day"
                   time.beginning_of_day
                 end
