@@ -172,9 +172,8 @@ describe Groupdate do
           create_user "2013-05-01 00:00:00 UTC"
           expected = {}
           7.times do |n|
-            expected[number_key(n)] = 0
+            expected[number_key(n, true)] = n == 3 ? 1 : 0
           end
-          expected[number_key(3)] = 1
           assert_equal(expected, User.group_by_day_of_week(:created_at, Time.zone, true).count(:created_at))
         end
 
@@ -182,9 +181,8 @@ describe Groupdate do
           create_user "2013-05-01 20:00:00 UTC"
           expected = {}
           24.times do |n|
-            expected[number_key(n)] = 0
+            expected[number_key(n, true)] = n == 20 ? 1 : 0
           end
-          expected[number_key(20)] = 1
           assert_equal(expected, User.group_by_hour_of_day(:created_at, Time.zone, true).count(:created_at))
         end
 
@@ -221,30 +219,30 @@ describe Groupdate do
     assert_group_number method, created_at, key, "Pacific Time (US & Canada)"
   end
 
-  def assert_zeros(method, created_at, keys, range_start, range_end, time_zone = nil)
+  def assert_zeros(method, created_at, keys, range_start, range_end, time_zone = nil, java_hack = false)
     create_user created_at
     expected = {}
     keys.each_with_index do |key, i|
-      expected[time_key(key)] = i == 1 ? 1 : 0
+      expected[time_key(key, java_hack)] = i == 1 ? 1 : 0
     end
     assert_equal(expected, User.send(:"group_by_#{method}", :created_at, time_zone, Time.parse(range_start)..Time.parse(range_end)).order(method).count(:created_at))
   end
 
   def assert_zeros_tz(method, created_at, keys, range_start, range_end)
-    assert_zeros(method, created_at, keys, range_start, range_end, "Pacific Time (US & Canada)")
+    assert_zeros method, created_at, keys, range_start, range_end, "Pacific Time (US & Canada)", true
   end
 
-  def time_key(key)
+  def time_key(key, java_hack = false)
     if RUBY_PLATFORM == "java"
-      User.connection.adapter_name == "PostgreSQL" ? Time.parse(key).strftime("%Y-%m-%d %H:%M:%S%z")[0..-3] : Time.parse(key).strftime("%Y-%m-%d %H:%M:%S").gsub(/ 00\:00\:00\z/, "")
+      User.connection.adapter_name == "PostgreSQL" ? Time.parse(key).utc.strftime("%Y-%m-%d %H:%M:%S%z")[0..-3] : (java_hack ? Time.parse(key).utc.strftime("%Y-%m-%d %H:%M:%S") : Time.parse(key).strftime("%Y-%m-%d %H:%M:%S").gsub(/ 00\:00\:00\z/, ""))
     else
       User.connection.adapter_name == "PostgreSQL" && ActiveRecord::VERSION::MAJOR == 3 ? Time.parse(key).utc.strftime("%Y-%m-%d %H:%M:%S+00") : Time.parse(key)
     end
   end
 
-  def number_key(key)
+  def number_key(key, java_hack = false)
     if RUBY_PLATFORM == "java"
-      User.connection.adapter_name == "PostgreSQL" ? key.to_f : key
+      User.connection.adapter_name == "PostgreSQL" && !java_hack ? key.to_f : key
     else
       User.connection.adapter_name == "PostgreSQL" ? (ActiveRecord::VERSION::MAJOR == 3 ? key.to_s : key.to_f) : key
     end
