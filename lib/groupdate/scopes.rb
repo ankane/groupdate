@@ -33,7 +33,8 @@ module Groupdate
         time_fields = %w(second minute hour day week month year)
         number_fields = %w(day_of_week hour_of_day)
         (time_fields + number_fields).each do |field|
-          define_singleton_method :"group_by_#{field}" do |*args|
+          # no define_singleton_method in ruby 1.8
+          (class << self; self end).send :define_method, :"group_by_#{field}" do |*args|
             column = connection.quote_table_name(args[0])
             time_zone = args[1] || Time.zone || "Etc/UTC"
             if time_zone.is_a?(ActiveSupport::TimeZone) or time_zone = ActiveSupport::TimeZone[time_zone]

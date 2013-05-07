@@ -78,7 +78,7 @@ module Groupdate
 
     def method_missing(method, *args, &block)
       # https://github.com/rails/rails/blob/master/activerecord/lib/active_record/relation/calculations.rb
-      if ActiveRecord::Calculations.instance_methods.include?(method)
+      if ActiveRecord::Calculations.method_defined?(method)
         build_series(@relation.send(method, *args, &block))
       else
         raise NoMethodError, "valid methods are: #{ActiveRecord::Calculations.instance_methods.join(", ")}"
