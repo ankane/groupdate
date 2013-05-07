@@ -11,6 +11,8 @@ The simplest way to group by:
 
 :tada: Time zones supported!! **the best part**
 
+:cake: Get the entire series - **the other best part**
+
 Works with Rails 3.0+
 
 Supports PostgreSQL and MySQL
@@ -102,6 +104,51 @@ Go nuts!
 ```ruby
 Request.where(page: "/home").group_by_minute(:started_at).maximum(:request_time)
 ```
+
+### Show me the series :moneybag:
+
+You have two users - one created on May 2 and one on May 5.
+
+```ruby
+User.group_by_day(:created_at).count
+# {
+#   2013-05-02 00:00:00 UTC => 1,
+#   2013-05-05 00:00:00 UTC => 1
+# }
+```
+
+Awesome, but you want to see the first week of May.  Pass a range as the third argument.
+
+```ruby
+# pretend today is May 7
+time_range = 6.days.ago..Time.now
+
+User.group_by_day(:created_at, Time.zone, time_range).count
+# {
+#   2013-05-01 00:00:00 UTC => 0,
+#   2013-05-02 00:00:00 UTC => 1,
+#   2013-05-03 00:00:00 UTC => 0,
+#   2013-05-04 00:00:00 UTC => 0,
+#   2013-05-05 00:00:00 UTC => 1,
+#   2013-05-06 00:00:00 UTC => 0,
+#   2013-05-07 00:00:00 UTC => 0
+# }
+
+User.group_by_day_of_week(:created_at, Time.zone, time_range).count
+# {
+#   0 => 0,
+#   1 => 1,
+#   2 => 0,
+#   3 => 0,
+#   4 => 1,
+#   5 => 0,
+#   6 => 0
+# }
+```
+
+Results are returned in ascending order, so no need to sort.
+
+Also, this form of the method returns a Groupdate::Series instead of an ActiveRecord::Relation.  ActiveRecord::Relation method calls (like `where` and `joins`) should come before this.
 
 ## Installation
 

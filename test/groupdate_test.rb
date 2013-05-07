@@ -172,7 +172,7 @@ describe Groupdate do
           create_user "2013-05-01 00:00:00 UTC"
           expected = {}
           7.times do |n|
-            expected[number_key(n, true)] = n == 3 ? 1 : 0
+            expected[n] = n == 3 ? 1 : 0
           end
           assert_equal(expected, User.group_by_day_of_week(:created_at, Time.zone, true).count(:created_at))
         end
@@ -181,7 +181,7 @@ describe Groupdate do
           create_user "2013-05-01 20:00:00 UTC"
           expected = {}
           24.times do |n|
-            expected[number_key(n, true)] = n == 20 ? 1 : 0
+            expected[n] = n == 20 ? 1 : 0
           end
           assert_equal(expected, User.group_by_hour_of_day(:created_at, Time.zone, true).count(:created_at))
         end
@@ -189,9 +189,9 @@ describe Groupdate do
         it "excludes end" do
           create_user "2013-05-02 00:00:00 UTC"
           expected = {
-            time_key("2013-05-01 00:00:00 UTC") => 0
+            Time.parse("2013-05-01 00:00:00 UTC") => 0
           }
-          assert_equal(expected, User.group_by_day(:created_at, Time.zone, Time.parse("2013-05-01 00:00:00 UTC")...Time.parse("2013-05-02 00:00:00 UTC")).count(:created_at))
+          assert_equal(expected, User.group_by_day(:created_at, Time.zone, Time.parse("2013-05-01 00:00:00 UTC")...Time.parse("2013-05-02 00:00:00 UTC")).count)
         end
 
       end
@@ -203,7 +203,7 @@ describe Groupdate do
 
   def assert_group(method, created_at, key, time_zone = nil)
     create_user created_at
-    assert_equal(ordered_hash({time_key(key) => 1}), User.send(:"group_by_#{method}", :created_at, time_zone).order(method).count)
+    assert_equal(ordered_hash({time_key(key) => 1}), User.send(:"group_by_#{method}", :created_at, time_zone).order(method.to_s).count)
   end
 
   def assert_group_tz(method, created_at, key)
@@ -212,7 +212,7 @@ describe Groupdate do
 
   def assert_group_number(method, created_at, key, time_zone = nil)
     create_user created_at
-    assert_equal(ordered_hash({number_key(key) => 1}), User.send(:"group_by_#{method}", :created_at, time_zone).order(method).count)
+    assert_equal(ordered_hash({number_key(key) => 1}), User.send(:"group_by_#{method}", :created_at, time_zone).order(method.to_s).count)
   end
 
   def assert_group_number_tz(method, created_at, key)
@@ -223,9 +223,9 @@ describe Groupdate do
     create_user created_at
     expected = {}
     keys.each_with_index do |key, i|
-      expected[time_key(key, java_hack)] = i == 1 ? 1 : 0
+      expected[Time.parse(key)] = i == 1 ? 1 : 0
     end
-    assert_equal(expected, User.send(:"group_by_#{method}", :created_at, time_zone, Time.parse(range_start)..Time.parse(range_end)).order(method).count(:created_at))
+    assert_equal(expected, User.send(:"group_by_#{method}", :created_at, time_zone, Time.parse(range_start)..Time.parse(range_end)).count)
   end
 
   def assert_zeros_tz(method, created_at, keys, range_start, range_end)
