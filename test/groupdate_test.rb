@@ -122,6 +122,11 @@ describe Groupdate do
         assert_group_number_tz :day_of_week, "2013-03-03 00:00:00 UTC", 6
       end
 
+      it "works with previous scopes" do
+        create_user "2013-05-01 00:00:00 UTC"
+        assert_equal({}, User.where("id = 0").group_by_day(:created_at).count)
+      end
+
       describe "returns zeros" do
 
         it "group_by_second" do
@@ -192,6 +197,14 @@ describe Groupdate do
             Time.parse("2013-05-01 00:00:00 UTC") => 0
           }
           assert_equal(expected, User.group_by_day(:created_at, Time.zone, Time.parse("2013-05-01 00:00:00 UTC")...Time.parse("2013-05-02 00:00:00 UTC")).count)
+        end
+
+        it "works with previous scopes" do
+          create_user "2013-05-01 00:00:00 UTC"
+          expected = {
+            Time.parse("2013-05-01 00:00:00 UTC") => 0
+          }
+          assert_equal(expected, User.where("id = 0").group_by_day(:created_at, Time.zone, Time.parse("2013-05-01 00:00:00 UTC")..Time.parse("2013-05-01 23:59:59 UTC")).count)
         end
 
       end
