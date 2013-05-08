@@ -245,12 +245,10 @@ describe Groupdate do
     assert_zeros method, created_at, keys, range_start, range_end, "Pacific Time (US & Canada)", true
   end
 
-  def time_key(key, java_hack = false)
+  def time_key(key)
     if RUBY_PLATFORM == "java"
       if User.connection.adapter_name == "PostgreSQL"
         Time.parse(key).utc.strftime("%Y-%m-%d %H:%M:%S%z")[0..-3]
-      elsif java_hack
-        Time.parse(key).utc.strftime("%Y-%m-%d %H:%M:%S")
       else
         Time.parse(key).strftime("%Y-%m-%d %H:%M:%S").gsub(/ 00\:00\:00\z/, "")
       end
@@ -263,9 +261,9 @@ describe Groupdate do
     end
   end
 
-  def number_key(key, java_hack = false)
+  def number_key(key)
     if RUBY_PLATFORM == "java"
-      if User.connection.adapter_name == "PostgreSQL" and !java_hack
+      if User.connection.adapter_name == "PostgreSQL"
         key.to_f
       else
         key
