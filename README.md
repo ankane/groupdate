@@ -19,6 +19,8 @@ Supports PostgreSQL and MySQL
 
 [![Build Status](https://travis-ci.org/ankane/groupdate.png)](https://travis-ci.org/ankane/groupdate)
 
+:cupid: Goes hand in hand with [Chartkick](http://ankane.github.io/chartkick/)
+
 ## Usage
 
 ```ruby
