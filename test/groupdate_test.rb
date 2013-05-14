@@ -15,7 +15,7 @@ class User < ActiveRecord::Base
 end
 
 # migrations
-%w(postgresql mysql2).each do |adapter|
+%w(postgresql mysql2 sqlite3).each do |adapter|
   ActiveRecord::Base.establish_connection :adapter => adapter, :database => "groupdate_test", :username => adapter == "mysql2" ? "root" : nil
 
   unless ActiveRecord::Base.connection.table_exists? "users"
@@ -28,7 +28,9 @@ end
 end
 
 describe Groupdate do
-  %w(postgresql mysql2).each do |adapter|
+  %w(postgresql mysql2 sqlite3).each do |adapter|
+    supports_tz = adapter != "sqlite3"
+
     describe adapter do
 
       before do
@@ -79,6 +81,7 @@ describe Groupdate do
       end
 
       it "group_by_day with time zone" do
+        skip unless supports_tz
         assert_group_tz :day, "2013-04-01 01:01:01 UTC", "2013-03-31 07:00:00 UTC"
       end
 
@@ -87,6 +90,7 @@ describe Groupdate do
       end
 
       it "group_by_week with time zone" do # day of DST
+        skip unless supports_tz
         assert_group_tz :week, "2013-03-17 01:01:01 UTC", "2013-03-10 08:00:00 UTC"
       end
 
@@ -95,6 +99,7 @@ describe Groupdate do
       end
 
       it "group_by_month with time zone" do
+        skip unless supports_tz
         assert_group_tz :month, "2013-04-01 01:01:01 UTC", "2013-03-01 08:00:00 UTC"
       end
 
@@ -103,6 +108,7 @@ describe Groupdate do
       end
 
       it "group_by_year with time zone" do
+        skip unless supports_tz
         assert_group_tz :year, "2013-01-01 01:01:01 UTC", "2012-01-01 08:00:00 UTC"
       end
 
@@ -111,6 +117,7 @@ describe Groupdate do
       end
 
       it "group_by_hour_of_day with time zone" do
+        skip unless supports_tz
         assert_group_number_tz :hour_of_day, "2013-01-01 11:00:00 UTC", 3
       end
 
@@ -119,6 +126,7 @@ describe Groupdate do
       end
 
       it "group_by_day_of_week with time zone" do
+        skip unless supports_tz
         assert_group_number_tz :day_of_week, "2013-03-03 00:00:00 UTC", 6
       end
 
@@ -146,6 +154,7 @@ describe Groupdate do
         end
 
         it "group_by_day with time zone" do
+          skip unless supports_tz
           assert_zeros_tz :day, "2013-05-01 20:00:00 PDT", ["2013-04-30 00:00:00 PDT", "2013-05-01 00:00:00 PDT", "2013-05-02 00:00:00 PDT"], "2013-04-30 00:00:00 PDT", "2013-05-02 23:59:59 PDT"
         end
 
@@ -154,6 +163,7 @@ describe Groupdate do
         end
 
         it "group_by_week with time zone" do
+          skip unless supports_tz
           assert_zeros_tz :week, "2013-05-01 20:00:00 PDT", ["2013-04-21 00:00:00 PDT", "2013-04-28 00:00:00 PDT", "2013-05-05 00:00:00 PDT"], "2013-04-27 23:59:59 PDT", "2013-05-11 23:59:59 PDT"
         end
 
@@ -162,6 +172,7 @@ describe Groupdate do
         end
 
         it "group_by_month with time zone" do
+          skip unless supports_tz
           assert_zeros_tz :month, "2013-04-16 20:00:00 PDT", ["2013-03-01 00:00:00 PST", "2013-04-01 00:00:00 PDT", "2013-05-01 00:00:00 PDT"], "2013-03-01 00:00:00 PST", "2013-05-31 23:59:59 PDT"
         end
 
@@ -170,6 +181,7 @@ describe Groupdate do
         end
 
         it "group_by_year with time zone" do
+          skip unless supports_tz
           assert_zeros_tz :year, "2013-04-16 20:00:00 PDT", ["2012-01-01 00:00:00 PST", "2013-01-01 00:00:00 PST", "2014-01-01 00:00:00 PST"], "2012-01-01 00:00:00 PST", "2014-12-31 23:59:59 PST"
         end
 
@@ -253,8 +265,10 @@ describe Groupdate do
         Time.parse(key).strftime("%Y-%m-%d %H:%M:%S").gsub(/ 00\:00\:00\z/, "")
       end
     else
-      if User.connection.adapter_name == "PostgreSQL" and ActiveRecord::VERSION::MAJOR == 3
+      if User.connection.adapter_name == "PostgreSQL" && ActiveRecord::VERSION::MAJOR == 3
         Time.parse(key).utc.strftime("%Y-%m-%d %H:%M:%S+00")
+      elsif User.connection.adapter_name == "SQLite"
+        key
       else
         Time.parse(key)
       end
@@ -269,7 +283,7 @@ describe Groupdate do
         key
       end
     else
-      if User.connection.adapter_name == "PostgreSQL"
+      if User.connection.adapter_name == "PostgreSQL" || User.connection.adapter_name == "SQLite"
         ActiveRecord::VERSION::MAJOR == 3 ? key.to_s : key.to_f
       else
         key
