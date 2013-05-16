@@ -9,13 +9,13 @@ The simplest way to group by:
 - hour of the day
 - and more (complete list at bottom)
 
-:tada: Time zones supported!! **the best part**
+:tada: Time zones supported!! **the best part** (...except for SQLite :unamused:)
 
 :cake: Get the entire series - **the other best part**
 
 Works with Rails 3.0+
 
-Supports PostgreSQL and MySQL
+Supports PostgreSQL, MySQL, and SQLite
 
 [![Build Status](https://travis-ci.org/ankane/groupdate.png)](https://travis-ci.org/ankane/groupdate)
 
@@ -195,6 +195,11 @@ group_by_?
 - day_of_week
 
 ## Note
+
+[SQLite has no concept of timezones](http://marc.info/?l=sqlite-users&m=109798367320017) outside of primitive "localtime"
+to UTC conversions.  Time zones specified in queries are silently ignored, and columns are implicitly assumed to be, and
+reported back as, UTC.  Don't try to get too clever.
+
 
 activerecord <= 4.0.0.beta1 and the pg gem returns String objects instead of Time objects.
 [This is fixed on activerecord master](https://github.com/rails/rails/commit/2cc09441c2de57b024b11ba666ba1e72c2b20cfe)
