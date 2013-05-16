@@ -227,6 +227,12 @@ User.group_by_day_of_week(:created_at).count
 
 These are *not* a result of groupdate (and unfortunately cannot be fixed by groupdate)
 
+## History
+
+View the [changelog](https://github.com/ankane/groupdate/blob/master/CHANGELOG.md)
+
+Groupdate follows [Semantic Versioning](http://semver.org/)
+
 ## Contributing
 
 1. Fork it
