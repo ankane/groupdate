@@ -262,18 +262,10 @@ describe Groupdate do
   end
 
   def number_key(key)
-    if RUBY_PLATFORM == "java"
-      if User.connection.adapter_name == "PostgreSQL"
-        key.to_f
-      else
-        key
-      end
+    if RUBY_PLATFORM != "java" and User.connection.adapter_name == "PostgreSQL" and ActiveRecord::VERSION::MAJOR == 3
+      key.to_s
     else
-      if User.connection.adapter_name == "PostgreSQL"
-        ActiveRecord::VERSION::MAJOR == 3 ? key.to_s : key.to_f
-      else
-        key
-      end
+      key
     end
   end
 

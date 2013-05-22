@@ -75,9 +75,9 @@ module Groupdate
               when "PostgreSQL"
                 case field
                 when "day_of_week"
-                  ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ?)", time_zone]
+                  ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ?)::integer", time_zone]
                 when "hour_of_day"
-                  ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ?)", time_zone]
+                  ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ?)::integer", time_zone]
                 when "week" # start on Sunday, not PostgreSQL default Monday
                   ["(DATE_TRUNC('#{field}', (#{column}::timestamptz + INTERVAL '1 day') AT TIME ZONE ?) - INTERVAL '1 day') AT TIME ZONE ?", time_zone, time_zone]
                 else
