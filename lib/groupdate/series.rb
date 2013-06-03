@@ -68,7 +68,7 @@ module Groupdate
             series << series.last + step
           end
 
-          series.map{|s| s.to_time }
+          series.map{|s| s.to_time.utc }  # Rails 3.0 stable
         end
 
       Hash[series.map do |k|
