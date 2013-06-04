@@ -9,7 +9,7 @@ class TestMysql < Minitest::Test
 
   def time_key(key)
     if RUBY_PLATFORM == "java"
-      key.strftime("%Y-%m-%d %H:%M:%S").gsub(/ 00\:00\:00\z/, "")
+      key.utc.strftime("%Y-%m-%d %H:%M:%S").gsub(/ 00\:00\:00\z/, "")
     else
       key
     end

@@ -12,12 +12,14 @@ module Groupdate
     end
 
     def build_series(count)
+      utc = ActiveSupport::TimeZone["UTC"]
+
       cast_method =
         case @field
         when "day_of_week", "hour_of_day"
           lambda{|k| k.to_i }
         else
-          lambda{|k| k.is_a?(Time) ? k : Time.parse(k) }
+          lambda{|k| (k.is_a?(Time) ? k : utc.parse(k)).utc }
         end
 
       count = Hash[count.map do |k, v|
@@ -53,7 +55,8 @@ module Groupdate
             when "day"
               time.beginning_of_day
             when "week"
-              time.beginning_of_week(:sunday)
+              # beginning_of_week does not support :sunday argument in activesupport < 3.2
+              (time - time.wday.days).midnight
             when "month"
               time.beginning_of_month
             else # year
@@ -68,7 +71,7 @@ module Groupdate
             series << series.last + step
           end
 
-          series.map{|s| s.to_time }
+          series.map{|s| s.to_time.utc }
         end
 
       Hash[series.map do |k|

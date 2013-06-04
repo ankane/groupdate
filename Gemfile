@@ -4,6 +4,8 @@ source 'https://rubygems.org'
 gemspec
 
 # gem "activerecord", github: "rails/rails"
+# gem "activerecord", "3.0.20"
+# gem "mysql2", "< 0.3.0"
 
 platform :jruby do
   gem "activerecord-jdbcpostgresql-adapter", :github => "jruby/activerecord-jdbc-adapter"
