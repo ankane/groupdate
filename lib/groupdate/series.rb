@@ -19,7 +19,7 @@ module Groupdate
         when "day_of_week", "hour_of_day"
           lambda{|k| k.to_i }
         else
-          lambda{|k| (k.is_a?(Time) ? k : utc.parse(k)).utc }
+          lambda{|k| (k.is_a?(String) ? utc.parse(k) : k.to_time).utc }
         end
 
       count = Hash[count.map do |k, v|
