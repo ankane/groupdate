@@ -81,7 +81,7 @@ module Groupdate
 
                   ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column}, '+00:00', ?), '#{format}'), ?, '+00:00')", time_zone, time_zone]
                 end
-              when "PostgreSQL"
+              when "PostgreSQL", "PostGIS"
                 case field
                 when "day_of_week"
                   ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ?)::integer", time_zone]
