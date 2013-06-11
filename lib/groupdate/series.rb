@@ -1,7 +1,7 @@
 module Groupdate
   class Series
 
-    def initialize(relation, field, column, time_zone, time_range)
+    def initialize(relation, field, column, time_zone, time_range, week_start)
       @relation = relation
       if time_range.is_a?(Range)
         @relation = relation.where("#{column} BETWEEN ? AND ?", time_range.first, time_range.last)
@@ -9,6 +9,7 @@ module Groupdate
       @field = field
       @time_zone = time_zone
       @time_range = time_range
+      @week_start = week_start
     end
 
     def build_series(count)
@@ -55,8 +56,9 @@ module Groupdate
             when "day"
               time.beginning_of_day
             when "week"
-              # beginning_of_week does not support :sunday argument in activesupport < 3.2
-              (time - time.wday.days).midnight
+              # same logic as MySQL group
+              weekday = (time.wday - 1) % 7
+              (time - ((7 - @week_start + weekday) % 7).days).midnight
             when "month"
               time.beginning_of_month
             else # year

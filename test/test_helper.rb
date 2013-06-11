@@ -95,6 +95,42 @@ module TestGroupdate
     assert_result_time :week, "2013-03-17 00:00:00 PDT", "2013-03-17 07:00:00", true
   end
 
+  # week starting on monday
+
+  def test_week_end_of_week_mon
+    assert_result_time :week, "2013-03-18 00:00:00 UTC", "2013-03-24 23:59:59", false, :start => :mon
+  end
+
+  def test_week_start_of_week_mon
+    assert_result_time :week, "2013-03-25 00:00:00 UTC", "2013-03-25 00:00:00", false, :start => :mon
+  end
+
+  def test_week_end_of_week_with_time_zone_mon
+    assert_result_time :week, "2013-03-11 00:00:00 PDT", "2013-03-18 06:59:59", true, :start => :mon
+  end
+
+  def test_week_start_of_week_with_time_zone_mon
+    assert_result_time :week, "2013-03-18 00:00:00 PDT", "2013-03-18 07:00:00", true, :start => :mon
+  end
+
+  # week starting on saturday
+
+  def test_week_end_of_week_sat
+    assert_result_time :week, "2013-03-16 00:00:00 UTC", "2013-03-22 23:59:59", false, :start => :sat
+  end
+
+  def test_week_start_of_week_sat
+    assert_result_time :week, "2013-03-23 00:00:00 UTC", "2013-03-23 00:00:00", false, :start => :sat
+  end
+
+  def test_week_end_of_week_with_time_zone_sat
+    assert_result_time :week, "2013-03-09 00:00:00 PST", "2013-03-16 06:59:59", true, :start => :sat
+  end
+
+  def test_week_start_of_week_with_time_zone_sat
+    assert_result_time :week, "2013-03-16 00:00:00 PDT", "2013-03-16 07:00:00", true, :start => :sat
+  end
+
   # month
 
   def test_month_end_of_month
@@ -197,6 +233,22 @@ module TestGroupdate
     assert_zeros :week, "2013-05-01 20:00:00 PDT", ["2013-04-21 00:00:00 PDT", "2013-04-28 00:00:00 PDT", "2013-05-05 00:00:00 PDT"], "2013-04-27 23:59:59 PDT", "2013-05-11 23:59:59 PDT", true
   end
 
+  def test_zeros_week_mon
+    assert_zeros :week, "2013-05-01 20:00:00 UTC", ["2013-04-22 00:00:00 UTC", "2013-04-29 00:00:00 UTC", "2013-05-06 00:00:00 UTC"], "2013-04-27 23:59:59 UTC", "2013-05-11 23:59:59 UTC", false, :start => :mon
+  end
+
+  def test_zeros_week_time_zone_mon
+    assert_zeros :week, "2013-05-01 20:00:00 PDT", ["2013-04-22 00:00:00 PDT", "2013-04-29 00:00:00 PDT", "2013-05-06 00:00:00 PDT"], "2013-04-27 23:59:59 PDT", "2013-05-11 23:59:59 PDT", true, :start => :mon
+  end
+
+  def test_zeros_week_sat
+    assert_zeros :week, "2013-05-01 20:00:00 UTC", ["2013-04-20 00:00:00 UTC", "2013-04-27 00:00:00 UTC", "2013-05-04 00:00:00 UTC"], "2013-04-26 23:59:59 UTC", "2013-05-10 23:59:59 UTC", false, :start => :sat
+  end
+
+  def test_zeros_week_time_zone_sat
+    assert_zeros :week, "2013-05-01 20:00:00 PDT", ["2013-04-20 00:00:00 PDT", "2013-04-27 00:00:00 PDT", "2013-05-04 00:00:00 PDT"], "2013-04-26 23:59:59 PDT", "2013-05-10 23:59:59 PDT", true, :start => :sat
+  end
+
   def test_zeros_month
     assert_zeros :month, "2013-04-16 20:00:00 UTC", ["2013-03-01 00:00:00 UTC", "2013-04-01 00:00:00 UTC", "2013-05-01 00:00:00 UTC"], "2013-03-01 00:00:00 UTC", "2013-05-31 23:59:59 UTC"
   end
@@ -272,23 +324,23 @@ module TestGroupdate
 
   # helpers
 
-  def assert_result_time(method, expected, time_str, time_zone = false)
-    assert_result method, Time.parse(expected), time_str, time_zone
+  def assert_result_time(method, expected, time_str, time_zone = false, options = {})
+    assert_result method, Time.parse(expected), time_str, time_zone, options
   end
 
-  def assert_result(method, expected, time_str, time_zone = false)
+  def assert_result(method, expected, time_str, time_zone = false, options = {})
     create_user time_str
     expected = expected.is_a?(Time) ? time_key(expected) : number_key(expected)
-    assert_equal(ordered_hash({expected => 1}), User.send(:"group_by_#{method}", :created_at, time_zone ? "Pacific Time (US & Canada)" : nil).order(method.to_s).count)
+    assert_equal(ordered_hash({expected => 1}), User.send(:"group_by_#{method}", :created_at, time_zone ? "Pacific Time (US & Canada)" : nil, options).order(method.to_s).count)
   end
 
-  def assert_zeros(method, created_at, keys, range_start, range_end, time_zone = nil)
+  def assert_zeros(method, created_at, keys, range_start, range_end, time_zone = nil, options = {})
     create_user created_at
     expected = {}
     keys.each_with_index do |key, i|
       expected[Time.parse(key)] = i == 1 ? 1 : 0
     end
-    assert_equal(expected, User.send(:"group_by_#{method}", :created_at, time_zone ? "Pacific Time (US & Canada)" : nil, Time.parse(range_start)..Time.parse(range_end)).count)
+    assert_equal(expected, User.send(:"group_by_#{method}", :created_at, time_zone ? "Pacific Time (US & Canada)" : nil, Time.parse(range_start)..Time.parse(range_end), options).count)
   end
 
   def ordered_hash(hash)

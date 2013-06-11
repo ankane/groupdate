@@ -61,7 +61,14 @@ time_zone = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
 User.group_by_week(:created_at, time_zone).count
 ```
 
-**Note:** Weeks start on Sunday.
+**Note:** Weeks start on Sunday by default. For other days, use:
+
+```ruby
+User.group_by_week(:created_at, :start => :mon) # first three letters of day
+
+# must be the last argument
+User.group_by_week(:created_at, time_zone, :start => :sat)
+```
 
 You can also group by the day of the week or hour of the day.
 

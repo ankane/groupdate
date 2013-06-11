@@ -35,6 +35,8 @@ module Groupdate
         (time_fields + number_fields).each do |field|
           # no define_singleton_method in ruby 1.8
           (class << self; self end).send :define_method, :"group_by_#{field}" do |*args|
+            args = args.dup
+            options = args[-1].is_a?(Hash) ? args.pop : {}
             column = connection.quote_table_name(args[0])
             time_zone = args[1] || Time.zone || "Etc/UTC"
             if time_zone.is_a?(ActiveSupport::TimeZone) or time_zone = ActiveSupport::TimeZone[time_zone]
@@ -42,6 +44,13 @@ module Groupdate
             else
               raise "Unrecognized time zone"
             end
+
+            # for week
+            week_start = [:mon, :tue, :wed, :thu, :fri, :sat, :sun].index((options[:start] || :sun).to_sym)
+            if field == "week" and !week_start
+              raise "Unrecognized :start option"
+            end
+
             query =
               case connection.adapter_name
               when "MySQL", "Mysql2"
@@ -52,7 +61,7 @@ module Groupdate
                 when "hour_of_day"
                   ["EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?))", time_zone]
                 when "week"
-                  ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL (DAYOFWEEK(CONVERT_TZ(#{column}, '+00:00', ?)) - 1) DAY), '+00:00', ?), '%Y-%m-%d 00:00:00'), ?, '+00:00')", time_zone, time_zone, time_zone]
+                  ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL ((#{7 - week_start} + WEEKDAY(CONVERT_TZ(#{column}, '+00:00', ?))) % 7) DAY), '+00:00', ?), '%Y-%m-%d 00:00:00'), ?, '+00:00')", time_zone, time_zone, time_zone]
                 else
                   format =
                     case field
@@ -79,7 +88,7 @@ module Groupdate
                 when "hour_of_day"
                   ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ?)::integer", time_zone]
                 when "week" # start on Sunday, not PostgreSQL default Monday
-                  ["(DATE_TRUNC('#{field}', (#{column}::timestamptz + INTERVAL '1 day') AT TIME ZONE ?) - INTERVAL '1 day') AT TIME ZONE ?", time_zone, time_zone]
+                  ["(DATE_TRUNC('#{field}', (#{column}::timestamptz - INTERVAL '#{week_start} day') AT TIME ZONE ?) + INTERVAL '#{week_start} day') AT TIME ZONE ?", time_zone, time_zone]
                 else
                   ["DATE_TRUNC('#{field}', #{column}::timestamptz AT TIME ZONE ?) AT TIME ZONE ?", time_zone, time_zone]
                 end
@@ -89,7 +98,7 @@ module Groupdate
 
             group = group(Groupdate::OrderHack.new(sanitize_sql_array(query), field, time_zone))
             if args[2]
-              Series.new(group, field, column, time_zone, args[2])
+              Series.new(group, field, column, time_zone, args[2], week_start)
             else
               group
             end
