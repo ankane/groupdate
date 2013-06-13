@@ -299,6 +299,14 @@ module TestGroupdate
     assert_equal(expected, User.where("id = 0").group_by_day(:created_at, Time.zone, Time.parse("2013-05-01 00:00:00 UTC")..Time.parse("2013-05-01 23:59:59 UTC")).count)
   end
 
+  def test_zeros_datetime
+    create_user "2013-05-01 00:00:00 UTC"
+    expected = {
+      Time.parse("2013-05-01 00:00:00 UTC") => 1
+    }
+    assert_equal(expected, User.group_by_day(:created_at, Time.zone, DateTime.parse("2013-05-01 00:00:00 UTC")..DateTime.parse("2013-05-01 00:00:00 UTC")).count)
+  end
+
   # misc
 
   def test_order_day
