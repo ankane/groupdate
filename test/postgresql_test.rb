@@ -1,6 +1,6 @@
 require "test_helper"
 
-class TestPostgresql < Minitest::Test
+class TestPostgresql < Minitest::Unit::TestCase
   include TestGroupdate
 
   def setup
