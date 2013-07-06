@@ -1,7 +1,7 @@
 require "groupdate/version"
 require "groupdate/scopes"
 
-ActiveRecord::Base.send :include, Groupdate::Scopes
+ActiveRecord::Base.send :extend, Groupdate::Scopes
 
 # hack for **unfixed** rails issue
 # https://github.com/rails/rails/issues/7121
