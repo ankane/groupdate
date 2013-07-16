@@ -269,7 +269,7 @@ module TestGroupdate
     7.times do |n|
       expected[n] = n == 3 ? 1 : 0
     end
-    assert_equal(expected, User.group_by_day_of_week(:created_at, Time.zone, true).count(:created_at))
+    assert_equal expected, User.group_by_day_of_week(:created_at, Time.zone, true).count(:created_at)
   end
 
   def test_zeros_hour_of_day
@@ -278,7 +278,7 @@ module TestGroupdate
     24.times do |n|
       expected[n] = n == 20 ? 1 : 0
     end
-    assert_equal(expected, User.group_by_hour_of_day(:created_at, Time.zone, true).count(:created_at))
+    assert_equal expected, User.group_by_hour_of_day(:created_at, Time.zone, true).count(:created_at)
   end
 
   def test_zeros_excludes_end
@@ -286,7 +286,7 @@ module TestGroupdate
     expected = {
       Time.parse("2013-05-01 00:00:00 UTC") => 0
     }
-    assert_equal(expected, User.group_by_day(:created_at, Time.zone, Time.parse("2013-05-01 00:00:00 UTC")...Time.parse("2013-05-02 00:00:00 UTC")).count)
+    assert_equal expected, User.group_by_day(:created_at, Time.zone, Time.parse("2013-05-01 00:00:00 UTC")...Time.parse("2013-05-02 00:00:00 UTC")).count
   end
 
   def test_zeros_previous_scope
@@ -294,7 +294,7 @@ module TestGroupdate
     expected = {
       Time.parse("2013-05-01 00:00:00 UTC") => 0
     }
-    assert_equal(expected, User.where("id = 0").group_by_day(:created_at, Time.zone, Time.parse("2013-05-01 00:00:00 UTC")..Time.parse("2013-05-01 23:59:59 UTC")).count)
+    assert_equal expected, User.where("id = 0").group_by_day(:created_at, Time.zone, Time.parse("2013-05-01 00:00:00 UTC")..Time.parse("2013-05-01 23:59:59 UTC")).count
   end
 
   def test_zeros_datetime
@@ -302,7 +302,7 @@ module TestGroupdate
     expected = {
       Time.parse("2013-05-01 00:00:00 UTC") => 1
     }
-    assert_equal(expected, User.group_by_day(:created_at, Time.zone, DateTime.parse("2013-05-01 00:00:00 UTC")..DateTime.parse("2013-05-01 00:00:00 UTC")).count)
+    assert_equal expected, User.group_by_day(:created_at, Time.zone, DateTime.parse("2013-05-01 00:00:00 UTC")..DateTime.parse("2013-05-01 00:00:00 UTC")).count
   end
 
   def test_zeros_null_value
@@ -314,24 +314,24 @@ module TestGroupdate
   # misc
 
   def test_order_day
-    assert_equal({}, User.group_by_day(:created_at).order("day desc").limit(20).count)
+    assert_empty User.group_by_day(:created_at).order("day desc").limit(20).count
   end
 
   def test_order_week
-    assert_equal({}, User.group_by_week(:created_at).order("week asc").count)
+    assert_empty User.group_by_week(:created_at).order("week asc").count
   end
 
   def test_order_hour_of_day
-    assert_equal({}, User.group_by_hour_of_day(:created_at).order("hour_of_day desc").count)
+    assert_empty User.group_by_hour_of_day(:created_at).order("hour_of_day desc").count
   end
 
   def test_table_name
-    assert_equal({}, User.group_by_day("users.created_at").count)
+    assert_empty User.group_by_day("users.created_at").count
   end
 
   def test_previous_scopes
     create_user "2013-05-01 00:00:00 UTC"
-    assert_equal({}, User.where("id = 0").group_by_day(:created_at).count)
+    assert_empty User.where("id = 0").group_by_day(:created_at).count
   end
 
   # helpers
@@ -343,7 +343,7 @@ module TestGroupdate
   def assert_result(method, expected, time_str, time_zone = false, options = {})
     create_user time_str
     expected = expected.is_a?(Time) ? time_key(expected) : number_key(expected)
-    assert_equal(ordered_hash({expected => 1}), User.send(:"group_by_#{method}", :created_at, time_zone ? "Pacific Time (US & Canada)" : nil, options).order(method.to_s).count)
+    assert_equal ordered_hash({expected => 1}), User.send(:"group_by_#{method}", :created_at, time_zone ? "Pacific Time (US & Canada)" : nil, options).order(method.to_s).count
   end
 
   def assert_zeros(method, created_at, keys, range_start, range_end, time_zone = nil, options = {})
@@ -352,7 +352,7 @@ module TestGroupdate
     keys.each_with_index do |key, i|
       expected[Time.parse(key)] = i == 1 ? 1 : 0
     end
-    assert_equal(expected, User.send(:"group_by_#{method}", :created_at, time_zone ? "Pacific Time (US & Canada)" : nil, Time.parse(range_start)..Time.parse(range_end), options).count)
+    assert_equal expected, User.send(:"group_by_#{method}", :created_at, time_zone ? "Pacific Time (US & Canada)" : nil, Time.parse(range_start)..Time.parse(range_end), options).count
   end
 
   def ordered_hash(hash)
@@ -360,7 +360,7 @@ module TestGroupdate
   end
 
   def create_user(created_at)
-    User.create!(:name => "Andrew", :score => 1, :created_at => ActiveSupport::TimeZone["UTC"].parse(created_at))
+    User.create! :name => "Andrew", :score => 1, :created_at => ActiveSupport::TimeZone["UTC"].parse(created_at)
   end
 
   def teardown
