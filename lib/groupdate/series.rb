@@ -3,7 +3,8 @@ module Groupdate
 
     def initialize(relation, field, column, time_zone, time_range, week_start)
       if time_range.is_a?(Range)
-        @relation = relation.where("#{column} BETWEEN ? AND ?", time_range.first, time_range.last)
+        # doesn't matter whether we include the end of a ... range - it will be excluded later
+        @relation = relation.where("#{column} >= ? AND #{column} <= ?", time_range.first, time_range.last)
       else
         @relation = relation.where("#{column} IS NOT NULL")
       end
