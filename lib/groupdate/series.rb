@@ -25,9 +25,7 @@ module Groupdate
           lambda{|k| (k.is_a?(String) ? utc.parse(k) : k.to_time).utc }
         end
 
-      count = Hash[count.map do |k, v|
-        [cast_method.call(k), v]
-      end]
+      count = Hash[ count.map{|k, v| [cast_method.call(k), v] } ]
 
       series =
         case @field
