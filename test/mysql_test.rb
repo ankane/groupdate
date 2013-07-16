@@ -8,11 +8,7 @@ class TestMysql < Minitest::Unit::TestCase
   end
 
   def time_key(key)
-    if RUBY_PLATFORM == "java"
-      key.utc.strftime("%Y-%m-%d %H:%M:%S").gsub(/ 00\:00\:00\z/, "")
-    else
-      key
-    end
+    key
   end
 
   def number_key(key)

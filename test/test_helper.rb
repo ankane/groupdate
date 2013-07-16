@@ -4,6 +4,11 @@ require "minitest/autorun"
 require "minitest/pride"
 require "logger"
 
+# TODO determine why this is necessary
+if RUBY_PLATFORM == "java"
+  ENV["TZ"] = "UTC"
+end
+
 # for debugging
 # ActiveRecord::Base.logger = Logger.new(STDOUT)
 

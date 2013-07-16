@@ -8,14 +8,10 @@ class TestPostgresql < Minitest::Unit::TestCase
   end
 
   def time_key(key)
-    if RUBY_PLATFORM == "java"
-      key.utc.strftime("%Y-%m-%d %H:%M:%S%z")[0..-3]
+    if ActiveRecord::VERSION::MAJOR == 3
+      key.utc.strftime("%Y-%m-%d %H:%M:%S+00")
     else
-      if ActiveRecord::VERSION::MAJOR == 3
-        key.utc.strftime("%Y-%m-%d %H:%M:%S+00")
-      else
-        key
-      end
+      key
     end
   end
 
