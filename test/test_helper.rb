@@ -18,12 +18,10 @@ end
 %w(postgresql mysql2).each do |adapter|
   ActiveRecord::Base.establish_connection :adapter => adapter, :database => "groupdate_test", :username => adapter == "mysql2" ? "root" : nil
 
-  unless ActiveRecord::Base.connection.table_exists? "users"
-    ActiveRecord::Migration.create_table :users do |t|
-      t.string :name
-      t.integer :score
-      t.timestamps
-    end
+  ActiveRecord::Migration.create_table :users, :force => true do |t|
+    t.string :name
+    t.integer :score
+    t.timestamps
   end
 end
 
