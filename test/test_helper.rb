@@ -305,6 +305,12 @@ module TestGroupdate
     assert_equal(expected, User.group_by_day(:created_at, Time.zone, DateTime.parse("2013-05-01 00:00:00 UTC")..DateTime.parse("2013-05-01 00:00:00 UTC")).count)
   end
 
+  def test_zeros_null_value
+    user = User.create!(name: "Andrew")
+    user.update_column :created_at, nil
+    assert_equal 0, User.group_by_hour_of_day(:created_at, Time.zone, true).count[0]
+  end
+
   # misc
 
   def test_order_day

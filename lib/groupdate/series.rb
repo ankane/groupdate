@@ -2,9 +2,10 @@ module Groupdate
   class Series
 
     def initialize(relation, field, column, time_zone, time_range, week_start)
-      @relation = relation
       if time_range.is_a?(Range)
         @relation = relation.where("#{column} BETWEEN ? AND ?", time_range.first, time_range.last)
+      else
+        @relation = relation.where("#{column} IS NOT NULL")
       end
       @field = field
       @time_zone = time_zone
