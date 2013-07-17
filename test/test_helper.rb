@@ -32,6 +32,8 @@ end
 
 module TestGroupdate
 
+  @@default_config = Hash[Groupdate.class_variables.collect { |opt| [opt[2..-1].to_sym, Groupdate.class_variable_get(opt)] }]
+
   # second
 
   def test_second_end_of_second
@@ -132,6 +134,32 @@ module TestGroupdate
 
   def test_week_start_of_week_with_time_zone_sat
     assert_result_time :week, "2013-03-16 00:00:00 PDT", "2013-03-16 07:00:00", true, :start => :sat
+  end
+
+  # config week starting key
+
+  def test_week_start_of_week_mon_from_config
+    with_config :week_starts_with => :mon do
+      assert_result_time :week, "2013-03-25 00:00:00 UTC", "2013-03-25 00:00:00", false
+    end
+  end
+
+  def test_week_end_of_week_mon_from_config
+    with_config :week_starts_with => :mon do
+      assert_result_time :week, "2013-03-18 00:00:00 UTC", "2013-03-24 23:59:59", false
+    end
+  end
+
+  def test_week_end_of_week_with_time_zone_mon_from_config
+    with_config :week_starts_with => :mon do
+      assert_result_time :week, "2013-03-11 00:00:00 PDT", "2013-03-18 06:59:59", true
+    end
+  end
+
+  def test_week_start_of_week_with_time_zone_mon_from_config
+    with_config :week_starts_with => :mon do
+      assert_result_time :week, "2013-03-18 00:00:00 PDT", "2013-03-18 07:00:00", true
+    end
   end
 
   # month
@@ -370,6 +398,21 @@ module TestGroupdate
 
   def teardown
     User.delete_all
+  end
+
+  def with_config(config)
+    setup_config config
+    yield
+  ensure
+    setup_config @@default_config
+  end
+
+private
+
+  def setup_config(config)
+    config.each do |option, value|
+      Groupdate.send "#{option}=", value
+    end
   end
 
 end

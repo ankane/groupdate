@@ -21,3 +21,12 @@ module ActiveRecord
 
   end
 end
+
+module Groupdate
+  mattr_accessor :week_starts_with
+  @@week_starts_with = :sun
+
+  def self.configure
+    yield self
+  end
+end
