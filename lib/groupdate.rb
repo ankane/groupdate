@@ -23,8 +23,8 @@ module ActiveRecord
 end
 
 module Groupdate
-  mattr_accessor :week_starts_with
-  @@week_starts_with = :sun
+  mattr_accessor :week_start
+  @@week_start = :sun
 
   def self.configure
     yield self

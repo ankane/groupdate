@@ -139,25 +139,25 @@ module TestGroupdate
   # config week starting key
 
   def test_week_start_of_week_mon_from_config
-    with_config :week_starts_with => :mon do
+    with_config :week_start => :mon do
       assert_result_time :week, "2013-03-25 00:00:00 UTC", "2013-03-25 00:00:00", false
     end
   end
 
   def test_week_end_of_week_mon_from_config
-    with_config :week_starts_with => :mon do
+    with_config :week_start => :mon do
       assert_result_time :week, "2013-03-18 00:00:00 UTC", "2013-03-24 23:59:59", false
     end
   end
 
   def test_week_end_of_week_with_time_zone_mon_from_config
-    with_config :week_starts_with => :mon do
+    with_config :week_start => :mon do
       assert_result_time :week, "2013-03-11 00:00:00 PDT", "2013-03-18 06:59:59", true
     end
   end
 
   def test_week_start_of_week_with_time_zone_mon_from_config
-    with_config :week_starts_with => :mon do
+    with_config :week_start => :mon do
       assert_result_time :week, "2013-03-18 00:00:00 PDT", "2013-03-18 07:00:00", true
     end
   end
