@@ -73,7 +73,7 @@ User.group_by_week(:created_at, time_zone, :start => :sat)
 You can override this option:
 ```ruby
 Groupdate.configure do |config|
-  config.week_starts_with = :sat
+  config.week_start = :sat
 end
 ```
 
