@@ -24,9 +24,5 @@ end
 
 module Groupdate
   mattr_accessor :week_start
-  @@week_start = :sun
-
-  def self.configure
-    yield self
-  end
+  self.week_start = :sun
 end
