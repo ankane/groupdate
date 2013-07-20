@@ -1,3 +1,8 @@
+# 1.0.4
+
+- Added global week_start option
+- Fixed bug with NULL values and series
+
 ## 1.0.3
 
 - Fixed deprecation warning when used with will_paginate
