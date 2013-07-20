@@ -68,11 +68,8 @@ User.group_by_week(:created_at, :start => :mon) # first three letters of day
 
 # must be the last argument
 User.group_by_week(:created_at, time_zone, :start => :sat)
-```
 
-You can override this option:
-
-```ruby
+# change globally
 Groupdate.week_start = :mon
 ```
 
