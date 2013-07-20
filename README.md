@@ -71,10 +71,9 @@ User.group_by_week(:created_at, time_zone, :start => :sat)
 ```
 
 You can override this option:
+
 ```ruby
-Groupdate.configure do |config|
-  config.week_start = :sat
-end
+Groupdate.week_start = :mon
 ```
 
 You can also group by the day of the week or hour of the day.
