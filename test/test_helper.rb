@@ -320,6 +320,17 @@ module TestGroupdate
     assert_equal 0, User.group_by_hour_of_day(:created_at, Time.zone, true).count[0]
   end
 
+  def test_zeroes_range_true
+    create_user "2013-05-01 00:00:00 UTC"
+    create_user "2013-05-03 00:00:00 UTC"
+    expected = {
+      Time.parse("2013-05-01 00:00:00 UTC") => 1,
+      Time.parse("2013-05-02 00:00:00 UTC") => 0,
+      Time.parse("2013-05-03 00:00:00 UTC") => 1
+    }
+    assert_equal expected, User.group_by_day(:created_at, Time.zone, true).count
+  end
+
   # week_start
 
   def test_week_start
