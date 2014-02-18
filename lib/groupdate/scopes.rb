@@ -40,20 +40,20 @@ module Groupdate
               ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(DATE_SUB(#{column}, INTERVAL ((#{7 - week_start} + WEEKDAY(CONVERT_TZ(#{column}, '+00:00', ?))) % 7) DAY), INTERVAL #{day_start} HOUR), '+00:00', ?), '%Y-%m-%d 00:00:00'), ?, '+00:00'), INTERVAL #{day_start} HOUR)", time_zone, time_zone, time_zone]
             else
               format =
-                  case field
-                  when "second"
-                    "%Y-%m-%d %H:%i:%S"
-                  when "minute"
-                    "%Y-%m-%d %H:%i:00"
-                  when "hour"
-                    "%Y-%m-%d %H:00:00"
-                  when "day"
-                    "%Y-%m-%d 00:00:00"
-                  when "month"
-                    "%Y-%m-01 00:00:00"
-                  else # year
-                    "%Y-01-01 00:00:00"
-                  end
+                case field
+                when "second"
+                  "%Y-%m-%d %H:%i:%S"
+                when "minute"
+                  "%Y-%m-%d %H:%i:00"
+                when "hour"
+                  "%Y-%m-%d %H:00:00"
+                when "day"
+                  "%Y-%m-%d 00:00:00"
+                when "month"
+                  "%Y-%m-01 00:00:00"
+                else # year
+                  "%Y-01-01 00:00:00"
+                end
 
               ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} HOUR), '+00:00', ?), '#{format}'), ?, '+00:00'), INTERVAL #{day_start} HOUR)", time_zone, time_zone]
             end
