@@ -56,6 +56,10 @@ module TestGroupdate
     assert_result_time :minute, "2013-05-03 00:01:00 UTC", "2013-05-03 00:01:00"
   end
 
+  def test_minute_ignores_day_start
+    assert_result_time :minute, "2013-05-03 00:01:00 UTC", "2013-05-03 00:01:00", false, day_start: 1
+  end
+
   # hour
 
   def test_hour_end_of_hour
@@ -64,6 +68,10 @@ module TestGroupdate
 
   def test_hour_start_of_hour
     assert_result_time :hour, "2013-05-03 01:00:00 UTC", "2013-05-03 01:00:00"
+  end
+
+  def test_hour_ignores_day_start
+    assert_result_time :hour, "2013-05-03 01:00:00 UTC", "2013-05-03 01:00:00", false, day_start: 1
   end
 
   # day
@@ -82,6 +90,12 @@ module TestGroupdate
 
   def test_day_start_of_day_with_time_zone
     assert_result_time :day, "2013-05-03 00:00:00 PDT", "2013-05-03 07:00:00", true
+  end
+
+  # day starting at different times
+
+  def test_day_start_of_day_with_hour_offset
+    assert_result_time :day, "2013-05-03 01:00:00 UTC", "2013-05-04 00:59:59", false, day_start: 1
   end
 
   # week
@@ -138,6 +152,11 @@ module TestGroupdate
     assert_result_time :week, "2013-03-16 00:00:00 PDT", "2013-03-16 07:00:00", true, :start => :sat
   end
 
+  # weeks starting on different hours of the day
+  def test_week_start_of_week_with_hour_offset
+    assert_result_time :week, "2013-03-24 01:00:00 UTC", "2013-03-24 01:00:00", false, day_start: 1
+  end
+
   # month
 
   def test_month_end_of_month
@@ -192,6 +211,10 @@ module TestGroupdate
     assert_result :hour_of_day, 1, "2013-01-01 09:00:00", true
   end
 
+  def test_hour_of_day_ignores_with_hour_offset
+    assert_result :hour_of_day, 23, "2013-01-01 00:59:59", false, day_start: 1
+  end
+
   # day of week
 
   def test_day_of_week_end_of_day
@@ -208,6 +231,10 @@ module TestGroupdate
 
   def test_day_of_week_start_of_week_with_time_zone
     assert_result :day_of_week, 3, "2013-01-02 08:00:00", true
+  end
+
+  def test_day_of_week_end_of_day_with_hour_offset
+    assert_result :day_of_week, 3, "2013-01-03 00:59:59", false, day_start: 1
   end
 
   # zeros

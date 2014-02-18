@@ -23,6 +23,7 @@ module ActiveRecord
 end
 
 module Groupdate
-  mattr_accessor :week_start
+  mattr_accessor :week_start, :day_start
   self.week_start = :sun
+  self.day_start = 0
 end
