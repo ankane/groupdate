@@ -143,7 +143,7 @@ Groupdate 2.0 brings a number a great improvements.
 
 However, there are a few things to be aware of when upgrading.
 
-1. Groupdate methods must come after any `where`, `order`, `joins`, or `includes`.
+1. Groupdate methods must come after any `where`, `joins`, or `includes`.
 
   Throws error
 
