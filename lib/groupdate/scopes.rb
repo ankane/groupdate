@@ -21,7 +21,7 @@ module Groupdate
         # for week
         week_start = [:mon, :tue, :wed, :thu, :fri, :sat, :sun].index((options[:week_start] || options[:start] || Groupdate.week_start).to_sym)
         if field == "week" and !week_start
-          raise "Unrecognized :start option"
+          raise "Unrecognized :week_start option"
         end
 
         # for day
