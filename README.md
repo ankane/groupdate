@@ -64,7 +64,7 @@ The default time zone is `Time.zone`.  Change this with:
 Groupdate.time_zone = "Pacific Time (US & Canada)"
 ```
 
-or with:
+or
 
 ```ruby
 User.group_by_week(:created_at, time_zone: "Pacific Time (US & Canada)").count
@@ -87,7 +87,7 @@ Weeks start on Sunday by default. Change this with:
 Groupdate.week_start = :mon # first three letters of day
 ```
 
-or with:
+or
 
 ```ruby
 User.group_by_week(:created_at, week_start: :mon).count
@@ -101,7 +101,7 @@ You can change the hour days start with:
 Groupdate.day_start = 2 # 2 am - 2 am
 ```
 
-or with:
+or
 
 ```ruby
 User.group_by_day(:created_at, day_start: 2).count
