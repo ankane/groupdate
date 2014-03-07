@@ -87,7 +87,7 @@ User.group_by_hour_of_day(:created_at).count
 # }
 ```
 
-Works with all aggregate functions, like `average`, `maximum`, `minimum`.
+Works with all aggregate functions, like `average`, `minimum`, and `maximum`.
 
 ```ruby
 Request.group_by_minute(:started_at).average(:request_time)
