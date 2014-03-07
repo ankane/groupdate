@@ -74,7 +74,7 @@ module Groupdate
 
         group = group(Groupdate::OrderHack.new(sanitize_sql_array(query), field, time_zone))
         range = args[2] || options[:range]
-        if range
+        unless options[:series] == false
           Series.new(group, field, column, time_zone, range, week_start, day_start)
         else
           group

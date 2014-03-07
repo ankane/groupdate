@@ -44,38 +44,42 @@ module Groupdate
               sorted_keys.first..sorted_keys.last
             end
 
-          # determine start time
-          time = time_range.first.to_time.in_time_zone(@time_zone) - @day_start.hours
-          starts_at =
-            case @field
-            when "second"
-              time.change(:usec => 0)
-            when "minute"
-              time.change(:sec => 0)
-            when "hour"
-              time.change(:min => 0)
-            when "day"
-              time.beginning_of_day
-            when "week"
-              # same logic as MySQL group
-              weekday = (time.wday - 1) % 7
-              (time - ((7 - @week_start + weekday) % 7).days).midnight
-            when "month"
-              time.beginning_of_month
-            else # year
-              time.beginning_of_year
+          if time_range.first
+            # determine start time
+            time = time_range.first.to_time.in_time_zone(@time_zone) - @day_start.hours
+            starts_at =
+              case @field
+              when "second"
+                time.change(:usec => 0)
+              when "minute"
+                time.change(:sec => 0)
+              when "hour"
+                time.change(:min => 0)
+              when "day"
+                time.beginning_of_day
+              when "week"
+                # same logic as MySQL group
+                weekday = (time.wday - 1) % 7
+                (time - ((7 - @week_start + weekday) % 7).days).midnight
+              when "month"
+                time.beginning_of_month
+              else # year
+                time.beginning_of_year
+              end
+
+            starts_at += @day_start.hours
+            series = [starts_at]
+
+            step = 1.send(@field)
+
+            while time_range.cover?(series.last + step)
+              series << series.last + step
             end
 
-          starts_at += @day_start.hours
-          series = [starts_at]
-
-          step = 1.send(@field)
-
-          while time_range.cover?(series.last + step)
-            series << series.last + step
+            series.map{|s| s.to_time.utc }
+          else
+            []
           end
-
-          series.map{|s| s.to_time.utc }
         end
 
       Hash[series.map do |k|
