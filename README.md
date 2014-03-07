@@ -78,7 +78,7 @@ User.group_by_day_of_week(:created_at).count
 # }
 
 # hour of the day
-User.group_by_hour_of_day(:created_at, time_zone: "Pacific Time (US & Canada)").count
+User.group_by_hour_of_day(:created_at).count
 # {
 #   0 => 34,
 #   1 => 61,
@@ -87,10 +87,10 @@ User.group_by_hour_of_day(:created_at, time_zone: "Pacific Time (US & Canada)").
 # }
 ```
 
-Go nuts!
+Works with all aggregate functions, like `average`, `maximum`, `minimum`.
 
 ```ruby
-Request.where(page: "/home").group_by_minute(:started_at).average(:request_time)
+Request.group_by_minute(:started_at).average(:request_time)
 ```
 
 ## Customize
