@@ -97,6 +97,14 @@ or
 User.group_by_day(:created_at, day_start: 2).count
 ```
 
+### Time Range
+
+To get a specific time range, use:
+
+```ruby
+User.group_by_day(:created_at, range: 2.weeks.ago.midnight..Time.now).count
+```
+
 ## Installation
 
 Add this line to your application’s Gemfile:
