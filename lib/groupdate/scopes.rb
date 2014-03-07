@@ -53,7 +53,7 @@ module Groupdate
                   "%Y-%m-01 00:00:00"
                 else # year
                   "%Y-01-01 00:00:00"
-              end
+                end
 
               ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} HOUR), '+00:00', ?), '#{format}'), ?, '+00:00'), INTERVAL #{day_start} HOUR)", time_zone, time_zone]
             end
