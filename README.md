@@ -65,11 +65,9 @@ User.group_by_week(:created_at, time_zone: "Pacific Time (US & Canada)").count
 #   2013-03-10 08:00:00 UTC => 70,
 #   2013-03-17 07:00:00 UTC => 54
 # }
-
-# equivalently
-time_zone = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
-User.group_by_week(:created_at, time_zone: time_zone).count
 ```
+
+Time zone objects also work.
 
 ### Week Start
 
