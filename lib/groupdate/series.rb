@@ -23,7 +23,7 @@ module Groupdate
         when "day_of_week", "hour_of_day"
           lambda{|k| k.to_i }
         else
-          lambda{|k| (k.is_a?(String) ? utc.parse(k) : k.to_time).utc }
+          lambda{|k| (k.is_a?(String) ? utc.parse(k) : k.to_time).in_time_zone(@time_zone) }
         end
 
       count = Hash[ count.map{|k, v| [cast_method.call(k), v] } ]
@@ -76,7 +76,7 @@ module Groupdate
               series << series.last + step
             end
 
-            series.map{|s| s.to_time.utc }
+            series
           else
             []
           end

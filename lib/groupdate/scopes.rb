@@ -13,6 +13,7 @@ module Groupdate
         column = connection.quote_table_name(args[0])
         time_zone = args[1] || options[:time_zone] || Groupdate.time_zone || Time.zone || "Etc/UTC"
         if time_zone.is_a?(ActiveSupport::TimeZone) or time_zone = ActiveSupport::TimeZone[time_zone]
+          time_zone_object = time_zone
           time_zone = time_zone.tzinfo.name
         else
           raise "Unrecognized time zone"
@@ -75,7 +76,7 @@ module Groupdate
         group = group(Groupdate::OrderHack.new(sanitize_sql_array(query), field, time_zone))
         range = args[2] || options[:range] || true
         unless options[:series] == false
-          Series.new(group, field, column, time_zone, range, week_start, day_start)
+          Series.new(group, field, column, time_zone_object, range, week_start, day_start)
         else
           group
         end
