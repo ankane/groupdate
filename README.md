@@ -4,10 +4,8 @@ The simplest way to group by:
 
 - day
 - week
-- month
-- day of the week
 - hour of the day
-- and more (complete list at bottom)
+- and more (complete list below)
 
 :tada: Time zones supported!! **the best part**
 
@@ -23,6 +21,8 @@ Supports PostgreSQL and MySQL
 
 ## Get Started
 
+Group by day
+
 ```ruby
 User.group_by_day(:created_at).count
 # {
@@ -30,25 +30,41 @@ User.group_by_day(:created_at).count
 #   2013-04-17 00:00:00 UTC => 100,
 #   2013-04-18 00:00:00 UTC => 34
 # }
-
-Task.group_by_month(:updated_at).count
-# {
-#   2013-02-01 00:00:00 UTC => 84,
-#   2013-03-01 00:00:00 UTC => 23,
-#   2013-04-01 00:00:00 UTC => 44
-# }
-
-Goal.group_by_year(:accomplished_at).count
-# {
-#   2011-01-01 00:00:00 UTC => 7,
-#   2012-01-01 00:00:00 UTC => 11,
-#   2013-01-01 00:00:00 UTC => 3
-# }
 ```
 
 Results are returned in ascending order, so no need to sort.
 
-The default time zone is `Time.zone`.  Pass a time zone with:
+You can also group by:
+
+- second
+- minute
+- hour
+- week
+- month
+- year
+
+and
+
+- hour_of_day
+- day_of_week (Sunday = 0, Monday = 1, etc)
+
+Groupdate works with all aggregate methods, like `average`, `minimum`, and `maximum`.
+
+```ruby
+Request.group_by_minute(:started_at).average(:request_time)
+```
+
+## Customize
+
+### Time Zone
+
+The default time zone is `Time.zone`.  Change this with:
+
+```ruby
+Groupdate.time_zone = "Pacific Time (US & Canada)"
+```
+
+or with:
 
 ```ruby
 User.group_by_week(:created_at, time_zone: "Pacific Time (US & Canada)").count
@@ -63,71 +79,33 @@ time_zone = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
 User.group_by_week(:created_at, time_zone: time_zone).count
 ```
 
-**Note:** Weeks start on Sunday by default.
+### Week Start
 
-You can also group by the day of the week or hour of the day.
-
-```ruby
-# day of the week
-User.group_by_day_of_week(:created_at).count
-# {
-#   0 => 54, # Sunday
-#   1 => 2,  # Monday
-#   ...
-#   6 => 3   # Saturday
-# }
-
-# hour of the day
-User.group_by_hour_of_day(:created_at).count
-# {
-#   0 => 34,
-#   1 => 61,
-#   ...
-#   23 => 12
-# }
-```
-
-Works with all aggregate functions, like `average`, `minimum`, and `maximum`.
+Weeks start on Sunday by default. Change this with:
 
 ```ruby
-Request.group_by_minute(:started_at).average(:request_time)
+Groupdate.week_start = :mon # first three letters of day
 ```
 
-## Customize
-
-You can change the day weeks start with:
+or with:
 
 ```ruby
-User.group_by_week(:created_at, week_start: :mon) # first three letters of day
-
-# change globally
-Groupdate.week_start = :mon
+User.group_by_week(:created_at, week_start: :mon).count
 ```
+
+### Day Start
 
 You can change the hour days start with:
 
 ```ruby
-User.group_by_day(:created_at, day_start: 2) # 2 am - 2 am
-
-# change globally
-Groupdate.day_start = 2
+Groupdate.day_start = 2 # 2 am - 2 am
 ```
 
-Works with `day`, `week`, `month`, `year` and `hour_of_day`.
-
-The default time zone is `Time.zone`.  To change this, use:
+or with:
 
 ```ruby
-Groupdate.time_zone = "Pacific Time (US & Canada)"
+User.group_by_day(:created_at, day_start: 2).count
 ```
-
-To return an `ActiveRecord::Relation` instead of a `Groupdate::Series`, use:
-
-```ruby
-User.group_by_day(:created_at, series: false)
-```
-
-**Note:** Results will be unordered, and days with no records will not appear.
 
 ## Installation
 
@@ -157,19 +135,17 @@ gem "activerecord-jdbcpostgresql-adapter", :github => "jruby/activerecord-jdbc-a
 gem "activerecord-jdbcmysql-adapter", :github => "jruby/activerecord-jdbc-adapter"
 ```
 
-## Complete list
+## Before 2.0
 
-group_by_?
+Before 2.0, Groupdate returned an `ActiveRecord::Relation` instead of a `Groupdate::Series` by default.
 
-- second
-- minute
-- hour
-- day
-- week
-- month
-- year
-- hour_of_day
-- day_of_week
+Use `series: false` for this behavior.
+
+```ruby
+User.group_by_day(:created_at, series: false).count
+```
+
+**Note:** Results will be unordered, and days with no records will not appear.
 
 ## History
 
