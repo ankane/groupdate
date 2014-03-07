@@ -1,3 +1,7 @@
+# 2.0.1
+
+- Use time zone instead of UTC for results
+
 # 2.0.0
 
 - Returns entire series by default
