@@ -11,7 +11,7 @@ module Groupdate
         args = args.dup
         options = args[-1].is_a?(Hash) ? args.pop : {}
         column = connection.quote_table_name(args[0])
-        time_zone = args[1] || Time.zone || "Etc/UTC"
+        time_zone = args[1] || Groupdate.time_zone || Time.zone || "Etc/UTC"
         if time_zone.is_a?(ActiveSupport::TimeZone) or time_zone = ActiveSupport::TimeZone[time_zone]
           time_zone = time_zone.tzinfo.name
         else

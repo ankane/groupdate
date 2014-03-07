@@ -190,6 +190,14 @@ gem "activerecord-jdbcpostgresql-adapter", :github => "jruby/activerecord-jdbc-a
 gem "activerecord-jdbcmysql-adapter", :github => "jruby/activerecord-jdbc-adapter"
 ```
 
+## Reference
+
+The default time zone is `Time.zone`.  To change this, use:
+
+```ruby
+Groupdate.time_zone = "Pacific Time (US & Canada)"
+```
+
 ## Complete list
 
 group_by_?

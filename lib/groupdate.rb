@@ -24,5 +24,6 @@ end
 
 module Groupdate
   mattr_accessor :week_start
+  mattr_accessor :time_zone
   self.week_start = :sun
 end
