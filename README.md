@@ -46,6 +46,8 @@ Goal.group_by_year(:accomplished_at).count
 # }
 ```
 
+Results are returned in ascending order, so no need to sort.
+
 The default time zone is `Time.zone`.  Pass a time zone with:
 
 ```ruby
@@ -61,14 +63,7 @@ time_zone = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
 User.group_by_week(:created_at, time_zone: time_zone).count
 ```
 
-**Note:** Weeks start on Sunday by default. For other days, use:
-
-```ruby
-User.group_by_week(:created_at, week_start: :mon) # first three letters of day
-
-# change globally
-Groupdate.week_start = :mon
-```
+**Note:** Weeks start on Sunday by default.
 
 You can also group by the day of the week or hour of the day.
 
@@ -92,19 +87,47 @@ User.group_by_hour_of_day(:created_at, time_zone: "Pacific Time (US & Canada)").
 # }
 ```
 
-Results are returned in ascending order, so no need to sort.
-
-Use it with anywhere you can use `group`.
-
-```ruby
-Task.completed.group_by_hour(:completed_at).average(:priority)
-```
-
 Go nuts!
 
 ```ruby
-Request.where(page: "/home").group_by_minute(:started_at).maximum(:request_time)
+Request.where(page: "/home").group_by_minute(:started_at).average(:request_time)
 ```
+
+## Customize
+
+You can change the day weeks start with:
+
+```ruby
+User.group_by_week(:created_at, week_start: :mon) # first three letters of day
+
+# change globally
+Groupdate.week_start = :mon
+```
+
+You can change the hour days start with:
+
+```ruby
+User.group_by_day(:created_at, day_start: 2) # 2 am - 2 am
+
+# change globally
+Groupdate.day_start = 2
+```
+
+This works with `week`, `month`, `year` and `hour_of_day`.
+
+The default time zone is `Time.zone`.  To change this, use:
+
+```ruby
+Groupdate.time_zone = "Pacific Time (US & Canada)"
+```
+
+To return an `ActiveRecord::Relation` instead of a `Groupdate::Series`, use:
+
+```ruby
+User.group_by_day(:created_at, series: false)
+```
+
+**Note:** Results will be unordered, and days with no records will not appear.
 
 ## Installation
 
@@ -133,22 +156,6 @@ gem "activerecord-jdbcpostgresql-adapter", :github => "jruby/activerecord-jdbc-a
 # mysql
 gem "activerecord-jdbcmysql-adapter", :github => "jruby/activerecord-jdbc-adapter"
 ```
-
-## Reference
-
-The default time zone is `Time.zone`.  To change this, use:
-
-```ruby
-Groupdate.time_zone = "Pacific Time (US & Canada)"
-```
-
-To return an `ActiveRecord::Relation` instead of a `Groupdate::Series`, use:
-
-```ruby
-User.group_by_day(:created_at, series: false)
-```
-
-**Note:** Results will be unordered, and days with no records will not appear.
 
 ## Complete list
 
