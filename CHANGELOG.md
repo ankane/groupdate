@@ -1,3 +1,7 @@
+# 1.0.5
+
+- Added global time_zone option
+
 # 1.0.4
 
 - Added global week_start option
