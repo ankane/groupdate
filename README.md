@@ -48,9 +48,7 @@ and
 - hour_of_day
 - day_of_week (Sunday = 0, Monday = 1, etc)
 
-## Customize
-
-### Time Zone
+### Time Zones
 
 The default time zone is `Time.zone`.  Change this with:
 
