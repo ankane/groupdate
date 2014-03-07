@@ -1,7 +1,7 @@
 module Groupdate
   class Series
 
-    def initialize(relation, field, column, time_zone, time_range, week_start)
+    def initialize(relation, field, column, time_zone, time_range, week_start, day_start)
       if time_range.is_a?(Range)
         # doesn't matter whether we include the end of a ... range - it will be excluded later
         @relation = relation.where("#{column} >= ? AND #{column} <= ?", time_range.first, time_range.last)
@@ -12,6 +12,7 @@ module Groupdate
       @time_zone = time_zone
       @time_range = time_range
       @week_start = week_start
+      @day_start = day_start
     end
 
     def build_series(count)
@@ -44,7 +45,7 @@ module Groupdate
             end
 
           # determine start time
-          time = time_range.first.to_time.in_time_zone(@time_zone)
+          time = time_range.first.to_time.in_time_zone(@time_zone) - @day_start.hours
           starts_at =
             case @field
             when "second"
@@ -65,6 +66,7 @@ module Groupdate
               time.beginning_of_year
             end
 
+          starts_at += @day_start.hours
           series = [starts_at]
 
           step = 1.send(@field)
