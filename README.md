@@ -21,7 +21,7 @@ Supports PostgreSQL and MySQL
 
 :cupid: Goes hand in hand with [Chartkick](http://ankane.github.io/chartkick/)
 
-## Usage
+## Get Started
 
 ```ruby
 User.group_by_day(:created_at).count
@@ -92,15 +92,7 @@ User.group_by_hour_of_day(:created_at, time_zone: "Pacific Time (US & Canada)").
 # }
 ```
 
-You can order results with:
-
-```ruby
-User.group_by_day(:created_at).order("day asc").count
-
-User.group_by_week(:created_at).order("week desc").count
-
-User.group_by_hour_of_day(:created_at).order("hour_of_day asc").count
-```
+Results are returned in ascending order, so no need to sort.
 
 Use it with anywhere you can use `group`.
 
@@ -114,54 +106,9 @@ Go nuts!
 Request.where(page: "/home").group_by_minute(:started_at).maximum(:request_time)
 ```
 
-### Show me the series :moneybag:
-
-You have two users - one created on May 2 and one on May 5.
-
-```ruby
-User.group_by_day(:created_at).count
-# {
-#   2013-05-02 00:00:00 UTC => 1,
-#   2013-05-05 00:00:00 UTC => 1
-# }
-```
-
-Awesome, but you want to see the first week of May.  Pass a range as the third argument.
-
-```ruby
-# pretend today is May 7
-time_range = 6.days.ago..Time.now
-
-User.group_by_day(:created_at, range: time_range).count
-# {
-#   2013-05-01 00:00:00 UTC => 0,
-#   2013-05-02 00:00:00 UTC => 1,
-#   2013-05-03 00:00:00 UTC => 0,
-#   2013-05-04 00:00:00 UTC => 0,
-#   2013-05-05 00:00:00 UTC => 1,
-#   2013-05-06 00:00:00 UTC => 0,
-#   2013-05-07 00:00:00 UTC => 0
-# }
-
-User.group_by_day_of_week(:created_at, range: time_range).count
-# {
-#   0 => 0,
-#   1 => 1,
-#   2 => 0,
-#   3 => 0,
-#   4 => 1,
-#   5 => 0,
-#   6 => 0
-# }
-```
-
-Results are returned in ascending order, so no need to sort.
-
-Also, this form of the method returns a Groupdate::Series instead of an ActiveRecord::Relation.  ActiveRecord::Relation method calls (like `where` and `joins`) should come before this.
-
 ## Installation
 
-Add this line to your application's Gemfile:
+Add this line to your application’s Gemfile:
 
 ```ruby
 gem 'groupdate'
@@ -195,6 +142,14 @@ The default time zone is `Time.zone`.  To change this, use:
 Groupdate.time_zone = "Pacific Time (US & Canada)"
 ```
 
+To return an `ActiveRecord::Relation` instead of a `Groupdate::Series`, use:
+
+```ruby
+User.group_by_day(:created_at, series: false)
+```
+
+**Note:** Results will be unordered, and days with no records will not appear.
+
 ## Complete list
 
 group_by_?
@@ -208,39 +163,6 @@ group_by_?
 - year
 - hour_of_day
 - day_of_week
-
-## Note
-
-activerecord <= 4.0.0.beta1 and the pg gem returns String objects instead of Time objects.
-[This is fixed on activerecord master](https://github.com/rails/rails/commit/2cc09441c2de57b024b11ba666ba1e72c2b20cfe)
-
-```ruby
-User.group_by_day(:created_at).count
-
-# mysql2
-# pg and activerecord master
-{2013-04-22 00:00:00 UTC => 1} # Time object
-
-# pg and activerecord <= 4.0.0.beta1
-{"2013-04-22 00:00:00+00" => 1} # String
-```
-
-Another data type inconsistency
-
-```ruby
-User.group_by_day_of_week(:created_at).count
-
-# mysql2
-{0 => 1, 4 => 1} # Integer
-
-# pg and activerecord <= 4.0.0.beta1
-{"0" => 1, "4" => 1} # String
-
-# pg and activerecord master
-{0.0 => 1, 4.0 => 1} # Float
-```
-
-These are *not* a result of groupdate (and unfortunately cannot be fixed by groupdate)
 
 ## History
 
