@@ -113,7 +113,7 @@ User.group_by_day(:created_at, day_start: 2) # 2 am - 2 am
 Groupdate.day_start = 2
 ```
 
-This works with `week`, `month`, `year` and `hour_of_day`.
+Works with `day`, `week`, `month`, `year` and `hour_of_day`.
 
 The default time zone is `Time.zone`.  To change this, use:
 
