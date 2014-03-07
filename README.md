@@ -61,9 +61,9 @@ or
 ```ruby
 User.group_by_week(:created_at, time_zone: "Pacific Time (US & Canada)").count
 # {
-#   2013-03-03 00:00:00 PST => 80,
 #   2013-03-10 00:00:00 PST => 70,
-#   2013-03-17 00:00:00 PDT => 54
+#   2013-03-17 00:00:00 PDT => 54,
+#   2013-03-24 00:00:00 PDT => 80
 # }
 ```
 
@@ -157,7 +157,7 @@ However, there are a few things to be aware of when upgrading.
   User.where(company_id: 1).group_by_day(:created_at).count
   ```
 
-2. `Time` keys are now returned for every database adapter. Some older adapters previously returned `String` keys.
+2. `ActiveSupport::TimeWithZone` keys are now returned for every database adapter. Adapters previously returned `Time` or `String` keys.
 
 ## History
 
