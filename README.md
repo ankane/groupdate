@@ -46,10 +46,10 @@ Goal.group_by_year(:accomplished_at).count
 # }
 ```
 
-The default time zone is `Time.zone`.  Pass a time zone as the second argument.
+The default time zone is `Time.zone`.  Pass a time zone with:
 
 ```ruby
-User.group_by_week(:created_at, "Pacific Time (US & Canada)").count
+User.group_by_week(:created_at, time_zone: "Pacific Time (US & Canada)").count
 # {
 #   2013-03-03 08:00:00 UTC => 80,
 #   2013-03-10 08:00:00 UTC => 70,
@@ -58,16 +58,13 @@ User.group_by_week(:created_at, "Pacific Time (US & Canada)").count
 
 # equivalently
 time_zone = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
-User.group_by_week(:created_at, time_zone).count
+User.group_by_week(:created_at, time_zone: time_zone).count
 ```
 
 **Note:** Weeks start on Sunday by default. For other days, use:
 
 ```ruby
-User.group_by_week(:created_at, :start => :mon) # first three letters of day
-
-# must be the last argument
-User.group_by_week(:created_at, time_zone, :start => :sat)
+User.group_by_week(:created_at, week_start: :mon) # first three letters of day
 
 # change globally
 Groupdate.week_start = :mon
@@ -86,7 +83,7 @@ User.group_by_day_of_week(:created_at).count
 # }
 
 # hour of the day
-User.group_by_hour_of_day(:created_at, "Pacific Time (US & Canada)").count
+User.group_by_hour_of_day(:created_at, time_zone: "Pacific Time (US & Canada)").count
 # {
 #   0 => 34,
 #   1 => 61,
@@ -135,7 +132,7 @@ Awesome, but you want to see the first week of May.  Pass a range as the third a
 # pretend today is May 7
 time_range = 6.days.ago..Time.now
 
-User.group_by_day(:created_at, Time.zone, time_range).count
+User.group_by_day(:created_at, range: time_range).count
 # {
 #   2013-05-01 00:00:00 UTC => 0,
 #   2013-05-02 00:00:00 UTC => 1,
@@ -146,7 +143,7 @@ User.group_by_day(:created_at, Time.zone, time_range).count
 #   2013-05-07 00:00:00 UTC => 0
 # }
 
-User.group_by_day_of_week(:created_at, Time.zone, time_range).count
+User.group_by_day_of_week(:created_at, range: time_range).count
 # {
 #   0 => 0,
 #   1 => 1,

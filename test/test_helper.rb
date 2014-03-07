@@ -484,6 +484,7 @@ module TestGroupdate
     create_user time_str
     expected = expected.is_a?(Time) ? time_key(expected) : number_key(expected)
     assert_equal ordered_hash({expected => 1}), User.send(:"group_by_#{method}", :created_at, time_zone ? "Pacific Time (US & Canada)" : nil, options).order(method.to_s).count
+    assert_equal ordered_hash({expected => 1}), User.send(:"group_by_#{method}", :created_at, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil)).order(method.to_s).count
     assert_equal 1, User.send(:"group_by_#{method}", :created_at, time_zone ? "Pacific Time (US & Canada)" : nil, true, options).count[expected]
   end
 

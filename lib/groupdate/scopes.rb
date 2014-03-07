@@ -11,7 +11,7 @@ module Groupdate
         args = args.dup
         options = args[-1].is_a?(Hash) ? args.pop : {}
         column = connection.quote_table_name(args[0])
-        time_zone = args[1] || Groupdate.time_zone || Time.zone || "Etc/UTC"
+        time_zone = args[1] || options[:time_zone] || Groupdate.time_zone || Time.zone || "Etc/UTC"
         if time_zone.is_a?(ActiveSupport::TimeZone) or time_zone = ActiveSupport::TimeZone[time_zone]
           time_zone = time_zone.tzinfo.name
         else
@@ -73,8 +73,9 @@ module Groupdate
           end
 
         group = group(Groupdate::OrderHack.new(sanitize_sql_array(query), field, time_zone))
-        if args[2]
-          Series.new(group, field, column, time_zone, args[2], week_start, day_start)
+        range = args[2] || options[:range]
+        if range
+          Series.new(group, field, column, time_zone, range, week_start, day_start)
         else
           group
         end
