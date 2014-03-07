@@ -125,17 +125,31 @@ gem "activerecord-jdbcpostgresql-adapter", :github => "jruby/activerecord-jdbc-a
 gem "activerecord-jdbcmysql-adapter", :github => "jruby/activerecord-jdbc-adapter"
 ```
 
-## Before 2.0
+## Upgrading to 2.0
 
-Before 2.0, Groupdate returned an `ActiveRecord::Relation` instead of a `Groupdate::Series` by default.
+Groupdate 2.0 brings a number a great improvements.
 
-Use `series: false` for this behavior.
+- the entire series is returned by default
+- the `day_start` option
+- an improved interface
 
-```ruby
-User.group_by_day(:created_at, series: false).count
-```
+However, there are a few things to be aware of when upgrading.
 
-**Note:** Results will be unordered, and days with no records will not appear.
+1. Groupdate methods must come after any `where`, `joins`, or `includes`.
+
+  Throws error
+
+  ```ruby
+  User.group_by_day(:created_at).where(company_id: 1).count
+  ```
+
+  :moneybag:
+
+  ```ruby
+  User.where(company_id: 1).group_by_day(:created_at).count
+  ```
+
+2. `Time` keys are now returned for every database adapter. Some older adapters previously returned `String` keys.
 
 ## History
 
