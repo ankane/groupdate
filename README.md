@@ -48,12 +48,6 @@ and
 - hour_of_day
 - day_of_week (Sunday = 0, Monday = 1, etc)
 
-Groupdate works with all aggregate methods, like `average`, `minimum`, and `maximum`.
-
-```ruby
-Request.group_by_minute(:started_at).average(:request_time)
-```
-
 ## Customize
 
 ### Time Zone
