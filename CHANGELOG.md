@@ -1,3 +1,9 @@
+# 2.0.0
+
+- Returns entire series by default
+- Added day_start option
+- Better interface
+
 # 1.0.5
 
 - Added global time_zone option
