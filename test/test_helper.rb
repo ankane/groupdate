@@ -482,7 +482,8 @@ module TestGroupdate
 
   def test_merge_scopes
     create_user "2013-05-01 00:00:00 UTC"
-    assert_equal({Time.parse("2013-05-01 00:00:00 UTC") => 1}, User.all.merge(User.group_by_day(:created_at)).count)
+    time_zone = "Pacific Time (US & Canada)"
+    assert_equal(time_zone, User.all.merge(User.group_by_day(:created_at, time_zone: time_zone)).count.keys.first.time_zone.name)
   end
 
   # helpers
