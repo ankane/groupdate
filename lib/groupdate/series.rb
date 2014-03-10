@@ -93,6 +93,8 @@ module Groupdate
         build_series(@relation.send(method, *args, &block))
       elsif [:joins, :includes, :where].include?(method)
         raise NoMethodError, "#{method} must come before the group_by_#{@field} method"
+      elsif ActiveRecord::Relation.method_defined?(method)
+        @relation.send(method, *args, &block)
       else
         raise NoMethodError, "valid methods are: #{ActiveRecord::Calculations.instance_methods.join(", ")}"
       end
