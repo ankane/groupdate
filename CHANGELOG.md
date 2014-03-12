@@ -1,3 +1,7 @@
+# 2.0.3 [unreleased]
+
+- implemented respond_to?
+
 # 2.0.2
 
 - where, joins, and includes no longer need to be before the group_by method
