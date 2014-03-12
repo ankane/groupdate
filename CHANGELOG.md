@@ -1,4 +1,4 @@
-# 2.0.3 [unreleased]
+# 2.0.3
 
 - implemented respond_to?
 
