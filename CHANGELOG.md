@@ -1,3 +1,7 @@
+# 2.0.2
+
+- where, joins, and includes no longer need to be before the group_by method
+
 # 2.0.1
 
 - Use time zone instead of UTC for results
