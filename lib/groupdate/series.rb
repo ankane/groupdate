@@ -99,5 +99,9 @@ module Groupdate
       end
     end
 
+    def respond_to?(method, include_all = false)
+      ActiveRecord::Calculations.method_defined?(method) || @relation.respond_to?(method) || super
+    end
+
   end # Series
 end

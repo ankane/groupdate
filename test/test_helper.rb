@@ -491,6 +491,14 @@ module TestGroupdate
     assert_raises(NoMethodError) { User.group_by_day(:created_at).no_such_method }
   end
 
+  def test_respond_to_where
+    assert User.group_by_day(:created_at).respond_to?(:order)
+  end
+
+  def test_respond_to_bad_method
+    assert !User.group_by_day(:created_at).respond_to?(:no_such_method)
+  end
+
   # helpers
 
   def assert_result_time(method, expected, time_str, time_zone = false, options = {})
