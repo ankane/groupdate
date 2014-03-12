@@ -135,29 +135,10 @@ gem "activerecord-jdbcmysql-adapter", :github => "jruby/activerecord-jdbc-adapte
 
 ## Upgrading to 2.0
 
-Groupdate 2.0 brings a number a great improvements.
+Groupdate 2.0 brings a number a great improvements.  Here are two things to be aware of:
 
 - the entire series is returned by default
-- the `day_start` option
-- an improved interface
-
-However, there are a few things to be aware of when upgrading.
-
-1. Groupdate methods must come after any `where`, `joins`, or `includes`.
-
-  Throws error
-
-  ```ruby
-  User.group_by_day(:created_at).where(company_id: 1).count
-  ```
-
-  :moneybag:
-
-  ```ruby
-  User.where(company_id: 1).group_by_day(:created_at).count
-  ```
-
-2. `ActiveSupport::TimeWithZone` keys are now returned for every database adapter. Adapters previously returned `Time` or `String` keys.
+- `ActiveSupport::TimeWithZone` keys are now returned for every database adapter - adapters previously returned `Time` or `String` keys
 
 ## History
 

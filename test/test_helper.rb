@@ -480,6 +480,17 @@ module TestGroupdate
     assert_equal time_zone, User.group_by_day(:created_at, time_zone: time_zone).count.keys.first.time_zone.name
   end
 
+  def test_where_after
+    create_user "2013-05-01 00:00:00 UTC"
+    create_user "2013-05-02 00:00:00 UTC"
+    expected = {utc.parse("2013-05-02 00:00:00 UTC") => 1}
+    assert_equal expected, User.group_by_day(:created_at).where("created_at > ?", "2013-05-01 00:00:00 UTC").count
+  end
+
+  def test_bad_method
+    assert_raises(NoMethodError) { User.group_by_day(:created_at).no_such_method }
+  end
+
   # helpers
 
   def assert_result_time(method, expected, time_str, time_zone = false, options = {})
@@ -507,7 +518,11 @@ module TestGroupdate
   end
 
   def create_user(created_at)
-    User.create! :name => "Andrew", :score => 1, :created_at => ActiveSupport::TimeZone["UTC"].parse(created_at)
+    User.create! :name => "Andrew", :score => 1, :created_at => utc.parse(created_at)
+  end
+
+  def utc
+    ActiveSupport::TimeZone["UTC"]
   end
 
   def teardown

@@ -91,10 +91,11 @@ module Groupdate
       # https://github.com/rails/rails/blob/master/activerecord/lib/active_record/relation/calculations.rb
       if ActiveRecord::Calculations.method_defined?(method)
         build_series(@relation.send(method, *args, &block))
-      elsif [:joins, :includes, :where].include?(method)
-        raise NoMethodError, "#{method} must come before the group_by_#{@field} method"
+      elsif @relation.respond_to?(method)
+        @relation = @relation.send(method, *args, &block)
+        self
       else
-        raise NoMethodError, "valid methods are: #{ActiveRecord::Calculations.instance_methods.join(", ")}"
+        super
       end
     end
 
