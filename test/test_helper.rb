@@ -401,7 +401,7 @@ module TestGroupdate
   def test_zeros_excludes_end
     create_user "2013-05-02 00:00:00 UTC"
     expected = {
-      Time.parse("2013-05-01 00:00:00 UTC") => 0
+      utc.parse("2013-05-01 00:00:00 UTC") => 0
     }
     assert_equal expected, User.group_by_day(:created_at, range: Time.parse("2013-05-01 00:00:00 UTC")...Time.parse("2013-05-02 00:00:00 UTC")).count
   end
@@ -409,7 +409,7 @@ module TestGroupdate
   def test_zeros_previous_scope
     create_user "2013-05-01 00:00:00 UTC"
     expected = {
-      Time.parse("2013-05-01 00:00:00 UTC") => 0
+      utc.parse("2013-05-01 00:00:00 UTC") => 0
     }
     assert_equal expected, User.where("id = 0").group_by_day(:created_at, range: Time.parse("2013-05-01 00:00:00 UTC")..Time.parse("2013-05-01 23:59:59 UTC")).count
   end
@@ -417,7 +417,7 @@ module TestGroupdate
   def test_zeros_datetime
     create_user "2013-05-01 00:00:00 UTC"
     expected = {
-      Time.parse("2013-05-01 00:00:00 UTC") => 1
+      utc.parse("2013-05-01 00:00:00 UTC") => 1
     }
     assert_equal expected, User.group_by_day(:created_at, range: DateTime.parse("2013-05-01 00:00:00 UTC")..DateTime.parse("2013-05-01 00:00:00 UTC")).count
   end
@@ -432,9 +432,9 @@ module TestGroupdate
     create_user "2013-05-01 00:00:00 UTC"
     create_user "2013-05-03 00:00:00 UTC"
     expected = {
-      Time.parse("2013-05-01 00:00:00 UTC") => 1,
-      Time.parse("2013-05-02 00:00:00 UTC") => 0,
-      Time.parse("2013-05-03 00:00:00 UTC") => 1
+      utc.parse("2013-05-01 00:00:00 UTC") => 1,
+      utc.parse("2013-05-02 00:00:00 UTC") => 0,
+      utc.parse("2013-05-03 00:00:00 UTC") => 1
     }
     assert_equal expected, User.group_by_day(:created_at, range: true).count
   end
@@ -510,7 +510,7 @@ module TestGroupdate
   # helpers
 
   def assert_result_time(method, expected, time_str, time_zone = false, options = {})
-    expected = {Time.parse(expected) => 1}
+    expected = {utc.parse(expected).in_time_zone(time_zone ? "Pacific Time (US & Canada)" : utc) => 1}
     assert_equal expected, result(method, time_str, time_zone, options)
   end
 
@@ -527,7 +527,7 @@ module TestGroupdate
     create_user created_at
     expected = {}
     keys.each_with_index do |key, i|
-      expected[Time.parse(key)] = i == 1 ? 1 : 0
+      expected[utc.parse(key).in_time_zone(time_zone ? "Pacific Time (US & Canada)" : utc)] = i == 1 ? 1 : 0
     end
     assert_equal expected, User.send(:"group_by_#{method}", :created_at, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil, range: Time.parse(range_start)..Time.parse(range_end))).count
   end
