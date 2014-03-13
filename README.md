@@ -107,6 +107,12 @@ To get a specific time range, use:
 User.group_by_day(:created_at, range: 2.weeks.ago.midnight..Time.now).count
 ```
 
+[master] To get the last N time periods from the current time, use:
+
+```ruby
+User.group_by_week(:created_at, last: 8).count # last 8 weeks
+```
+
 ### Order
 
 You can order in descending order with:
@@ -119,14 +125,6 @@ or
 
 ```ruby
 User.group_by_day(:created_at).order("day desc").count
-```
-
-### Last [master]
-
-Get the last N time periods from the current time.
-
-```ruby
-User.group_by_week(:created_at, last: 8).count # last 8 weeks
 ```
 
 ## Installation
