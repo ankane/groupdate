@@ -127,7 +127,7 @@ or
 User.group_by_day(:created_at).order("day desc").count
 ```
 
-### Key Format [master]
+### Prettier Keys [master]
 
 To get keys in a different format, use:
 
