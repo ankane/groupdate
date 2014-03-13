@@ -39,7 +39,7 @@ module Groupdate
       if reverse
         relation = relation.reverse_order
       end
-      order = @relation.order_values.first
+      order = relation.order_values.first
       if order.is_a?(String)
         parts = order.split(" ")
         reverse_order = (parts.size == 2 && parts[0] == @field && parts[1].to_s.downcase == "desc")
