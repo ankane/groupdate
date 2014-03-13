@@ -549,6 +549,17 @@ module TestGroupdate
     assert !User.group_by_day(:created_at).respond_to?(:no_such_method)
   end
 
+  def test_last
+    create_user "2011-05-01 00:00:00 UTC"
+    create_user "2013-05-01 00:00:00 UTC"
+    expected = {
+      utc.parse("2012-01-01 00:00:00 UTC") => 0,
+      utc.parse("2013-01-01 00:00:00 UTC") => 1,
+      utc.parse("2014-01-01 00:00:00 UTC") => 0
+    }
+    assert_equal expected, User.group_by_year(:created_at, last: 3).count
+  end
+
   # helpers
 
   def assert_result_time(method, expected, time_str, time_zone = false, options = {})

@@ -121,6 +121,14 @@ or
 User.group_by_day(:created_at).order("day desc").count
 ```
 
+### Last [master]
+
+Get the last N time periods from the current time.
+
+```ruby
+User.group_by_week(:created_at, last: 8).count # last 8 weeks
+```
+
 ## Installation
 
 Add this line to your application’s Gemfile:
