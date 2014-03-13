@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["acekane1@gmail.com"]
   spec.description   = %q{The simplest way to group temporal data}
   spec.summary       = %q{The simplest way to group temporal data}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/ankane/groupdate"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
