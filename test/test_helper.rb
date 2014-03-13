@@ -517,6 +517,14 @@ module TestGroupdate
     assert_equal expected, User.group_by_day(:created_at).group(:score).order(:score).count
   end
 
+  def test_groupdate_multiple
+    create_user "2013-05-01 00:00:00 UTC", 1
+    expected = {
+      [utc.parse("2013-05-01 00:00:00 UTC"), utc.parse("2013-05-01 00:00:00 UTC")] => 1
+    }
+    assert_equal expected, User.group_by_day(:created_at).group_by_day(:created_at).count
+  end
+
   def test_not_modified
     create_user "2013-05-01 00:00:00 UTC"
     expected = {utc.parse("2013-05-01 00:00:00 UTC") => 1}
