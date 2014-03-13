@@ -560,7 +560,36 @@ module TestGroupdate
     assert_equal expected, User.group_by_year(:created_at, last: 3).count
   end
 
+  def test_format_day
+    create_user "2014-03-01 00:00:00 UTC"
+    assert_format :day, "March 1, 2014", "%B %-e, %Y"
+  end
+
+  def test_format_month
+    create_user "2014-03-01 00:00:00 UTC"
+    assert_format :month, "March 2014", "%B %Y"
+  end
+
+  def test_format_year
+    create_user "2014-03-01 00:00:00 UTC"
+    assert_format :year, "2014", "%Y"
+  end
+
+  def test_format_hour_of_day
+    create_user "2014-03-01 16:00:00 UTC"
+    assert_format :hour_of_day, "12 am", "%l %P"
+  end
+
+  def test_format_day_of_week
+    create_user "2014-03-01 16:00:00 UTC"
+    assert_format :day_of_week, "Sun", "%a"
+  end
+
   # helpers
+
+  def assert_format(method, expected, format)
+    assert_equal expected, User.send(:"group_by_#{method}", :created_at, format: format).count.keys.first
+  end
 
   def assert_result_time(method, expected, time_str, time_zone = false, options = {})
     expected = {utc.parse(expected).in_time_zone(time_zone ? "Pacific Time (US & Canada)" : utc) => 1}

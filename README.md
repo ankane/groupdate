@@ -127,6 +127,16 @@ or
 User.group_by_day(:created_at).order("day desc").count
 ```
 
+## Keys [master]
+
+To get keys in a different format, use:
+
+```ruby
+User.group_by_hour_of_day(:created_at, format: "%l %P").count.keys.first # 12 am
+```
+
+Takes a `String`, which is passed to [strftime](http://strfti.me/), or a `Proc`
+
 ## Installation
 
 Add this line to your application’s Gemfile:
