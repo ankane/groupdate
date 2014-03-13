@@ -487,6 +487,14 @@ module TestGroupdate
     assert_equal expected, User.group_by_day(:created_at).where("created_at > ?", "2013-05-01 00:00:00 UTC").count
   end
 
+  def test_not_modified
+    create_user "2013-05-01 00:00:00 UTC"
+    expected = {utc.parse("2013-05-01 00:00:00 UTC") => 1}
+    relation = User.group_by_day(:created_at)
+    relation.where("created_at > ?", "2013-05-01 00:00:00 UTC")
+    assert_equal expected, relation.count
+  end
+
   def test_bad_method
     assert_raises(NoMethodError) { User.group_by_day(:created_at).no_such_method }
   end

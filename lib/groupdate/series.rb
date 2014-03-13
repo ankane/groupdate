@@ -2,13 +2,9 @@ module Groupdate
   class Series
 
     def initialize(relation, field, column, time_zone, time_range, week_start, day_start)
-      if time_range.is_a?(Range)
-        # doesn't matter whether we include the end of a ... range - it will be excluded later
-        @relation = relation.where("#{column} >= ? AND #{column} <= ?", time_range.first, time_range.last)
-      else
-        @relation = relation.where("#{column} IS NOT NULL")
-      end
+      @relation = relation
       @field = field
+      @column = column
       @time_zone = time_zone
       @time_range = time_range
       @week_start = week_start
@@ -90,10 +86,16 @@ module Groupdate
     def method_missing(method, *args, &block)
       # https://github.com/rails/rails/blob/master/activerecord/lib/active_record/relation/calculations.rb
       if ActiveRecord::Calculations.method_defined?(method)
-        build_series(@relation.send(method, *args, &block))
+        relation =
+          if @time_range.is_a?(Range)
+            # doesn't matter whether we include the end of a ... range - it will be excluded later
+            @relation.where("#{@column} >= ? AND #{@column} <= ?", @time_range.first, @time_range.last)
+          else
+            @relation.where("#{@column} IS NOT NULL")
+          end
+        build_series(relation.send(method, *args, &block))
       elsif @relation.respond_to?(method)
-        @relation = @relation.send(method, *args, &block)
-        self
+        Groupdate::Series.new(@relation.send(method, *args, &block), @field, @column, @time_zone, @time_range, @week_start, @day_start)
       else
         super
       end
