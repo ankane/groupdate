@@ -1,3 +1,9 @@
+# 2.0.4
+
+- added multiple groups
+- added order
+- subsequent methods no longer modify relation
+
 # 2.0.3
 
 - implemented respond_to?
