@@ -576,19 +576,29 @@ module TestGroupdate
   end
 
   def test_format_hour_of_day
-    create_user "2014-03-01 16:00:00 UTC"
-    assert_format :hour_of_day, "12 am", "%l %P"
+    create_user "2014-03-01 00:00:00 UTC"
+    assert_format :hour_of_day, "12 am", "%-l %P"
+  end
+
+  def test_format_hour_of_day_day_start
+    create_user "2014-03-01 00:00:00 UTC"
+    assert_format :hour_of_day, "2 am", "%-l %P", day_start: 2
   end
 
   def test_format_day_of_week
-    create_user "2014-03-01 16:00:00 UTC"
+    create_user "2014-03-01 00:00:00 UTC"
     assert_format :day_of_week, "Sun", "%a"
+  end
+
+  def test_format_day_of_week_week_start
+    create_user "2014-03-01 00:00:00 UTC"
+    assert_format :day_of_week, "Sun", "%a", week_start: :sat
   end
 
   # helpers
 
-  def assert_format(method, expected, format)
-    assert_equal expected, User.send(:"group_by_#{method}", :created_at, format: format).count.keys.first
+  def assert_format(method, expected, format, options = {})
+    assert_equal expected, User.send(:"group_by_#{method}", :created_at, options.merge(format: format)).count.keys.first
   end
 
   def assert_result_time(method, expected, time_str, time_zone = false, options = {})

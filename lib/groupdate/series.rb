@@ -116,7 +116,7 @@ module Groupdate
             lambda do |key|
               case @field
               when "hour_of_day"
-                key = @time_zone.now.change(hour: key)
+                key = sunday + key.hours + @day_start.hours
               when "day_of_week"
                 key = sunday + key.days
               end
