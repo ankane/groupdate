@@ -1,7 +1,7 @@
 module Groupdate
   class Series
 
-    def initialize(relation, field, column, time_zone, time_range, week_start, day_start)
+    def initialize(relation, field, column, time_zone, time_range, week_start, day_start, group_index)
       @relation = relation
       @field = field
       @column = column
@@ -9,10 +9,13 @@ module Groupdate
       @time_range = time_range
       @week_start = week_start
       @day_start = day_start
+      @group_index = group_index
     end
 
     def build_series(count)
       utc = ActiveSupport::TimeZone["UTC"]
+
+      arr = @relation.group_values.size > 1
 
       cast_method =
         case @field
@@ -22,7 +25,7 @@ module Groupdate
           lambda{|k| (k.is_a?(String) ? utc.parse(k) : k.to_time).in_time_zone(@time_zone) }
         end
 
-      count = Hash[ count.map{|k, v| [cast_method.call(k), v] } ]
+      count = Hash[ count.map{|k, v| [arr ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] } ]
 
       series =
         case @field
@@ -36,7 +39,12 @@ module Groupdate
               @time_range
             else
               # use first and last values
-              sorted_keys = count.keys.sort
+              sorted_keys =
+                if arr
+                  count.keys.map{|k| k[@group_index] }.sort
+                else
+                  count.keys.sort
+                end
               sorted_keys.first..sorted_keys.last
             end
 
@@ -73,6 +81,15 @@ module Groupdate
             end
 
             series
+
+            if arr
+              keys = count.keys.map{|k| k[0...@group_index] + k[(@group_index + 1)..-1] }.uniq
+              keys.flat_map do |k|
+                series.map{|s| k[0...@group_index] + [s] + k[@group_index..-1] }
+              end
+            else
+              series
+            end
           else
             []
           end
@@ -95,7 +112,7 @@ module Groupdate
           end
         build_series(relation.send(method, *args, &block))
       elsif @relation.respond_to?(method)
-        Groupdate::Series.new(@relation.send(method, *args, &block), @field, @column, @time_zone, @time_range, @week_start, @day_start)
+        Groupdate::Series.new(@relation.send(method, *args, &block), @field, @column, @time_zone, @time_range, @week_start, @day_start, @group_index)
       else
         super
       end
