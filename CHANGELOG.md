@@ -1,3 +1,8 @@
+# 2.1.0 [unreleased]
+
+- added last option
+- added format option
+
 # 2.0.4
 
 - added multiple groups
