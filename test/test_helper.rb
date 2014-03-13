@@ -510,14 +510,17 @@ module TestGroupdate
   # helpers
 
   def assert_result_time(method, expected, time_str, time_zone = false, options = {})
-    assert_result method, Time.parse(expected), time_str, time_zone, options
+    expected = {Time.parse(expected) => 1}
+    assert_equal expected, result(method, time_str, time_zone, options)
   end
 
   def assert_result(method, expected, time_str, time_zone = false, options = {})
+    assert_equal 1, result(method, time_str, time_zone, options)[expected]
+  end
+
+  def result(method, time_str, time_zone = false, options = {})
     create_user time_str
-    expected = expected.is_a?(Time) ? time_key(expected) : number_key(expected)
-    assert_equal ordered_hash({expected => 1}), User.send(:"group_by_#{method}", :created_at, options.merge(series: false, time_zone: time_zone ? "Pacific Time (US & Canada)" : nil)).order(method.to_s).count
-    assert_equal 1, User.send(:"group_by_#{method}", :created_at, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil)).count[expected]
+    User.send(:"group_by_#{method}", :created_at, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil)).count
   end
 
   def assert_zeros(method, created_at, keys, range_start, range_end, time_zone = nil, options = {})
@@ -527,10 +530,6 @@ module TestGroupdate
       expected[Time.parse(key)] = i == 1 ? 1 : 0
     end
     assert_equal expected, User.send(:"group_by_#{method}", :created_at, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil, range: Time.parse(range_start)..Time.parse(range_end))).count
-  end
-
-  def ordered_hash(hash)
-    RUBY_VERSION =~ /1\.8/ ? hash.inject(ActiveSupport::OrderedHash.new){|h, (k, v)| h[k] = v; h } : hash
   end
 
   def create_user(created_at)
