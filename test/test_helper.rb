@@ -386,7 +386,7 @@ module TestGroupdate
     7.times do |n|
       expected[n] = n == 3 ? 1 : 0
     end
-    assert_equal expected, User.group_by_day_of_week(:created_at, range: true).count(:created_at)
+    assert_equal expected, User.group_by_day_of_week(:created_at, range: true).count
   end
 
   def test_zeros_hour_of_day
@@ -395,7 +395,7 @@ module TestGroupdate
     24.times do |n|
       expected[n] = n == 20 ? 1 : 0
     end
-    assert_equal expected, User.group_by_hour_of_day(:created_at, range: true).count(:created_at)
+    assert_equal expected, User.group_by_hour_of_day(:created_at, range: true).count
   end
 
   def test_zeros_excludes_end
@@ -453,16 +453,20 @@ module TestGroupdate
 
   # misc
 
-  def test_order_day
-    assert_empty User.group_by_day(:created_at, series: false).order("day desc").limit(20).count
-  end
-
-  def test_order_week
-    assert_empty User.group_by_week(:created_at, series: false).order("week asc").count
-  end
-
   def test_order_hour_of_day
-    assert_empty User.group_by_hour_of_day(:created_at, series: false).order("hour_of_day desc").count
+    assert_equal 23, User.group_by_hour_of_day(:created_at).order("hour_of_day desc").count.keys.first
+  end
+
+  def test_order_hour_of_day_case
+    assert_equal 23, User.group_by_hour_of_day(:created_at).order("hour_of_day DESC").count.keys.first
+  end
+
+  def test_order_hour_of_day_reverse
+    assert_equal 23, User.group_by_hour_of_day(:created_at).reverse_order.count.keys.first
+  end
+
+  def test_order_hour_of_day_order_reverse
+    assert_equal 0, User.group_by_hour_of_day(:created_at).order("hour_of_day desc").reverse_order.count.keys.first
   end
 
   def test_table_name

@@ -15,7 +15,15 @@ module Groupdate
     def build_series(count)
       utc = ActiveSupport::TimeZone["UTC"]
 
-      arr = @relation.group_values.size > 1
+      reverse = @reverse
+      order = @relation.order_values.first
+      if order.is_a?(String)
+        parts = order.split(" ")
+        reverse_order = (parts.size == 2 && parts[0] == @field && parts[1].to_s.downcase == "desc")
+        reverse = !reverse if reverse_order
+      end
+
+      multiple_groups = @relation.group_values.size > 1
 
       cast_method =
         case @field
@@ -25,7 +33,7 @@ module Groupdate
           lambda{|k| (k.is_a?(String) ? utc.parse(k) : k.to_time).in_time_zone(@time_zone) }
         end
 
-      count = Hash[ count.map{|k, v| [arr ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] } ]
+      count = Hash[ count.map{|k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] } ]
 
       series =
         case @field
@@ -40,7 +48,7 @@ module Groupdate
             else
               # use first and last values
               sorted_keys =
-                if arr
+                if multiple_groups
                   count.keys.map{|k| k[@group_index] }.sort
                 else
                   count.keys.sort
@@ -80,10 +88,9 @@ module Groupdate
               series << series.last + step
             end
 
-            series
-
-            if arr
+            if multiple_groups
               keys = count.keys.map{|k| k[0...@group_index] + k[(@group_index + 1)..-1] }.uniq
+              series = series.reverse if reverse
               keys.flat_map do |k|
                 series.map{|s| k[0...@group_index] + [s] + k[@group_index..-1] }
               end
@@ -94,6 +101,11 @@ module Groupdate
             []
           end
         end
+
+      # reversed above if multiple groups
+      if !multiple_groups and reverse
+        series = series.to_a.reverse
+      end
 
       Hash[series.map do |k|
         [k, count[k] || 0]
@@ -110,6 +122,13 @@ module Groupdate
           else
             @relation.where("#{@column} IS NOT NULL")
           end
+
+        # undo reverse since we do not want this to appear in the query
+        if relation.reverse_order_value
+          @reverse = true
+          relation = relation.reverse_order
+        end
+
         build_series(relation.send(method, *args, &block))
       elsif @relation.respond_to?(method)
         Groupdate::Series.new(@relation.send(method, *args, &block), @field, @column, @time_zone, @time_range, @week_start, @day_start, @group_index)

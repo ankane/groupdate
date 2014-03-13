@@ -32,7 +32,7 @@ User.group_by_day(:created_at).count
 # }
 ```
 
-Results are returned in ascending order, so no need to sort.
+Results are returned in ascending order by default, so no need to sort.
 
 You can also group by:
 
@@ -47,6 +47,8 @@ and
 
 - hour_of_day
 - day_of_week (Sunday = 0, Monday = 1, etc)
+
+Use it anywhere you can use `group`.
 
 ### Time Zones
 
@@ -103,6 +105,20 @@ To get a specific time range, use:
 
 ```ruby
 User.group_by_day(:created_at, range: 2.weeks.ago.midnight..Time.now).count
+```
+
+### Order
+
+You can order in descending order with:
+
+```ruby
+User.group_by_day(:created_at).reverse_order.count
+```
+
+or
+
+```ruby
+User.group_by_day(:created_at).order("day desc").count
 ```
 
 ## Installation
