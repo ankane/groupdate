@@ -107,7 +107,7 @@ To get a specific time range, use:
 User.group_by_day(:created_at, range: 2.weeks.ago.midnight..Time.now).count
 ```
 
-[master] To get the last N time periods from now, use:
+To get the most recent time periods, use:
 
 ```ruby
 User.group_by_week(:created_at, last: 8).count # last 8 weeks
@@ -127,7 +127,7 @@ or
 User.group_by_day(:created_at).order("day desc").count
 ```
 
-### Prettier Keys [master]
+### Pretty Keys
 
 To get keys in a different format, use:
 
