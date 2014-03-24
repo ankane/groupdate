@@ -1,37 +1,37 @@
-# 2.1.0
+## 2.1.0
 
 - added last option
 - added format option
 
-# 2.0.4
+## 2.0.4
 
 - added multiple groups
 - added order
 - subsequent methods no longer modify relation
 
-# 2.0.3
+## 2.0.3
 
 - implemented respond_to?
 
-# 2.0.2
+## 2.0.2
 
 - where, joins, and includes no longer need to be before the group_by method
 
-# 2.0.1
+## 2.0.1
 
 - Use time zone instead of UTC for results
 
-# 2.0.0
+## 2.0.0
 
 - Returns entire series by default
 - Added day_start option
 - Better interface
 
-# 1.0.5
+## 1.0.5
 
 - Added global time_zone option
 
-# 1.0.4
+## 1.0.4
 
 - Added global week_start option
 - Fixed bug with NULL values and series
