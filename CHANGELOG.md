@@ -1,17 +1,17 @@
 ## 2.1.0
 
-- added last option
-- added format option
+- Added last option
+- Added format option
 
 ## 2.0.4
 
-- added multiple groups
-- added order
-- subsequent methods no longer modify relation
+- Added multiple groups
+- Added order
+- Subsequent methods no longer modify relation
 
 ## 2.0.3
 
-- implemented respond_to?
+- Implemented respond_to?
 
 ## 2.0.2
 
