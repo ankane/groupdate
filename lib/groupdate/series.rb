@@ -2,7 +2,7 @@ module Groupdate
   class Series
     attr_accessor :relation
 
-    def initialize(relation, field, column, time_zone, time_range, week_start, day_start, group_index, options)
+    def initialize(relation, field, column, time_zone, time_range, week_start, day_start, month_start, group_index, options)
       @relation = relation
       @field = field
       @column = column
@@ -10,6 +10,7 @@ module Groupdate
       @time_range = time_range
       @week_start = week_start
       @day_start = day_start
+      @month_start = month_start
       @group_index = group_index
       @options = options
     end
@@ -150,7 +151,15 @@ module Groupdate
           weekday = (time.wday - 1) % 7
           (time - ((7 - @week_start + weekday) % 7).days).midnight
         when "month"
-          time.beginning_of_month
+          if @month_start > 1
+            month_offset = time.month - 1
+            if time.day < @month_start
+              month_offset -= 1
+            end
+            time.beginning_of_year.change(day: @month_start) + month_offset.months
+          else
+            time.beginning_of_month
+          end
         else # year
           time.beginning_of_year
         end
@@ -159,7 +168,7 @@ module Groupdate
     end
 
     def clone
-      Groupdate::Series.new(@relation, @field, @column, @time_zone, @time_range, @week_start, @day_start, @group_index, @options)
+      Groupdate::Series.new(@relation, @field, @column, @time_zone, @time_range, @week_start, @day_start, @month_start, @group_index, @options)
     end
 
     # clone to prevent modifying original variables

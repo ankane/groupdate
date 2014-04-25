@@ -28,6 +28,9 @@ module Groupdate
         # for day
         day_start = (options[:day_start] || Groupdate.day_start).to_i
 
+        # for month
+        month_start = (options[:month_start] || Groupdate.month_start).to_i
+
         query =
           case connection.adapter_name
           when "MySQL", "Mysql2"
@@ -40,23 +43,29 @@ module Groupdate
             when "week"
               ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL ((#{7 - week_start} + WEEKDAY(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} HOUR)) % 7) DAY) - INTERVAL #{day_start} HOUR, '+00:00', ?), '%Y-%m-%d 00:00:00') + INTERVAL #{day_start} HOUR, ?, '+00:00')", time_zone, time_zone, time_zone]
             else
-              format =
-                case field
-                when "second"
-                  "%Y-%m-%d %H:%i:%S"
-                when "minute"
-                  "%Y-%m-%d %H:%i:00"
-                when "hour"
-                  "%Y-%m-%d %H:00:00"
-                when "day"
-                  "%Y-%m-%d 00:00:00"
-                when "month"
-                  "%Y-%m-01 00:00:00"
-                else # year
-                  "%Y-01-01 00:00:00"
-                end
+              if field == 'month' && month_start > 1
+                day_with_adjusted_start = "CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} HOUR), '+00:00', :time_zone)"
+                month_expr = "DATE_FORMAT(IF(DAY(#{day_with_adjusted_start}) < #{month_start}, DATE_SUB(#{day_with_adjusted_start}, INTERVAL 1 MONTH), #{day_with_adjusted_start}), '%Y-%m-%d 00:00:00')"
+                ["DATE_ADD(CONVERT_TZ(DATE_ADD(DATE_FORMAT(#{month_expr}, '%Y-01-#{month_start} 00:00:00'), INTERVAL (MONTH(#{month_expr}) - 1) MONTH), :time_zone, '+00:00'), INTERVAL #{day_start} HOUR)", {time_zone: time_zone}]
+              else
+                format =
+                  case field
+                  when "second"
+                    "%Y-%m-%d %H:%i:%S"
+                  when "minute"
+                    "%Y-%m-%d %H:%i:00"
+                  when "hour"
+                    "%Y-%m-%d %H:00:00"
+                  when "day"
+                    "%Y-%m-%d 00:00:00"
+                  when "month"
+                    "%Y-%m-01 00:00:00"
+                  else # year
+                    "%Y-01-01 00:00:00"
+                  end
 
-              ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} HOUR), '+00:00', ?), '#{format}'), ?, '+00:00'), INTERVAL #{day_start} HOUR)", time_zone, time_zone]
+                ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} HOUR), '+00:00', ?), '#{format}'), ?, '+00:00'), INTERVAL #{day_start} HOUR)", time_zone, time_zone]
+              end
             end
           when "PostgreSQL", "PostGIS"
             case field
@@ -67,7 +76,25 @@ module Groupdate
             when "week" # start on Sunday, not PostgreSQL default Monday
               ["(DATE_TRUNC('#{field}', (#{column}::timestamptz - INTERVAL '#{week_start} day' - INTERVAL '#{day_start}' hour) AT TIME ZONE ?) + INTERVAL '#{week_start} day' + INTERVAL '#{day_start}' hour) AT TIME ZONE ?", time_zone, time_zone]
             else
-              ["(DATE_TRUNC('#{field}', (#{column}::timestamptz - INTERVAL '#{day_start} hour') AT TIME ZONE ?) + INTERVAL '#{day_start} hour') AT TIME ZONE ?", time_zone, time_zone]
+              if field == 'month' && month_start > 1
+                day_with_adjusted_start = "((#{column}::timestamptz AT TIME ZONE :time_zone - INTERVAL '#{day_start}' hour))"
+                month_expr = <<-SQL
+                  (DATE_TRUNC('month',
+                    CASE WHEN EXTRACT(DAY from #{day_with_adjusted_start}) < #{month_start}
+                      THEN (#{day_with_adjusted_start} - INTERVAL '1 month')
+                      ELSE #{day_with_adjusted_start}
+                    END
+                  ))
+                SQL
+
+                [<<-SQL, {time_zone: time_zone}]
+                  (((DATE_TRUNC('year', #{month_expr}) + INTERVAL '#{month_start - 1} day')
+                  + INTERVAL '1 month' * (EXTRACT(MONTH from (#{month_expr})) - 1))
+                  + INTERVAL '#{day_start} hour') AT TIME ZONE :time_zone
+                SQL
+              else
+                ["(DATE_TRUNC('#{field}', (#{column}::timestamptz - INTERVAL '#{day_start} hour') AT TIME ZONE ?) + INTERVAL '#{day_start} hour') AT TIME ZONE ?", time_zone, time_zone]
+              end
             end
           else
             raise "Connection adapter not supported: #{connection.adapter_name}"
@@ -76,7 +103,7 @@ module Groupdate
         group = group(Groupdate::OrderHack.new(sanitize_sql_array(query), field, time_zone))
         range = args[2] || options[:range] || true
         unless options[:series] == false
-          Series.new(group, field, column, time_zone_object, range, week_start, day_start, group.group_values.size - 1, options)
+          Series.new(group, field, column, time_zone_object, range, week_start, day_start, month_start, group.group_values.size - 1, options)
         else
           group
         end
