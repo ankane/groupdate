@@ -1,3 +1,7 @@
+## 2.1.1 [unreleased]
+
+- Fixed format option with multiple groups
+
 ## 2.1.0
 
 - Added last option

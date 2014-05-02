@@ -128,7 +128,7 @@ module Groupdate
         end
 
       Hash[series.map do |k|
-        [key_format.call(k), count[k] || 0]
+        [multiple_groups ? k[0...@group_index] + [key_format.call(k[@group_index])] + k[(@group_index + 1)..-1] : key_format.call(k), count[k] || 0]
       end]
     end
 

@@ -595,6 +595,12 @@ module TestGroupdate
     assert_format :day_of_week, "Sun", "%a", week_start: :sat
   end
 
+  def test_format_multiple_groups
+    create_user "2014-03-01 00:00:00 UTC"
+    assert_equal ({["Sun", 1] => 1}), User.group_by_week(:created_at, format: "%a").group(:score).count
+    assert_equal ({[1, "Sun"] => 1}), User.group(:score).group_by_week(:created_at, format: "%a").count
+  end
+
   # helpers
 
   def assert_format(method, expected, format, options = {})
