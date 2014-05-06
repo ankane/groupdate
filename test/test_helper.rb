@@ -318,6 +318,24 @@ module TestGroupdate
     assert_result :day_of_week, 3, "2013-01-02 10:00:00", true, :day_start => 2
   end
 
+  # day of month
+
+  def test_day_of_month_end_of_month
+    assert_result :day_of_month, 2, "2013-01-31 23:59:59"
+  end
+
+  def test_day_of_month_start_of_month
+    assert_result :day_of_month, 3, "2013-01-01 00:00:00"
+  end
+
+  def test_day_of_week_end_of_month_with_time_zone
+    assert_result :day_of_month, 2, "2013-01-31 07:59:59", true
+  end
+
+  def test_day_of_week_start_of_month_with_time_zone
+    assert_result :day_of_month, 3, "2013-01-02 08:00:00", true
+  end
+  
   # zeros
 
   def test_zeros_second

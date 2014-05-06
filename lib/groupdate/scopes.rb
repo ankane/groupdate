@@ -5,7 +5,7 @@ require "active_record"
 module Groupdate
   module Scopes
     time_fields = %w(second minute hour day week month year)
-    number_fields = %w(day_of_week hour_of_day)
+    number_fields = %w(day_of_week hour_of_day day_of_month)
     (time_fields + number_fields).each do |field|
       define_method :"group_by_#{field}" do |*args|
         args = args.dup
@@ -64,6 +64,8 @@ module Groupdate
               ["EXTRACT(DOW from (#{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour'))::integer", time_zone]
             when "hour_of_day"
               ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour')::integer", time_zone]
+            when "day_of_month"
+              ["EXTRACT(DAY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour')::integer", time_zone]
             when "week" # start on Sunday, not PostgreSQL default Monday
               ["(DATE_TRUNC('#{field}', (#{column}::timestamptz - INTERVAL '#{week_start} day' - INTERVAL '#{day_start}' hour) AT TIME ZONE ?) + INTERVAL '#{week_start} day' + INTERVAL '#{day_start}' hour) AT TIME ZONE ?", time_zone, time_zone]
             else

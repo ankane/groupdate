@@ -50,7 +50,7 @@ module Groupdate
 
       cast_method =
         case @field
-        when "day_of_week", "hour_of_day"
+        when "day_of_week", "hour_of_day", "day_of_month"
           lambda{|k| k.to_i }
         else
           lambda{|k| (k.is_a?(String) ? utc.parse(k) : k.to_time).in_time_zone(@time_zone) }
@@ -64,6 +64,8 @@ module Groupdate
           0..6
         when "hour_of_day"
           0..23
+        when "day_of_month"
+          0..31
         else
           time_range =
             if time_range.is_a?(Range)
@@ -118,6 +120,8 @@ module Groupdate
               when "hour_of_day"
                 key = sunday + key.hours + @day_start.hours
               when "day_of_week"
+                key = sunday + key.days
+              when "day_of_month"
                 key = sunday + key.days
               end
               key.strftime(@options[:format].to_s)
