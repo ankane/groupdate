@@ -5,7 +5,7 @@ require "active_record"
 module Groupdate
   module Scopes
     time_fields = %w(second minute hour day week month year)
-    number_fields = %w(day_of_week hour_of_day)
+    number_fields = %w(day_of_week hour_of_day day_of_month)
     (time_fields + number_fields).each do |field|
       define_method :"group_by_#{field}" do |*args|
         args = args.dup
@@ -37,6 +37,8 @@ module Groupdate
               ["DAYOFWEEK(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} HOUR), '+00:00', ?)) - 1", time_zone]
             when "hour_of_day"
               ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) + 24 - #{day_start}) % 24", time_zone]
+            when "day_of_month"
+              ["DAYOFMONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} HOUR), '+00:00', ?)) - 1", time_zone]
             when "week"
               ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL ((#{7 - week_start} + WEEKDAY(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} HOUR)) % 7) DAY) - INTERVAL #{day_start} HOUR, '+00:00', ?), '%Y-%m-%d 00:00:00') + INTERVAL #{day_start} HOUR, ?, '+00:00')", time_zone, time_zone, time_zone]
             else
@@ -64,6 +66,8 @@ module Groupdate
               ["EXTRACT(DOW from (#{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour'))::integer", time_zone]
             when "hour_of_day"
               ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour')::integer", time_zone]
+            when "day_of_month"
+              ["EXTRACT(DAY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour')::integer", time_zone]
             when "week" # start on Sunday, not PostgreSQL default Monday
               ["(DATE_TRUNC('#{field}', (#{column}::timestamptz - INTERVAL '#{week_start} day' - INTERVAL '#{day_start}' hour) AT TIME ZONE ?) + INTERVAL '#{week_start} day' + INTERVAL '#{day_start}' hour) AT TIME ZONE ?", time_zone, time_zone]
             else
