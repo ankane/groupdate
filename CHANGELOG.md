@@ -1,4 +1,4 @@
-## 2.1.1 [unreleased]
+## 2.1.1
 
 - Fixed format option with multiple groups
 - Better error message if time zone support is missing for MySQL
