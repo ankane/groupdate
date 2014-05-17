@@ -1,6 +1,7 @@
 ## 2.1.1 [unreleased]
 
 - Fixed format option with multiple groups
+- Better error message if time zone support is missing for MySQL
 
 ## 2.1.0
 
