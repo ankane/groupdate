@@ -1,7 +1,3 @@
-require "groupdate/order_hack"
-require "groupdate/series"
-require "active_record"
-
 module Groupdate
   module Scopes
 
