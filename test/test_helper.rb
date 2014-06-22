@@ -3,6 +3,7 @@ Bundler.require(:default)
 require "minitest/autorun"
 require "minitest/pride"
 require "logger"
+require "active_record"
 
 # TODO determine why this is necessary
 if RUBY_PLATFORM == "java"
