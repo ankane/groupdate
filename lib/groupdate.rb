@@ -1,5 +1,6 @@
 require "active_support/time"
 require "groupdate/version"
+require "groupdate/magic"
 require "groupdate/enumerable"
 require "groupdate/active_record"
 
