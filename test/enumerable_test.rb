@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-class TestEnumerable < Minitest::Unit::TestCase
+class TestEnumerable < Minitest::Test
   include TestGroupdate
 
   def test_enumerable

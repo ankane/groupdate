@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-class TestMysql < Minitest::Unit::TestCase
+class TestMysql < Minitest::Test
   include TestGroupdate
 
   def setup
