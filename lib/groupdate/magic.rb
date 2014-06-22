@@ -16,7 +16,7 @@ module Groupdate
     end
 
     def group_by(enum, &block)
-      series(enum.group_by{|v| v2 = block.call(v); v2 ? round_time(v2) : nil }, [])
+      series(enum.group_by{|v| v = yield(v); v ? round_time(v) : nil }, [])
     end
 
     def relation(column, relation)
