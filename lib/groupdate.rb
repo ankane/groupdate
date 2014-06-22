@@ -1,7 +1,12 @@
 require "active_support/time"
 require "groupdate/version"
 require "groupdate/magic"
-require "groupdate/active_record"
+begin
+  require "active_record"
+rescue LoadError
+  # do nothing
+end
+require "groupdate/active_record" if defined?(ActiveRecord)
 require "groupdate/enumerable"
 
 module Groupdate
