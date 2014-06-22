@@ -16,7 +16,7 @@ module Groupdate
     end
 
     def group_by(enum, &block)
-      series(enum.group_by{|v| round_time(block.call(v)) }, [])
+      series(enum.map(&block).compact.group_by{|v| round_time(v) }, [])
     end
 
     def relation(column, relation)

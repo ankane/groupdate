@@ -420,13 +420,13 @@ module TestGroupdate
     expected = {
       utc.parse("2013-05-01 00:00:00 UTC") => 1
     }
-    assert_equal expected, User.group_by_day(:created_at, range: DateTime.parse("2013-05-01 00:00:00 UTC")..DateTime.parse("2013-05-01 00:00:00 UTC")).count
+    assert_equal expected, call_method(:day, :created_at, range: DateTime.parse("2013-05-01 00:00:00 UTC")..DateTime.parse("2013-05-01 00:00:00 UTC"))
   end
 
   def test_zeros_null_value
     user = User.create!(name: "Andrew")
     user.update_column :created_at, nil
-    assert_equal 0, User.group_by_hour_of_day(:created_at, range: true).count[0]
+    assert_equal 0, call_method(:hour_of_day, :created_at, range: true)[0]
   end
 
   def test_zeroes_range_true
@@ -437,7 +437,7 @@ module TestGroupdate
       utc.parse("2013-05-02 00:00:00 UTC") => 0,
       utc.parse("2013-05-03 00:00:00 UTC") => 1
     }
-    assert_equal expected, User.group_by_day(:created_at, range: true).count
+    assert_equal expected, call_method(:day, :created_at, range: true)
   end
 
   # week_start
