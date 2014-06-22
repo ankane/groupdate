@@ -1,6 +1,6 @@
-## 2.2.0 [unreleased]
+## 2.2.0
 
-- Added support for enumerables
+- Added support for Arrays and Hashes
 
 ## 2.1.1
 

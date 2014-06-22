@@ -137,7 +137,7 @@ User.group_by_hour_of_day(:created_at, format: "%l %P").count.keys.first # 12 am
 
 Takes a `String`, which is passed to [strftime](http://strfti.me/), or a `Proc`
 
-## Arrays and Hashes [master]
+## Arrays and Hashes
 
 ```ruby
 users.group_by_day{|u| u.created_at } # or group_by_day(&:created_at)
