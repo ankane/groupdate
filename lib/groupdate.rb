@@ -1,5 +1,7 @@
 require "active_support/core_ext/module/attribute_accessors"
+require "active_support/time"
 require "groupdate/version"
+require "groupdate/magic"
 
 module Groupdate
   FIELDS = [:second, :minute, :hour, :day, :week, :month, :year, :day_of_week, :hour_of_day]
@@ -10,12 +12,10 @@ module Groupdate
   self.day_start = 0
 end
 
-require "active_support/time"
-require "groupdate/magic"
+require "groupdate/enumerable"
 begin
   require "active_record"
 rescue LoadError
   # do nothing
 end
 require "groupdate/active_record" if defined?(ActiveRecord)
-require "groupdate/enumerable"
