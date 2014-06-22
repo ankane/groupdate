@@ -3,6 +3,9 @@ rvm:
   - 1.9.3
   - 2.0.0
   - jruby
+gemfile:
+  - Gemfile
+  - gemfiles/activerecord31.gemfile
 script: bundle exec rake test
 before_script:
   - mysql -e 'create database groupdate_test;'
