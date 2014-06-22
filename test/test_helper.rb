@@ -387,7 +387,7 @@ module TestGroupdate
     7.times do |n|
       expected[n] = n == 3 ? 1 : 0
     end
-    assert_equal expected, User.group_by_day_of_week(:created_at, range: true).count
+    assert_equal expected, call_method(:day_of_week, :created_at, {})
   end
 
   def test_zeros_hour_of_day
@@ -396,7 +396,7 @@ module TestGroupdate
     24.times do |n|
       expected[n] = n == 20 ? 1 : 0
     end
-    assert_equal expected, User.group_by_hour_of_day(:created_at, range: true).count
+    assert_equal expected, call_method(:hour_of_day, :created_at, {})
   end
 
   def test_zeros_excludes_end
@@ -404,7 +404,7 @@ module TestGroupdate
     expected = {
       utc.parse("2013-05-01 00:00:00 UTC") => 0
     }
-    assert_equal expected, User.group_by_day(:created_at, range: Time.parse("2013-05-01 00:00:00 UTC")...Time.parse("2013-05-02 00:00:00 UTC")).count
+    assert_equal expected, call_method(:day, :created_at, range: Time.parse("2013-05-01 00:00:00 UTC")...Time.parse("2013-05-02 00:00:00 UTC"))
   end
 
   def test_zeros_previous_scope
@@ -605,7 +605,7 @@ module TestGroupdate
   # helpers
 
   def assert_format(method, expected, format, options = {})
-    assert_equal expected, User.send(:"group_by_#{method}", :created_at, options.merge(format: format)).count.keys.first
+    assert_equal expected, call_method(method, :created_at, options.merge(format: format)).keys.first
   end
 
   def assert_result_time(method, expected, time_str, time_zone = false, options = {})
