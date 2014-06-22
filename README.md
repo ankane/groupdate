@@ -13,7 +13,7 @@ The simplest way to group by:
 
 Works with Rails 3.0+
 
-Supports PostgreSQL and MySQL
+Supports PostgreSQL and MySQL, plus Arrays and Hashes
 
 [![Build Status](https://travis-ci.org/ankane/groupdate.png)](https://travis-ci.org/ankane/groupdate)
 
@@ -136,6 +136,18 @@ User.group_by_hour_of_day(:created_at, format: "%l %P").count.keys.first # 12 am
 ```
 
 Takes a `String`, which is passed to [strftime](http://strfti.me/), or a `Proc`
+
+## Arrays and Hashes [master]
+
+```ruby
+users.group_by_day{|u| u.created_at } # or group_by_day(&:created_at)
+```
+
+Supports the same options as above
+
+```ruby
+users.group_by_day(time_zone: time_zone){|u| u.created_at }
+```
 
 ## Installation
 

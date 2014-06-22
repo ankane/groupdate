@@ -14,7 +14,7 @@ module Groupdate
       @options = options
     end
 
-    def perform(method, *args, &block)
+    def perform(method = nil, *args, &block)
       utc = ActiveSupport::TimeZone["UTC"]
 
       time_range = @time_range
@@ -26,42 +26,51 @@ module Groupdate
         end
       end
 
-      relation =
-        if time_range.is_a?(Range)
-          # doesn't matter whether we include the end of a ... range - it will be excluded later
-          @relation.where("#{@column} >= ? AND #{@column} <= ?", time_range.first, time_range.last)
-        else
-          @relation.where("#{@column} IS NOT NULL")
+      if @relation.is_a?(Enumerable)
+        multiple_groups = false
+        reverse = @options[:reverse] || false
+        count = @relation.group_by{|v| round_time(block.call(v)) }
+        default_value = []
+      else
+        relation =
+          if time_range.is_a?(Range)
+            # doesn't matter whether we include the end of a ... range - it will be excluded later
+            @relation.where("#{@column} >= ? AND #{@column} <= ?", time_range.first, time_range.last)
+          else
+            @relation.where("#{@column} IS NOT NULL")
+          end
+
+        # undo reverse since we do not want this to appear in the query
+        reverse = relation.reverse_order_value
+        if reverse
+          relation = relation.reverse_order
+        end
+        order = relation.order_values.first
+        if order.is_a?(String)
+          parts = order.split(" ")
+          reverse_order = (parts.size == 2 && parts[0] == @field && parts[1].to_s.downcase == "desc")
+          reverse = !reverse if reverse_order
         end
 
-      # undo reverse since we do not want this to appear in the query
-      reverse = relation.reverse_order_value
-      if reverse
-        relation = relation.reverse_order
+        multiple_groups = relation.group_values.size > 1
+
+        cast_method =
+          case @field
+          when "day_of_week", "hour_of_day"
+            lambda{|k| k.to_i }
+          else
+            lambda{|k| (k.is_a?(String) ? utc.parse(k) : k.to_time).in_time_zone(@time_zone) }
+          end
+
+        count =
+          begin
+            Hash[ relation.send(method, *args, &block).map{|k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] } ]
+          rescue NoMethodError
+            raise "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
+          end
+
+        default_value = 0
       end
-      order = relation.order_values.first
-      if order.is_a?(String)
-        parts = order.split(" ")
-        reverse_order = (parts.size == 2 && parts[0] == @field && parts[1].to_s.downcase == "desc")
-        reverse = !reverse if reverse_order
-      end
-
-      multiple_groups = relation.group_values.size > 1
-
-      cast_method =
-        case @field
-        when "day_of_week", "hour_of_day"
-          lambda{|k| k.to_i }
-        else
-          lambda{|k| (k.is_a?(String) ? utc.parse(k) : k.to_time).in_time_zone(@time_zone) }
-        end
-
-      count =
-        begin
-          Hash[ relation.send(method, *args, &block).map{|k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] } ]
-        rescue NoMethodError
-          raise "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
-        end
 
       series =
         case @field
@@ -133,7 +142,7 @@ module Groupdate
         end
 
       Hash[series.map do |k|
-        [multiple_groups ? k[0...@group_index] + [key_format.call(k[@group_index])] + k[(@group_index + 1)..-1] : key_format.call(k), count[k] || 0]
+        [multiple_groups ? k[0...@group_index] + [key_format.call(k[@group_index])] + k[(@group_index + 1)..-1] : key_format.call(k), count[k] || default_value]
       end]
     end
 
@@ -156,11 +165,15 @@ module Groupdate
           (time - ((7 - @week_start + weekday) % 7).days).midnight
         when "month"
           time.beginning_of_month
+        when "hour_of_day"
+          time.hour
+        when "day_of_week"
+          (7 - @week_start + ((time.wday - 1) % 7) % 7)
         else # year
           time.beginning_of_year
         end
 
-      time + @day_start.hours
+      time.is_a?(Time) ? time + @day_start.hours : time
     end
 
     def clone

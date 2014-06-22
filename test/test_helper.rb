@@ -618,7 +618,7 @@ module TestGroupdate
 
   def result(method, time_str, time_zone = false, options = {})
     create_user time_str
-    User.send(:"group_by_#{method}", :created_at, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil)).count
+    call_method(method, :created_at, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
   end
 
   def assert_zeros(method, created_at, keys, range_start, range_end, time_zone = nil, options = {})
@@ -627,7 +627,11 @@ module TestGroupdate
     keys.each_with_index do |key, i|
       expected[utc.parse(key).in_time_zone(time_zone ? "Pacific Time (US & Canada)" : utc)] = i == 1 ? 1 : 0
     end
-    assert_equal expected, User.send(:"group_by_#{method}", :created_at, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil, range: Time.parse(range_start)..Time.parse(range_end))).count
+    assert_equal expected, call_method(method, :created_at, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil, range: Time.parse(range_start)..Time.parse(range_end)))
+  end
+
+  def call_method(method, field, options)
+    User.send(:"group_by_#{method}", field, options).count
   end
 
   def create_user(created_at, score = 1)

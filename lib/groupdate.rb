@@ -1,5 +1,6 @@
 require "groupdate/version"
 require "groupdate/scopes"
+require "groupdate/enumerable"
 
 ActiveRecord::Base.send :extend, Groupdate::Scopes
 

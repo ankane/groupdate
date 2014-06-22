@@ -1,3 +1,7 @@
+## 2.2.0 [unreleased]
+
+- Added support for enumerables
+
 ## 2.1.1
 
 - Fixed format option with multiple groups
