@@ -470,6 +470,10 @@ module TestGroupdate
     assert_equal 0, User.group_by_hour_of_day(:created_at).order("hour_of_day desc").reverse_order.count.keys.first
   end
 
+  def test_order_hour_of_day_reverse_option
+    assert_equal 23, call_method(:hour_of_day, :created_at, reverse: true).keys.first
+  end
+
   def test_table_name
     assert_empty User.group_by_day("users.created_at").count
   end
@@ -482,7 +486,7 @@ module TestGroupdate
   def test_time_zone
     create_user "2013-05-01 00:00:00 UTC"
     time_zone = "Pacific Time (US & Canada)"
-    assert_equal time_zone, User.group_by_day(:created_at, time_zone: time_zone).count.keys.first.time_zone.name
+    assert_equal time_zone, call_method(:day, :created_at, time_zone: time_zone).keys.first.time_zone.name
   end
 
   def test_where_after

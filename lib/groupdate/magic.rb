@@ -154,6 +154,8 @@ module Groupdate
     end
 
     def series(count, default_value, multiple_groups = false, reverse = false)
+      reverse = !reverse if options[:reverse]
+
       series =
         case field
         when :day_of_week
