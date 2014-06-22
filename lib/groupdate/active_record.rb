@@ -3,6 +3,25 @@ require "groupdate/scopes"
 
 ActiveRecord::Base.send(:extend, Groupdate::Scopes)
 
+module ActiveRecord
+  class Relation
+
+    if ActiveRecord::VERSION::MAJOR == 3 and ActiveRecord::VERSION::MINOR < 2
+
+      def method_missing_with_hack(method, *args, &block)
+        if Groupdate::METHODS.include?(method)
+          scoping { @klass.send(method, *args, &block) }
+        else
+          method_missing_without_hack(method, *args, &block)
+        end
+      end
+      alias_method_chain :method_missing, :hack
+
+    end
+
+  end
+end
+
 # hack for **unfixed** rails issue
 # https://github.com/rails/rails/issues/7121
 module ActiveRecord
