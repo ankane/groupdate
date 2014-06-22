@@ -1,4 +1,4 @@
-require "active_support/time"
+require "active_support/core_ext/module/attribute_accessors"
 require "groupdate/version"
 
 module Groupdate
@@ -10,6 +10,7 @@ module Groupdate
   self.day_start = 0
 end
 
+require "active_support/time"
 require "groupdate/magic"
 begin
   require "active_record"
