@@ -11,7 +11,7 @@ The simplest way to group by:
 
 :cake: Get the entire series - **the other best part**
 
-Works with Rails 3.0+
+Works with Rails 3.1+
 
 Supports PostgreSQL and MySQL, plus Arrays and Hashes
 
