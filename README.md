@@ -149,6 +149,12 @@ Supports the same options as above
 users.group_by_day(time_zone: time_zone){|u| u.created_at }
 ```
 
+Count
+
+```ruby
+Hash[ users.group_by_day{|u| u.created_at }.map{|k, v| [k, v.size] } ]
+```
+
 ## Installation
 
 Add this line to your application’s Gemfile:
