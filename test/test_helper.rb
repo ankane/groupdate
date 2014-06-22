@@ -27,7 +27,7 @@ end
   ActiveRecord::Migration.create_table :users, :force => true do |t|
     t.string :name
     t.integer :score
-    t.timestamps
+    t.timestamp :created_at
   end
 end
 
