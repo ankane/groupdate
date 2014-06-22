@@ -15,37 +15,8 @@ module Groupdate
       end
     end
 
-    def time_zone
-      @time_zone ||= begin
-        time_zone = options[:time_zone] || Groupdate.time_zone || Time.zone || "Etc/UTC"
-        time_zone.is_a?(ActiveSupport::TimeZone) ? time_zone : ActiveSupport::TimeZone[time_zone]
-      end
-    end
-
-    def week_start
-      @week_start ||= [:mon, :tue, :wed, :thu, :fri, :sat, :sun].index((options[:week_start] || options[:start] || Groupdate.week_start).to_sym)
-    end
-
-    def day_start
-      @day_start ||= (options[:day_start] || Groupdate.day_start).to_i
-    end
-
     def group_by(enum, &block)
       series(enum.group_by{|v| round_time(block.call(v)) }, [])
-    end
-
-    def time_range
-      @time_range ||= begin
-        time_range = options[:range]
-        if !time_range and options[:last]
-          step = 1.send(field) if 1.respond_to?(field)
-          if step
-            now = Time.now
-            time_range = round_time(now - (options[:last].to_i - 1).send(field))..now
-          end
-        end
-        time_range
-      end
     end
 
     def relation(column, relation)
@@ -114,6 +85,71 @@ module Groupdate
         @group_index = group.group_values.size - 1
 
         Groupdate::Series.new(self, relation)
+      end
+    end
+
+    def perform(relation, method, *args, &block)
+      # undo reverse since we do not want this to appear in the query
+      reverse = relation.reverse_order_value
+      if reverse
+        relation = relation.reverse_order
+      end
+      order = relation.order_values.first
+      if order.is_a?(String)
+        parts = order.split(" ")
+        reverse_order = (parts.size == 2 && parts[0].to_sym == field && parts[1].to_s.downcase == "desc")
+        reverse = !reverse if reverse_order
+      end
+
+      multiple_groups = relation.group_values.size > 1
+
+      cast_method =
+        case field
+        when :day_of_week, :hour_of_day
+          lambda{|k| k.to_i }
+        else
+          utc = ActiveSupport::TimeZone["UTC"]
+          lambda{|k| (k.is_a?(String) ? utc.parse(k) : k.to_time).in_time_zone(time_zone) }
+        end
+
+      count =
+        begin
+          Hash[ relation.send(method, *args, &block).map{|k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] } ]
+        rescue NoMethodError
+          raise "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
+        end
+
+      series(count, 0, multiple_groups, reverse)
+    end
+
+    protected
+
+    def time_zone
+      @time_zone ||= begin
+        time_zone = options[:time_zone] || Groupdate.time_zone || Time.zone || "Etc/UTC"
+        time_zone.is_a?(ActiveSupport::TimeZone) ? time_zone : ActiveSupport::TimeZone[time_zone]
+      end
+    end
+
+    def week_start
+      @week_start ||= [:mon, :tue, :wed, :thu, :fri, :sat, :sun].index((options[:week_start] || options[:start] || Groupdate.week_start).to_sym)
+    end
+
+    def day_start
+      @day_start ||= (options[:day_start] || Groupdate.day_start).to_i
+    end
+
+    def time_range
+      @time_range ||= begin
+        time_range = options[:range]
+        if !time_range and options[:last]
+          step = 1.send(field) if 1.respond_to?(field)
+          if step
+            now = Time.now
+            time_range = round_time(now - (options[:last].to_i - 1).send(field))..now
+          end
+        end
+        time_range
       end
     end
 
@@ -191,40 +227,6 @@ module Groupdate
       Hash[series.map do |k|
         [multiple_groups ? k[0...@group_index] + [key_format.call(k[@group_index])] + k[(@group_index + 1)..-1] : key_format.call(k), count[k] || default_value]
       end]
-    end
-
-    def perform(relation, method, *args, &block)
-      # undo reverse since we do not want this to appear in the query
-      reverse = relation.reverse_order_value
-      if reverse
-        relation = relation.reverse_order
-      end
-      order = relation.order_values.first
-      if order.is_a?(String)
-        parts = order.split(" ")
-        reverse_order = (parts.size == 2 && parts[0].to_sym == field && parts[1].to_s.downcase == "desc")
-        reverse = !reverse if reverse_order
-      end
-
-      multiple_groups = relation.group_values.size > 1
-
-      cast_method =
-        case field
-        when :day_of_week, :hour_of_day
-          lambda{|k| k.to_i }
-        else
-          utc = ActiveSupport::TimeZone["UTC"]
-          lambda{|k| (k.is_a?(String) ? utc.parse(k) : k.to_time).in_time_zone(time_zone) }
-        end
-
-      count =
-        begin
-          Hash[ relation.send(method, *args, &block).map{|k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] } ]
-        rescue NoMethodError
-          raise "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
-        end
-
-      series(count, 0, multiple_groups, reverse)
     end
 
     def round_time(time)
