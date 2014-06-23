@@ -18,6 +18,10 @@ ActiveRecord::Base.default_timezone = :utc
 ActiveRecord::Base.time_zone_aware_attributes = true
 
 class User < ActiveRecord::Base
+  has_many :posts
+end
+
+class Post < ActiveRecord::Base
 end
 
 # migrations
@@ -27,6 +31,11 @@ end
   ActiveRecord::Migration.create_table :users, :force => true do |t|
     t.string :name
     t.integer :score
+    t.timestamp :created_at
+  end
+
+  ActiveRecord::Migration.create_table :posts, :force => true do |t|
+    t.references :user
     t.timestamp :created_at
   end
 end
@@ -604,6 +613,13 @@ module TestGroupdate
     create_user "2014-03-01 00:00:00 UTC"
     assert_equal ({["Sun", 1] => 1}), User.group_by_week(:created_at, format: "%a").group(:score).count
     assert_equal ({[1, "Sun"] => 1}), User.group(:score).group_by_week(:created_at, format: "%a").count
+  end
+
+  # associations
+
+  def test_associations
+    user = create_user("2014-03-01 00:00:00 UTC")
+    assert_empty user.posts.group_by_day(:created_at).count
   end
 
   # helpers

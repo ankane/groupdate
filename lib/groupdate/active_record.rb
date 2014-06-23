@@ -24,6 +24,16 @@ module ActiveRecord
   end
 end
 
+module ActiveRecord
+  module Associations
+    class CollectionProxy
+      if ActiveRecord::VERSION::MAJOR == 3
+        delegate *Groupdate::METHODS, :to => :scoped
+      end
+    end
+  end
+end
+
 # hack for **unfixed** rails issue
 # https://github.com/rails/rails/issues/7121
 module ActiveRecord
