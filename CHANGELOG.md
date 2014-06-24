@@ -1,3 +1,7 @@
+## 2.2.1
+
+- Fixed ActiveRecord 3 associations
+
 ## 2.2.0
 
 - Added support for Arrays and Hashes
