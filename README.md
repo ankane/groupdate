@@ -13,7 +13,7 @@ The simplest way to group by:
 
 Works with Rails 3.1+
 
-Supports PostgreSQL and MySQL, plus Arrays and Hashes
+Supports PostgreSQL and MySQL, plus arrays and hashes
 
 [![Build Status](https://travis-ci.org/ankane/groupdate.png)](https://travis-ci.org/ankane/groupdate)
 
