@@ -113,10 +113,18 @@ module Groupdate
         end
 
       count =
-        begin
-          Hash[ relation.send(method, *args, &block).map{|k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] } ]
-        rescue NoMethodError
-          raise "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
+        if method == :group_calc
+          begin
+            Hash[relation.select("#{relation.group_values[@group_index]} AS #{@field.to_s}", "#{args[0]} AS calculation").group("#{relation.group_values[@group_index]}").map { |record| [record.send(@field), record.calculation] }]
+          rescue
+            raise "Could not perform custom calculation. Please check your syntax."
+          end
+        else
+          begin
+            Hash[ relation.send(method, *args, &block).map{|k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] } ]
+          rescue NoMethodError
+            raise "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
+          end
         end
 
       series(count, 0, multiple_groups, reverse)
