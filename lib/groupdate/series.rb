@@ -8,7 +8,15 @@ module Groupdate
     end
 
     def cumulative_sum
-      custom("SUM(COUNT(id)) OVER (ORDER BY #{relation.group_values[0]})::integer")
+      magic.options[:carry_forward] = true
+      sql =
+        if magic.send(:postgresql?, connection.adapter_name)
+          "SUM(COUNT(id)) OVER (ORDER BY #{relation.group_values[0]})::integer"
+        else
+          raise "`cumulative_sum` not supported with MySQL"
+        end
+
+      custom(sql)
     end
 
     # clone to prevent modifying original variables

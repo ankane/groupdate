@@ -636,6 +636,18 @@ module TestGroupdate
     assert_equal expected, User.group_by_year(:created_at).cumulative_sum
   end
 
+  def test_cumulative_sum_last
+    create_user "2011-05-01 00:00:00 UTC"
+    create_user "2013-05-01 00:00:00 UTC"
+    create_user "2013-05-01 00:00:00 UTC"
+    expected = {
+      utc.parse("2012-01-01 00:00:00 UTC") => 1,
+      utc.parse("2013-01-01 00:00:00 UTC") => 3,
+      utc.parse("2014-01-01 00:00:00 UTC") => 3
+    }
+    assert_equal expected, User.group_by_year(:created_at, last: 3).cumulative_sum
+  end
+
   # helpers
 
   def assert_format(method, expected, format, options = {})
