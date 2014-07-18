@@ -72,18 +72,11 @@ module Groupdate
       if options[:series] == false
         group
       else
-        relation =
-          if time_range.is_a?(Range)
-            # doesn't matter whether we include the end of a ... range - it will be excluded later
-            group.where("#{column} >= ? AND #{column} <= ?", time_range.first, time_range.last)
-          else
-            group.where("#{column} IS NOT NULL")
-          end
-
         # TODO do not change object state
         @group_index = group.group_values.size - 1
+        @column = column
 
-        Groupdate::Series.new(self, relation)
+        Groupdate::Series.new(self, group)
       end
     end
 
@@ -110,6 +103,16 @@ module Groupdate
           utc = ActiveSupport::TimeZone["UTC"]
           lambda{|k| (k.is_a?(String) ? utc.parse(k) : k.to_time).in_time_zone(time_zone) }
         end
+
+      if !options[:carry_forward]
+        relation =
+          if time_range.is_a?(Range)
+            # doesn't matter whether we include the end of a ... range - it will be excluded later
+            relation.where("#{@column} >= ? AND #{@column} <= ?", time_range.first, time_range.last)
+          else
+            relation.where("#{@column} IS NOT NULL")
+          end
+      end
 
       count =
         begin

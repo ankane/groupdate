@@ -10,7 +10,7 @@ module Groupdate
     def cumulative_sum
       magic.options[:carry_forward] = true
       sql =
-        if magic.send(:postgresql?, connection.adapter_name)
+        if magic.send(:postgresql?, relation.connection.adapter_name)
           "SUM(COUNT(id)) OVER (ORDER BY #{relation.group_values[0]})::integer"
         else
           raise "`cumulative_sum` not supported with MySQL"
