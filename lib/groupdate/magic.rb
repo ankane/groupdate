@@ -22,10 +22,10 @@ module Groupdate
     def relation(column, relation)
       column = relation.connection.quote_table_name(column)
       time_zone = self.time_zone.tzinfo.name
+      @relation = relation
 
-      adapter_name = relation.connection.adapter_name
       query =
-        if mysql?(adapter_name)
+        if mysql?
           case field
           when :day_of_week # Sunday = 0, Monday = 1, etc
             # use CONCAT for consistent return type (String)
@@ -53,7 +53,7 @@ module Groupdate
 
             ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} HOUR), '+00:00', ?), '#{format}'), ?, '+00:00'), INTERVAL #{day_start} HOUR)", time_zone, time_zone]
           end
-        elsif postgresql?(adapter_name)
+        elsif postgresql?
           case field
           when :day_of_week
             ["EXTRACT(DOW from (#{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour'))::integer", time_zone]
@@ -239,12 +239,12 @@ module Groupdate
       end]
     end
 
-    def mysql?(adapter_name)
-      ["MySQL", "Mysql2"].include?(adapter_name)
+    def mysql?
+      ["MySQL", "Mysql2"].include?(@relation.connection.adapter_name)
     end
 
-    def postgresql?(adapter_name)
-      ["PostgreSQL", "PostGIS"].include?(adapter_name)
+    def postgresql?
+      ["PostgreSQL", "PostGIS"].include?(@relation.connection.adapter_name)
     end
 
     def round_time(time)

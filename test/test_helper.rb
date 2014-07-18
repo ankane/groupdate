@@ -625,26 +625,34 @@ module TestGroupdate
   # cumulative sum
 
   def test_cumulative_sum
-    create_user "2011-05-01 00:00:00 UTC"
-    create_user "2013-05-01 00:00:00 UTC"
-    create_user "2013-05-01 00:00:00 UTC"
-    expected = {
-      utc.parse("2011-01-01 00:00:00 UTC") => 1,
-      utc.parse("2012-01-01 00:00:00 UTC") => 1,
-      utc.parse("2013-01-01 00:00:00 UTC") => 3
-    }
-    assert_equal expected, User.group_by_year(:created_at).cumulative_sum
+    if postgresql?
+      create_user "2011-05-01 00:00:00 UTC"
+      create_user "2013-05-01 00:00:00 UTC"
+      create_user "2013-05-01 00:00:00 UTC"
+      expected = {
+        utc.parse("2011-01-01 00:00:00 UTC") => 1,
+        utc.parse("2012-01-01 00:00:00 UTC") => 1,
+        utc.parse("2013-01-01 00:00:00 UTC") => 3
+      }
+      assert_equal expected, User.group_by_year(:created_at).cumulative_sum
+    elsif mysql?
+      assert_raises(NoMethodError) { User.group_by_year(:created_at).cumulative_sum }
+    end
   end
 
   def test_cumulative_sum_last
-    create_user "2011-05-01 00:00:00 UTC"
-    create_user "2013-05-01 00:00:00 UTC"
-    create_user "2013-05-01 00:00:00 UTC"
-    expected = {
-      utc.parse("2013-01-01 00:00:00 UTC") => 3,
-      utc.parse("2014-01-01 00:00:00 UTC") => 3
-    }
-    assert_equal expected, User.group_by_year(:created_at, last: 2).cumulative_sum
+    if postgresql?
+      create_user "2011-05-01 00:00:00 UTC"
+      create_user "2013-05-01 00:00:00 UTC"
+      create_user "2013-05-01 00:00:00 UTC"
+      expected = {
+        utc.parse("2013-01-01 00:00:00 UTC") => 3,
+        utc.parse("2014-01-01 00:00:00 UTC") => 3
+      }
+      assert_equal expected, User.group_by_year(:created_at, last: 2).cumulative_sum
+    elsif mysql?
+      assert_raises(NoMethodError) { User.group_by_year(:created_at, last: 2).cumulative_sum }
+    end
   end
 
   # helpers
@@ -687,6 +695,14 @@ module TestGroupdate
   def utc
     ActiveSupport::TimeZone["UTC"]
   end
+
+  def postgresql?
+   self.class == TestPostgresql
+  end
+
+  def mysql?
+   self.class == TestMysql
+ end
 
   def teardown
     User.delete_all
