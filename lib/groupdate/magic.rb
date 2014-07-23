@@ -20,6 +20,10 @@ module Groupdate
     end
 
     def relation(column, relation)
+      if relation.default_timezone == :local
+        raise "ActiveRecord::Base.default_timezone must be :utc to use Groupdate"
+      end
+
       column = relation.connection.quote_table_name(column)
       time_zone = self.time_zone.tzinfo.name
 

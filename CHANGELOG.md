@@ -1,3 +1,7 @@
+## 2.2.2 [unreleased]
+
+- Raise error when ActiveRecord::Base.default_timezone is not `:utc`
+
 ## 2.2.1
 
 - Fixed ActiveRecord 3 associations

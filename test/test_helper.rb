@@ -622,6 +622,17 @@ module TestGroupdate
     assert_empty user.posts.group_by_day(:created_at).count
   end
 
+  # activerecord default_timezone option
+
+  def test_default_timezone_local
+    begin
+      User.default_timezone = :local
+      assert_raises(RuntimeError){ User.group_by_day(:created_at).count }
+    ensure
+      User.default_timezone = :utc
+    end
+  end
+
   # helpers
 
   def assert_format(method, expected, format, options = {})
