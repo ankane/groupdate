@@ -328,6 +328,24 @@ module TestGroupdate
     assert_result :day_of_week, 3, "2013-01-02 10:00:00", true, :day_start => 2
   end
 
+  # month of year
+
+  def test_month_of_year_end_of_month
+    assert_result :month_of_year, 1, "2013-01-31 23:59:59"
+  end
+
+  def test_month_of_year_start_of_month
+    assert_result :month_of_year, 1, "2013-01-01 00:00:00"
+  end
+
+  def test_month_of_year_end_of_month_with_time_zone
+    assert_result :month_of_year, 1, "2013-02-01 07:59:59", true
+  end
+
+  def test_month_of_year_start_of_month_with_time_zone
+    assert_result :month_of_year, 1, "2013-01-01 08:00:00", true
+  end
+
   # zeros
 
   def test_zeros_second
@@ -406,6 +424,15 @@ module TestGroupdate
       expected[n] = n == 20 ? 1 : 0
     end
     assert_equal expected, call_method(:hour_of_day, :created_at, {})
+  end
+
+  def test_zeros_month_of_year
+    create_user "2013-05-01 00:00:00 UTC"
+    expected = {}
+    (1..12).each do |n|
+      expected[n] = n == 5 ? 1 : 0
+    end
+    assert_equal expected, call_method(:month_of_year, :created_at, {})
   end
 
   def test_zeros_excludes_end
@@ -607,6 +634,11 @@ module TestGroupdate
   def test_format_day_of_week_week_start
     create_user "2014-03-01 00:00:00 UTC"
     assert_format :day_of_week, "Sun", "%a", week_start: :sat
+  end
+
+  def test_format_month_of_year
+    create_user "2014-01-01 00:00:00 UTC"
+    assert_format :month_of_year, "Jan", "%b"
   end
 
   def test_format_multiple_groups
