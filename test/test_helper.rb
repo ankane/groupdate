@@ -346,6 +346,24 @@ module TestGroupdate
     assert_result :month_of_year, 1, "2013-01-01 08:00:00", true
   end
 
+  # month of year starts at 2am
+
+  def test_month_of_year_end_of_month_day_start_2am
+    assert_result :month_of_year, 12, "2013-01-01 01:59:59", false, :day_start => 2
+  end
+
+  def test_month_of_year_start_of_month_day_start_2am
+    assert_result :month_of_year, 1, "2013-01-01 02:00:00", false, :day_start => 2
+  end
+
+  def test_month_of_year_end_of_month_with_time_zone_day_start_2am
+    assert_result :month_of_year, 12, "2013-01-01 09:59:59", true, :day_start => 2
+  end
+
+  def test_month_of_year_start_of_month_with_time_zone_day_start_2am
+    assert_result :month_of_year, 1, "2013-01-01 10:00:00", true, :day_start => 2
+  end
+
   # zeros
 
   def test_zeros_second

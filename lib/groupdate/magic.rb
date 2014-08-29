@@ -38,7 +38,7 @@ module Groupdate
           when :hour_of_day
             ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) + 24 - #{day_start}) % 24", time_zone]
           when :month_of_year
-            ["MONTH(CONVERT_TZ(#{column}, '+00:00', ?))", time_zone]
+            ["MONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} HOUR), '+00:00', ?))", time_zone]
           when :week
             ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL ((#{7 - week_start} + WEEKDAY(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} HOUR)) % 7) DAY) - INTERVAL #{day_start} HOUR, '+00:00', ?), '%Y-%m-%d 00:00:00') + INTERVAL #{day_start} HOUR, ?, '+00:00')", time_zone, time_zone, time_zone]
           else
@@ -63,11 +63,11 @@ module Groupdate
         when "PostgreSQL", "PostGIS"
           case field
           when :day_of_week
-            ["EXTRACT(DOW from (#{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour'))::integer", time_zone]
+            ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour')::integer", time_zone]
           when :hour_of_day
             ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour')::integer", time_zone]
           when :month_of_year
-            ["EXTRACT(MONTH from (#{column}::timestamptz AT TIME ZONE ?))::integer", time_zone]
+            ["EXTRACT(MONTH from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour')::integer", time_zone]
           when :week # start on Sunday, not PostgreSQL default Monday
             ["(DATE_TRUNC('#{field}', (#{column}::timestamptz - INTERVAL '#{week_start} day' - INTERVAL '#{day_start}' hour) AT TIME ZONE ?) + INTERVAL '#{week_start} day' + INTERVAL '#{day_start}' hour) AT TIME ZONE ?", time_zone, time_zone]
           else
@@ -229,7 +229,7 @@ module Groupdate
               when :day_of_week
                 key = sunday + key.days
               when :month_of_year
-                key = Date.new(2014, key, 01)
+                key = Date.new(2014, key, 1).to_time
               end
               key.strftime(options[:format].to_s)
             end
