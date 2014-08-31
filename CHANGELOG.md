@@ -3,6 +3,7 @@
 - Raise error when ActiveRecord::Base.default_timezone is not `:utc`
 - Added `day_of_month`
 - Added `month_of_year`
+- Do not quote column name
 
 ## 2.2.1
 
