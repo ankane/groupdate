@@ -173,6 +173,8 @@ gem 'groupdate'
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 ```
 
+or copy and paste [these statements](https://gist.githubusercontent.com/ankane/1d6b0022173186accbf0/raw/time_zone_support.sql) into a SQL console.
+
 #### For JRuby
 
 Use the master version of your JDBC adapter.  You will get incorrect results for versions before [this commit](https://github.com/jruby/activerecord-jdbc-adapter/commit/c1cdb7cec8d3f06fc54995e8d872d830bd0a4d91).

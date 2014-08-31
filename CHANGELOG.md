@@ -1,6 +1,7 @@
 ## 2.2.2 [unreleased]
 
 - Raise error when ActiveRecord::Base.default_timezone is not `:utc`
+- Added `day_of_month`
 - Added `month_of_year`
 
 ## 2.2.1
