@@ -47,8 +47,8 @@ and
 
 - hour_of_day
 - day_of_week (Sunday = 0, Monday = 1, etc)
-- day_of_month [master]
-- month_of_year [master]
+- day_of_month
+- month_of_year
 
 Use it anywhere you can use `group`.
 
