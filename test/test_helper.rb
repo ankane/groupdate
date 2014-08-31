@@ -328,6 +328,46 @@ module TestGroupdate
     assert_result :day_of_week, 3, "2013-01-02 10:00:00", true, :day_start => 2
   end
 
+  # day of month
+
+  def test_day_of_month_end_of_day
+    assert_result :day_of_month, 31, "2013-01-31 23:59:59"
+  end
+
+  def test_day_of_month_end_of_day_feb_leap_year
+    assert_result :day_of_month, 29, "2012-02-29 23:59:59"
+  end
+
+  def test_day_of_month_start_of_day
+    assert_result :day_of_month, 3, "2013-01-03 00:00:00"
+  end
+
+  def test_day_of_month_end_of_day_with_time_zone
+    assert_result :day_of_month, 31, "2013-02-01 07:59:59", true
+  end
+
+  def test_day_of_month_start_of_day_with_time_zone
+    assert_result :day_of_month, 1, "2013-01-01 08:00:00", true
+  end
+
+  # day of month starts at 2am
+
+  def test_day_of_month_end_of_day_day_start_2am
+    assert_result :day_of_month, 31, "2013-01-01 01:59:59", false, :day_start => 2
+  end
+
+  def test_day_of_month_start_of_day_day_start_2am
+    assert_result :day_of_month, 1, "2013-01-01 02:00:00", false, :day_start => 2
+  end
+
+  def test_day_of_month_end_of_day_with_time_zone_day_start_2am
+    assert_result :day_of_month, 31, "2013-01-01 09:59:59", true, :day_start => 2
+  end
+
+  def test_day_of_month_start_of_day_with_time_zone_day_start_2am
+    assert_result :day_of_month, 1, "2013-01-01 10:00:00", true, :day_start => 2
+  end
+
   # month of year
 
   def test_month_of_year_end_of_month
@@ -442,6 +482,15 @@ module TestGroupdate
       expected[n] = n == 20 ? 1 : 0
     end
     assert_equal expected, call_method(:hour_of_day, :created_at, {})
+  end
+
+  def test_zeros_day_of_month
+    create_user "1978-12-18 00:00:00 UTC"
+    expected = {}
+    (1..31).each do |n|
+      expected[n] = n == 18 ? 1 : 0
+    end
+    assert_equal expected, call_method(:day_of_month, :created_at, {})
   end
 
   def test_zeros_month_of_year
@@ -652,6 +701,11 @@ module TestGroupdate
   def test_format_day_of_week_week_start
     create_user "2014-03-01 00:00:00 UTC"
     assert_format :day_of_week, "Sun", "%a", week_start: :sat
+  end
+
+  def test_format_day_of_month
+    create_user "2014-03-01 00:00:00 UTC"
+    assert_format :day_of_month, " 1", "%e"
   end
 
   def test_format_month_of_year

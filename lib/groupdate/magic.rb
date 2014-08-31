@@ -37,6 +37,8 @@ module Groupdate
             ["DAYOFWEEK(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} HOUR), '+00:00', ?)) - 1", time_zone]
           when :hour_of_day
             ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) + 24 - #{day_start}) % 24", time_zone]
+          when :day_of_month
+            ["DAYOFMONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} HOUR), '+00:00', ?))", time_zone]
           when :month_of_year
             ["MONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} HOUR), '+00:00', ?))", time_zone]
           when :week
@@ -66,6 +68,8 @@ module Groupdate
             ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour')::integer", time_zone]
           when :hour_of_day
             ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour')::integer", time_zone]
+          when :day_of_month
+            ["EXTRACT(DAY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour')::integer", time_zone]
           when :month_of_year
             ["EXTRACT(MONTH from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour')::integer", time_zone]
           when :week # start on Sunday, not PostgreSQL default Monday
@@ -113,7 +117,7 @@ module Groupdate
 
       cast_method =
         case field
-        when :day_of_week, :hour_of_day, :month_of_year
+        when :day_of_week, :hour_of_day, :day_of_month, :month_of_year
           lambda{|k| k.to_i }
         else
           utc = ActiveSupport::TimeZone["UTC"]
@@ -170,6 +174,8 @@ module Groupdate
           0..6
         when :hour_of_day
           0..23
+        when :day_of_month
+          1..31
         when :month_of_year
           1..12
         else
@@ -228,6 +234,8 @@ module Groupdate
                 key = sunday + key.hours + day_start.hours
               when :day_of_week
                 key = sunday + key.days
+              when :day_of_month
+                key = Date.new(2014, 1, key).to_time
               when :month_of_year
                 key = Date.new(2014, key, 1).to_time
               end
@@ -268,6 +276,8 @@ module Groupdate
           time.hour
         when :day_of_week
           (7 - week_start + ((time.wday - 1) % 7) % 7)
+        when :day_of_month
+          time.day
         when :month_of_year
           time.month
         else
