@@ -5,6 +5,8 @@ require "minitest/pride"
 require "logger"
 require "active_record"
 
+Minitest::Test = Minitest::Unit::TestCase unless defined?(Minitest::Test)
+
 # TODO determine why this is necessary
 if RUBY_PLATFORM == "java"
   ENV["TZ"] = "UTC"
