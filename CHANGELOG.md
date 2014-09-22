@@ -1,3 +1,7 @@
+## 2.3.1
+
+- Added `series: false` option for arrays and hashes
+
 ## 2.3.0
 
 - Raise error when ActiveRecord::Base.default_timezone is not `:utc`
@@ -11,7 +15,7 @@
 
 ## 2.2.0
 
-- Added support for Arrays and Hashes
+- Added support for arrays and hashes
 
 ## 2.1.1
 

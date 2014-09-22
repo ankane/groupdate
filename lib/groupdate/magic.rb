@@ -16,7 +16,12 @@ module Groupdate
     end
 
     def group_by(enum, &block)
-      series(enum.group_by{|v| v = yield(v); v ? round_time(v) : nil }, [])
+      group = enum.group_by{|v| v = yield(v); v ? round_time(v) : nil }
+      if options[:series] == false
+        group
+      else
+        series(group, [])
+      end
     end
 
     def relation(column, relation)
