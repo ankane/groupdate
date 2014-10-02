@@ -1,3 +1,5 @@
+require 'i18n'
+
 module Groupdate
   class Magic
     attr_accessor :field, :options
@@ -243,7 +245,7 @@ module Groupdate
               when :month_of_year
                 key = Date.new(2014, key, 1).to_time
               end
-              key.strftime(options[:format].to_s)
+              I18n.localize(key, format: options[:format].to_s)
             end
           end
         else
