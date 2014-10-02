@@ -715,6 +715,14 @@ module TestGroupdate
     assert_format :month_of_year, "Jan", "%b"
   end
 
+  def test_locale_format
+    create_user "2014-10-01 00:00:00 UTC"
+    setup_date_translations
+    I18n.locale = :de
+    assert_equal ({"Okt" => 1}), User.group_by_day(:created_at, format: "%b").count
+    I18n.locale = :en
+  end
+
   def test_format_multiple_groups
     create_user "2014-03-01 00:00:00 UTC"
     assert_equal ({["Sun", 1] => 1}), User.group_by_week(:created_at, format: "%a").group(:score).count
@@ -782,6 +790,26 @@ module TestGroupdate
 
   def teardown
     User.delete_all
+  end
+
+  protected
+
+  def setup_date_translations
+    I18n.backend.store_translations :de, {
+      :date => {
+        :formats => {
+          :default => "%d.%m.%Y",
+          :short => "%d. %b",
+          :long => "%d. %B %Y",
+        },
+        :am => 'am',
+        :pm => 'pm',
+        :day_names => %w(Sonntag Montag Dienstag Mittwoch Donnerstag Freitag Samstag),
+        :abbr_day_names => %w(So Mo Di Mi Do Fr  Sa),
+        :month_names => %w(Januar Februar März April Mai Juni Juli August September Oktober November Dezember).unshift(nil),
+        :abbr_month_names => %w(Jan Feb Mar Apr Mai Jun Jul Aug Sep Okt Nov Dez).unshift(nil)
+      }
+    }
   end
 
 end
