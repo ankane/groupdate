@@ -766,8 +766,8 @@ module TestGroupdate
     create_user("2014-10-19 02:00:00 BRST")
     create_user("2014-10-20 02:00:00 BRST")
     expected = {
-      utc.parse("2014-10-19 01:00:00 BRST") => 1,
-      utc.parse("2014-10-20 00:00:00 BRST") => 1
+      brasilia.parse("2014-10-19 01:00:00") => 1,
+      brasilia.parse("2014-10-20 00:00:00") => 1
     }
     assert_equal expected, User.group_by_day(:created_at, time_zone: "Brasilia").count
   end
@@ -811,6 +811,10 @@ module TestGroupdate
 
   def utc
     ActiveSupport::TimeZone["UTC"]
+  end
+
+  def brasilia
+    ActiveSupport::TimeZone["Brasilia"]
   end
 
   def teardown
