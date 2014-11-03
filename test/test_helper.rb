@@ -26,6 +26,14 @@ end
 class Post < ActiveRecord::Base
 end
 
+# i18n
+I18n.enforce_available_locales = true
+I18n.backend.store_translations :de, {
+  :date => {
+    :abbr_month_names => %w(Jan Feb Mar Apr Mai Jun Jul Aug Sep Okt Nov Dez).unshift(nil)
+  }
+}
+
 # migrations
 %w(postgresql mysql2).each do |adapter|
   ActiveRecord::Base.establish_connection :adapter => adapter, :database => "groupdate_test", :username => adapter == "mysql2" ? "root" : nil
@@ -713,6 +721,19 @@ module TestGroupdate
   def test_format_month_of_year
     create_user "2014-01-01 00:00:00 UTC"
     assert_format :month_of_year, "Jan", "%b"
+  end
+
+  def test_format_locale
+    create_user "2014-10-01 00:00:00 UTC"
+    assert_equal ({"Okt" => 1}), User.group_by_day(:created_at, format: "%b", locale: :de).count
+  end
+
+  def test_format_locale_global
+    create_user "2014-10-01 00:00:00 UTC"
+    I18n.locale = :de
+    assert_equal ({"Okt" => 1}), User.group_by_day(:created_at, format: "%b").count
+  ensure
+    I18n.locale = :en
   end
 
   def test_format_multiple_groups

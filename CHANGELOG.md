@@ -1,3 +1,7 @@
+## 2.4.0 [unreleased]
+
+- Added localization
+
 ## 2.3.1
 
 - Added `series: false` option for arrays and hashes
