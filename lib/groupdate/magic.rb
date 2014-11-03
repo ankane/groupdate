@@ -205,8 +205,8 @@ module Groupdate
 
             step = 1.send(field)
 
-            while time_range.cover?(series.last + step)
-              series << series.last + step
+            while (next_step = round_time(series.last + step)) and time_range.cover?(next_step)
+              series << next_step
             end
 
             if multiple_groups
