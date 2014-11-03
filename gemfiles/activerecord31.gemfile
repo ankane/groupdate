@@ -3,6 +3,4 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in searchkick.gemspec
 gemspec path: "../"
 
-gem "tzinfo"
-gem "tzinfo-data" # travis
 gem "activerecord", "~> 3.1.0"
