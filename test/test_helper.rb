@@ -760,16 +760,16 @@ module TestGroupdate
     end
   end
 
-  # BRST
+  # Brasilia Summer Time
 
-  def test_brst
+  def test_brasilia_summer_time
     create_user("2014-10-19 02:00:00 BRST")
     create_user("2014-10-20 02:00:00 BRST")
     expected = {
       utc.parse("2014-10-19 01:00:00 BRST") => 1,
       utc.parse("2014-10-20 00:00:00 BRST") => 1
     }
-    assert_equal expected, User.group_by_day(:created_at, time_zone: "America/Sao_Paulo").count
+    assert_equal expected, User.group_by_day(:created_at, time_zone: "Brasilia").count
   end
 
   # helpers
