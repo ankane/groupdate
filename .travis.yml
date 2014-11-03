@@ -10,8 +10,6 @@ gemfile:
   - gemfiles/activerecord40.gemfile
 script: bundle exec rake test
 before_script:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq tzdata
   - mysql -e 'create database groupdate_test;'
   - mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
   - psql -c 'create database groupdate_test;' -U postgres
