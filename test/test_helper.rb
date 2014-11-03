@@ -26,6 +26,14 @@ end
 class Post < ActiveRecord::Base
 end
 
+# i18n
+I18n.enforce_available_locales = true
+I18n.backend.store_translations :de, {
+  :date => {
+    :abbr_month_names => %w(Jan Feb Mar Apr Mai Jun Jul Aug Sep Okt Nov Dez).unshift(nil)
+  }
+}
+
 # migrations
 %w(postgresql mysql2).each do |adapter|
   ActiveRecord::Base.establish_connection :adapter => adapter, :database => "groupdate_test", :username => adapter == "mysql2" ? "root" : nil
@@ -715,11 +723,16 @@ module TestGroupdate
     assert_format :month_of_year, "Jan", "%b"
   end
 
-  def test_locale_format
+  def test_format_locale
     create_user "2014-10-01 00:00:00 UTC"
-    setup_date_translations
+    assert_equal ({"Okt" => 1}), User.group_by_day(:created_at, format: "%b", locale: :de).count
+  end
+
+  def test_format_locale_global
+    create_user "2014-10-01 00:00:00 UTC"
     I18n.locale = :de
     assert_equal ({"Okt" => 1}), User.group_by_day(:created_at, format: "%b").count
+  ensure
     I18n.locale = :en
   end
 
@@ -790,26 +803,6 @@ module TestGroupdate
 
   def teardown
     User.delete_all
-  end
-
-  protected
-
-  def setup_date_translations
-    I18n.backend.store_translations :de, {
-      :date => {
-        :formats => {
-          :default => "%d.%m.%Y",
-          :short => "%d. %b",
-          :long => "%d. %B %Y",
-        },
-        :am => 'am',
-        :pm => 'pm',
-        :day_names => %w(Sonntag Montag Dienstag Mittwoch Donnerstag Freitag Samstag),
-        :abbr_day_names => %w(So Mo Di Mi Do Fr  Sa),
-        :month_names => %w(Januar Februar März April Mai Juni Juli August September Oktober November Dezember).unshift(nil),
-        :abbr_month_names => %w(Jan Feb Mar Apr Mai Jun Jul Aug Sep Okt Nov Dez).unshift(nil)
-      }
-    }
   end
 
 end
