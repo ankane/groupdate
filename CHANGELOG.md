@@ -1,6 +1,7 @@
 ## 2.4.0 [unreleased]
 
 - Added localization
+- Fixed issue w/ Brasilia Summer Time
 
 ## 2.3.1
 
