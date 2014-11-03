@@ -137,7 +137,7 @@ To get keys in a different format, use:
 User.group_by_hour_of_day(:created_at, format: "%l %P").count.keys.first # 12 am
 ```
 
-Takes a `String`, which is passed to [strftime](http://strfti.me/), or a `Proc`
+Takes a `String`, which is passed to [strftime](http://strfti.me/), or a `Proc`.  You can pass a locale with the `locale` option.
 
 ## Arrays and Hashes
 
