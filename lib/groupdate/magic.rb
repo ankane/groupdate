@@ -87,8 +87,11 @@ module Groupdate
           raise "Connection adapter not supported: #{adapter_name}"
         end
 
-      group = relation.group(Groupdate::OrderHack.new(relation.send(:sanitize_sql_array, query), field, time_zone))
-      if options[:series] == false
+      group_query = relation.send(:sanitize_sql_array, query)
+      group = relation.group(Groupdate::OrderHack.new(group_query, field, time_zone))
+      if options[:select]
+        group.select(options[:select] + ", #{group_query} AS #{field}")
+      elsif options[:series] == false
         group
       else
         relation =

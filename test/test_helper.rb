@@ -772,6 +772,17 @@ module TestGroupdate
     assert_equal expected, User.group_by_day(:created_at, time_zone: "Brasilia").count
   end
 
+  # select
+
+  def test_select
+    create_user("2014-10-19 00:00:00")
+    create_user("2014-10-19 00:00:00", 2)
+    result = User.group_by_day(:created_at, select: "COUNT(*) AS count, SUM(score) AS sum").to_a.first
+    assert_equal 2, result.count
+    assert_equal 3, result.sum
+    assert_equal utc.parse("2014-10-19 00:00:00"), result.day
+  end
+
   # helpers
 
   def assert_format(method, expected, format, options = {})
