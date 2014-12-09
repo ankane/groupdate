@@ -781,6 +781,14 @@ module TestGroupdate
     assert_equal 2, User.group_by_day(:created_at, carry_forward: true).count[utc.parse("2014-05-02 00:00:00 UTC")]
   end
 
+  # group_calc
+
+  def test_group_calc
+    create_user "2014-05-01 00:00:00 UTC", 10
+    create_user "2014-05-01 00:00:00 UTC", 20
+    assert_equal 15, User.group_by_day(:created_at).group_calc("SUM(score) * 1.0 / COUNT(*)")[utc.parse("2014-05-01 00:00:00 UTC")]
+  end
+
   # helpers
 
   def assert_format(method, expected, format, options = {})
