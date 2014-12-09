@@ -772,6 +772,15 @@ module TestGroupdate
     assert_equal expected, User.group_by_day(:created_at, time_zone: "Brasilia").count
   end
 
+  # carry_forward option
+
+  def test_carry_forward
+    create_user "2014-05-01 00:00:00 UTC"
+    create_user "2014-05-01 00:00:00 UTC"
+    create_user "2014-05-03 00:00:00 UTC"
+    assert_equal 2, User.group_by_day(:created_at, carry_forward: true).count[utc.parse("2014-05-02 00:00:00 UTC")]
+  end
+
   # helpers
 
   def assert_format(method, expected, format, options = {})
