@@ -132,11 +132,13 @@ module Groupdate
 
       count =
         begin
-         if method == :group_calc
-           Hash[ relation.select("#{relation.group_values[@group_index]} AS #{@field}", "#{args[0]} AS calculation").group("#{relation.group_values[@group_index]}").map{|record| [record.send(@field), record.calculation] } ]
-         else
-           Hash[ relation.send(method, *args, &block).map{|k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] } ]
-         end
+          calculation =
+            if method == :group_calc
+              Hash[ relation.group("#{relation.group_values[@group_index]}").pluck("#{relation.group_values[@group_index]} AS #{@field}, #{args[0]} AS calculation") ]
+            else
+              relation.send(method, *args, &block)
+            end
+          Hash[ calculation.map{|k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] } ]
         rescue NoMethodError
           raise "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
         end

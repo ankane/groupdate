@@ -789,6 +789,16 @@ module TestGroupdate
     assert_equal 15, User.group_by_day(:created_at).group_calc("SUM(score) * 1.0 / COUNT(*)")[utc.parse("2014-05-01 00:00:00 UTC")]
   end
 
+  def test_group_calc_multiple_groups
+    create_user "2014-05-01 00:00:00 UTC", 10
+    create_user "2014-05-01 00:00:00 UTC", 20
+    expected = {
+      [10, utc.parse("2014-05-01 00:00:00 UTC")] => 10,
+      [20, utc.parse("2014-05-01 00:00:00 UTC")] => 20
+    }
+    assert_equal expected, User.group(:score).group_by_day(:created_at).group_calc("SUM(score) * 1.0 / COUNT(*)")
+  end
+
   # helpers
 
   def assert_format(method, expected, format, options = {})
