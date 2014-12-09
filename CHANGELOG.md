@@ -2,6 +2,7 @@
 
 - Added localization
 - Fixed issue w/ Brasilia Summer Time
+- Added `carry_forward` option
 
 ## 2.3.1
 
