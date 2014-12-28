@@ -40,7 +40,7 @@ I18n.backend.store_translations :de, {
   ActiveRecord::Migration.create_table :users, :force => true do |t|
     t.string :name
     t.integer :score
-    t.timestamp :created_at, limit: 3 # need more than one second precision for MySQL
+    t.timestamp :created_at
   end
 
   ActiveRecord::Migration.create_table :posts, :force => true do |t|
@@ -58,7 +58,11 @@ module TestGroupdate
   # second
 
   def test_second_end_of_second
-    assert_result_time :second, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:00.999"
+    if ActiveRecord::Base.connection.adapter_name == "Mysql2" and ActiveRecord::VERSION::STRING.starts_with?("4.2.")
+      skip # no millisecond precision
+    else
+      assert_result_time :second, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:00.999"
+    end
   end
 
   def test_second_start_of_second

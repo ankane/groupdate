@@ -110,16 +110,17 @@ module Groupdate
       # undo reverse since we do not want this to appear in the query
       reverse = relation.reverse_order_value
       if reverse
-        relation = relation.reverse_order
+        relation = relation.except(:reverse_order)
       end
       order = relation.order_values.first
       if order.is_a?(String)
         parts = order.split(" ")
         reverse_order = (parts.size == 2 && parts[0].to_sym == field && parts[1].to_s.downcase == "desc")
-        reverse = !reverse if reverse_order
+        if reverse_order
+          reverse = !reverse
+          relation = relation.except(:order)
+        end
       end
-
-      relation = relation.except(:order, :reverse_order)
 
       multiple_groups = relation.group_values.size > 1
 
