@@ -175,18 +175,6 @@ mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 
 or copy and paste [these statements](https://gist.githubusercontent.com/ankane/1d6b0022173186accbf0/raw/time_zone_support.sql) into a SQL console.
 
-#### For JRuby
-
-Use the master version of your JDBC adapter.  You will get incorrect results for versions before [this commit](https://github.com/jruby/activerecord-jdbc-adapter/commit/c1cdb7cec8d3f06fc54995e8d872d830bd0a4d91).
-
-```ruby
-# postgresql
-gem "activerecord-jdbcpostgresql-adapter", :github => "jruby/activerecord-jdbc-adapter"
-
-# mysql
-gem "activerecord-jdbcmysql-adapter", :github => "jruby/activerecord-jdbc-adapter"
-```
-
 ## Upgrading to 2.0
 
 Groupdate 2.0 brings a number a great improvements.  Here are two things to be aware of:

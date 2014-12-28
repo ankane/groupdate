@@ -1,12 +1,10 @@
-## 2.4.0 [unreleased]
+## 2.4.0
 
 - Added localization
-- Fixed issue w/ Brasilia Summer Time
 - Added `carry_forward` option
-
-## 2.3.1
-
 - Added `series: false` option for arrays and hashes
+- Fixed issue w/ Brasilia Summer Time
+- Fixed issues w/ ActiveRecord 4.2
 
 ## 2.3.0
 
