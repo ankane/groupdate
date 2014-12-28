@@ -115,10 +115,10 @@ module Groupdate
       order = relation.order_values.first
       if order.is_a?(String)
         parts = order.split(" ")
-        reverse_order = (parts.size == 2 && parts[0].to_sym == field && parts[1].to_s.downcase == "desc")
+        reverse_order = (parts.size == 2 && (parts[0].to_sym == field || (activerecord42? && parts[0] == "#{relation.quoted_table_name}.#{relation.quoted_primary_key}")) && parts[1].to_s.downcase == "desc")
         if reverse_order
           reverse = !reverse
-          relation = relation.except(:order)
+          relation = relation.reorder(relation.order_values[1..-1])
         end
       end
 
@@ -297,6 +297,10 @@ module Groupdate
         end
 
       time.is_a?(Time) ? time + day_start.hours : time
+    end
+
+    def activerecord42?
+      ActiveRecord::VERSION::STRING.starts_with?("4.2.")
     end
 
   end
