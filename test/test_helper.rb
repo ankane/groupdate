@@ -6,10 +6,7 @@ require "logger"
 
 Minitest::Test = Minitest::Unit::TestCase unless defined?(Minitest::Test)
 
-# TODO determine why this is necessary
-if RUBY_PLATFORM == "java"
-  ENV["TZ"] = "UTC"
-end
+ENV["TZ"] = "UTC"
 
 # for debugging
 # ActiveRecord::Base.logger = Logger.new(STDOUT)
@@ -766,8 +763,9 @@ module TestGroupdate
   # Brasilia Summer Time
 
   def test_brasilia_summer_time
-    create_user("2014-10-19 02:00:00 BRST")
-    create_user("2014-10-20 02:00:00 BRST")
+    # must parse and convert to UTC for ActiveRecord 3.1
+    create_user(brasilia.parse("2014-10-19 02:00:00").utc.to_s)
+    create_user(brasilia.parse("2014-10-20 02:00:00").utc.to_s)
     expected = {
       brasilia.parse("2014-10-19 01:00:00") => 1,
       brasilia.parse("2014-10-20 00:00:00") => 1
