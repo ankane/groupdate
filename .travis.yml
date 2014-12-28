@@ -8,6 +8,7 @@ gemfile:
   - gemfiles/activerecord31.gemfile
   - gemfiles/activerecord32.gemfile
   - gemfiles/activerecord40.gemfile
+  - gemfiles/activerecord41.gemfile
 script: bundle exec rake test
 before_script:
   - mysql -e 'create database groupdate_test;'
