@@ -119,6 +119,8 @@ module Groupdate
         reverse = !reverse if reverse_order
       end
 
+      relation = relation.except(:order, :reverse_order)
+
       multiple_groups = relation.group_values.size > 1
 
       cast_method =

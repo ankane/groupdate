@@ -3,7 +3,6 @@ Bundler.require(:default)
 require "minitest/autorun"
 require "minitest/pride"
 require "logger"
-require "active_record"
 
 Minitest::Test = Minitest::Unit::TestCase unless defined?(Minitest::Test)
 
@@ -41,7 +40,7 @@ I18n.backend.store_translations :de, {
   ActiveRecord::Migration.create_table :users, :force => true do |t|
     t.string :name
     t.integer :score
-    t.timestamp :created_at
+    t.timestamp :created_at, limit: 3 # need more than one second precision for MySQL
   end
 
   ActiveRecord::Migration.create_table :posts, :force => true do |t|
