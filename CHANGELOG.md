@@ -1,3 +1,7 @@
+## 2.4.1 [unreleased]
+
+- raise `ArgumentError` if no block given to enumerable
+
 ## 2.4.0
 
 - Added localization
