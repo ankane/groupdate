@@ -108,7 +108,7 @@ module Groupdate
 
     def perform(relation, method, *args, &block)
       # undo reverse since we do not want this to appear in the query
-      reverse = relation.reverse_order_value
+      reverse = relation.send(:reverse_order_value)
       if reverse
         relation = relation.except(:reverse_order)
       end
