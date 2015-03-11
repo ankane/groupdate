@@ -8,17 +8,17 @@ module Groupdate
       @field = field
       @options = options
 
-      if !time_zone
+      unless time_zone
         raise "Unrecognized time zone"
       end
 
-      if field == :week and !week_start
+      if field == :week && !week_start
         raise "Unrecognized :week_start option"
       end
     end
 
-    def group_by(enum, &block)
-      group = enum.group_by{|v| v = yield(v); v ? round_time(v) : nil }
+    def group_by(enum, &_block)
+      group = enum.group_by { |v| v = yield(v); v ? round_time(v) : nil }
       if options[:series] == false
         group
       else
@@ -127,15 +127,15 @@ module Groupdate
       cast_method =
         case field
         when :day_of_week, :hour_of_day, :day_of_month, :month_of_year
-          lambda{|k| k.to_i }
+          lambda { |k| k.to_i }
         else
           utc = ActiveSupport::TimeZone["UTC"]
-          lambda{|k| (k.is_a?(String) ? utc.parse(k) : k.to_time).in_time_zone(time_zone) }
+          lambda { |k| (k.is_a?(String) ? utc.parse(k) : k.to_time).in_time_zone(time_zone) }
         end
 
       count =
         begin
-          Hash[ relation.send(method, *args, &block).map{|k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] } ]
+          Hash[relation.send(method, *args, &block).map { |k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] }]
         rescue NoMethodError
           raise "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
         end
@@ -163,7 +163,7 @@ module Groupdate
     def time_range
       @time_range ||= begin
         time_range = options[:range]
-        if !time_range and options[:last]
+        if !time_range && options[:last]
           step = 1.send(field) if 1.respond_to?(field)
           if step
             now = Time.now
@@ -196,7 +196,7 @@ module Groupdate
               # use first and last values
               sorted_keys =
                 if multiple_groups
-                  count.keys.map{|k| k[@group_index] }.sort
+                  count.keys.map { |k| k[@group_index] }.sort
                 else
                   count.keys.sort
                 end
@@ -208,15 +208,15 @@ module Groupdate
 
             step = 1.send(field)
 
-            while (next_step = round_time(series.last + step)) and time_range.cover?(next_step)
+            while (next_step = round_time(series.last + step)) && time_range.cover?(next_step)
               series << next_step
             end
 
             if multiple_groups
-              keys = count.keys.map{|k| k[0...@group_index] + k[(@group_index + 1)..-1] }.uniq
+              keys = count.keys.map { |k| k[0...@group_index] + k[(@group_index + 1)..-1] }.uniq
               series = series.reverse if reverse
               keys.flat_map do |k|
-                series.map{|s| k[0...@group_index] + [s] + k[@group_index..-1] }
+                series.map { |s| k[0...@group_index] + [s] + k[@group_index..-1] }
               end
             else
               series
@@ -227,7 +227,7 @@ module Groupdate
         end
 
       # reversed above if multiple groups
-      if !multiple_groups and reverse
+      if !multiple_groups && reverse
         series = series.to_a.reverse
       end
 
@@ -253,7 +253,7 @@ module Groupdate
             end
           end
         else
-          lambda{|k| k }
+          lambda { |k| k }
         end
 
       value = 0
@@ -302,6 +302,5 @@ module Groupdate
     def activerecord42?
       ActiveRecord::VERSION::STRING.starts_with?("4.2.")
     end
-
   end
 end

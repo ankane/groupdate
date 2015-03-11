@@ -7,8 +7,7 @@ ActiveRecord::Base.send(:extend, Groupdate::Scopes)
 
 module ActiveRecord
   class Relation
-
-    if ActiveRecord::VERSION::MAJOR == 3 and ActiveRecord::VERSION::MINOR < 2
+    if ActiveRecord::VERSION::MAJOR == 3 && ActiveRecord::VERSION::MINOR < 2
 
       def method_missing_with_hack(method, *args, &block)
         if Groupdate::METHODS.include?(method)
@@ -20,7 +19,6 @@ module ActiveRecord
       alias_method_chain :method_missing, :hack
 
     end
-
   end
 end
 
@@ -38,7 +36,6 @@ end
 # https://github.com/rails/rails/issues/7121
 module ActiveRecord
   module Calculations
-
     private
 
     def column_alias_for_with_hack(*keys)
@@ -49,6 +46,5 @@ module ActiveRecord
       end
     end
     alias_method_chain :column_alias_for, :hack
-
   end
 end

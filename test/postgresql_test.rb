@@ -7,5 +7,4 @@ class TestPostgresql < Minitest::Test
     super
     User.establish_connection :adapter => "postgresql", :database => "groupdate_test"
   end
-
 end

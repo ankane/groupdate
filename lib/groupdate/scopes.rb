@@ -1,6 +1,5 @@
 module Groupdate
   module Scopes
-
     Groupdate::FIELDS.each do |field|
       define_method :"group_by_#{field}" do |*args|
         args = args.dup
@@ -11,6 +10,5 @@ module Groupdate
         Groupdate::Magic.new(field, options).relation(args[0], self)
       end
     end
-
   end
 end

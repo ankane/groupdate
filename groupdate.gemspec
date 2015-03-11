@@ -1,19 +1,19 @@
 # coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'groupdate/version'
+require "groupdate/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "groupdate"
   spec.version       = Groupdate::VERSION
   spec.authors       = ["Andrew Kane"]
   spec.email         = ["acekane1@gmail.com"]
-  spec.description   = %q{The simplest way to group temporal data}
-  spec.summary       = %q{The simplest way to group temporal data}
+  spec.description   = "The simplest way to group temporal data"
+  spec.summary       = "The simplest way to group temporal data"
   spec.homepage      = "https://github.com/ankane/groupdate"
   spec.license       = "MIT"
 
-  spec.files         = `git ls-files`.split($/)
+  spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]

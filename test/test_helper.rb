@@ -24,10 +24,8 @@ end
 
 # i18n
 I18n.enforce_available_locales = true
-I18n.backend.store_translations :de, {
-  :date => {
-    :abbr_month_names => %w(Jan Feb Mar Apr Mai Jun Jul Aug Sep Okt Nov Dez).unshift(nil)
-  }
+I18n.backend.store_translations :de, :date => {
+  :abbr_month_names => %w(Jan Feb Mar Apr Mai Jun Jul Aug Sep Okt Nov Dez).unshift(nil)
 }
 
 # migrations
@@ -47,7 +45,6 @@ I18n.backend.store_translations :de, {
 end
 
 module TestGroupdate
-
   def setup
     Groupdate.week_start = :sun
   end
@@ -55,7 +52,7 @@ module TestGroupdate
   # second
 
   def test_second_end_of_second
-    if ActiveRecord::Base.connection.adapter_name == "Mysql2" and ActiveRecord::VERSION::STRING.starts_with?("4.2.")
+    if ActiveRecord::Base.connection.adapter_name == "Mysql2" && ActiveRecord::VERSION::STRING.starts_with?("4.2.")
       skip # no millisecond precision
     else
       assert_result_time :second, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:00.999"
@@ -752,12 +749,10 @@ module TestGroupdate
   # activerecord default_timezone option
 
   def test_default_timezone_local
-    begin
-      User.default_timezone = :local
-      assert_raises(RuntimeError){ User.group_by_day(:created_at).count }
-    ensure
-      User.default_timezone = :utc
-    end
+    User.default_timezone = :local
+    assert_raises(RuntimeError) { User.group_by_day(:created_at).count }
+  ensure
+    User.default_timezone = :utc
   end
 
   # Brasilia Summer Time
@@ -830,5 +825,4 @@ module TestGroupdate
   def teardown
     User.delete_all
   end
-
 end

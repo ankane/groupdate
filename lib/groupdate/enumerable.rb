@@ -1,5 +1,4 @@
 module Enumerable
-
   Groupdate::FIELDS.each do |field|
     define_method :"group_by_#{field}" do |options = {}, &block|
       if block
@@ -9,5 +8,4 @@ module Enumerable
       end
     end
   end
-
 end
