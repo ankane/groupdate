@@ -139,6 +139,18 @@ User.group_by_hour_of_day(:created_at, format: "%l %P").count.keys.first # 12 am
 
 Takes a `String`, which is passed to [strftime](http://strfti.me/), or a `Proc`.  You can pass a locale with the `locale` option.
 
+### Dynamic Grouping [master, may change]
+
+```ruby
+User.group_by_period(:day, :created_at).count
+```
+
+Limit groupings with the `permit` option.
+
+```ruby
+User.group_by_period(params[:period], :created_at, permit: %w[day week]).count
+```
+
 ## Arrays and Hashes
 
 ```ruby

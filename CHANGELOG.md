@@ -1,6 +1,7 @@
-## 2.4.1 [unreleased]
+## 2.5.0 [unreleased]
 
-- raise `ArgumentError` if no block given to enumerable
+- Added `group_by_period` method
+- Raise `ArgumentError` if no block given to enumerable
 
 ## 2.4.0
 

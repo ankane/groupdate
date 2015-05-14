@@ -8,4 +8,14 @@ module Enumerable
       end
     end
   end
+
+  def group_by_period(period, options = {}, &block)
+    # to_sym is unsafe on user input, so convert to strings
+    permitted_periods = ((options[:permit] || Groupdate::FIELDS).map(&:to_sym) & Groupdate::FIELDS).map(&:to_s)
+    if permitted_periods.include?(period.to_s)
+      send("group_by_#{period}", options, &block)
+    else
+      raise ArgumentError, "Unpermitted period"
+    end
+  end
 end

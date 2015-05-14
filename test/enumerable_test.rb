@@ -19,6 +19,6 @@ class TestEnumerable < Minitest::Test
   end
 
   def call_method(method, field, options)
-    Hash[User.all.to_a.send(:"group_by_#{method}", options) { |u| u.send(field) }.map { |k, v| [k, v.size] }]
+    Hash[User.all.to_a.group_by_period(method, options) { |u| u.send(field) }.map { |k, v| [k, v.size] }]
   end
 end

@@ -739,6 +739,28 @@ module TestGroupdate
     assert_equal ({[1, "Sun"] => 1}), User.group(:score).group_by_week(:created_at, format: "%a").count
   end
 
+  # permit
+
+  def test_permit
+    assert_raises(ArgumentError, "Unpermitted period") { User.group_by_period(:day, :created_at, permit: %w[week]).count }
+  end
+
+  def test_permit_symbol_symbols
+    assert_equal ({}), User.group_by_period(:day, :created_at, permit: %i[day]).count
+  end
+
+  def test_permit_string_symbols
+    assert_equal ({}), User.group_by_period("day", :created_at, permit: %i[day]).count
+  end
+
+  def test_permit_symbol_strings
+    assert_equal ({}), User.group_by_period(:day, :created_at, permit: %w[day]).count
+  end
+
+  def test_permit_string_strings
+    assert_equal ({}), User.group_by_period("day", :created_at, permit: %w[day]).count
+  end
+
   # associations
 
   def test_associations
@@ -807,7 +829,7 @@ module TestGroupdate
   end
 
   def call_method(method, field, options)
-    User.send(:"group_by_#{method}", field, options).count
+    User.group_by_period(method, field, options).count
   end
 
   def create_user(created_at, score = 1)
