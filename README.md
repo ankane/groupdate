@@ -142,19 +142,19 @@ Takes a `String`, which is passed to [strftime](http://strfti.me/), or a `Proc`.
 ## Arrays and Hashes
 
 ```ruby
-users.group_by_day{|u| u.created_at } # or group_by_day(&:created_at)
+users.group_by_day { |u| u.created_at } # or group_by_day(&:created_at)
 ```
 
 Supports the same options as above
 
 ```ruby
-users.group_by_day(time_zone: time_zone){|u| u.created_at }
+users.group_by_day(time_zone: time_zone) { |u| u.created_at }
 ```
 
 Count
 
 ```ruby
-Hash[ users.group_by_day{|u| u.created_at }.map{|k, v| [k, v.size] } ]
+Hash[ users.group_by_day { |u| u.created_at }.map { |k, v| [k, v.size] } ]
 ```
 
 ## Installation
