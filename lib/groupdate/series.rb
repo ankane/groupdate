@@ -12,7 +12,7 @@ module Groupdate
       # https://github.com/rails/rails/blob/master/activerecord/lib/active_record/relation/calculations.rb
       if ActiveRecord::Calculations.method_defined?(method)
         magic.perform(relation, method, *args, &block)
-      elsif @relation.respond_to?(method)
+      elsif @relation.respond_to?(method, true)
         Groupdate::Series.new(magic, relation.send(method, *args, &block))
       else
         super
