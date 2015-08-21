@@ -1,4 +1,4 @@
-require "active_record"
+require "active_record" unless defined?(ActiveRecord)
 require "groupdate/order_hack"
 require "groupdate/scopes"
 require "groupdate/series"
