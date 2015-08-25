@@ -1,5 +1,7 @@
-require "active_support/core_ext/module/attribute_accessors"
-require "active_support/time"
+unless defined?(ActiveSupport)
+  require "active_support/time"
+  require "active_support/core_ext/module/attribute_accessors"
+end
 require "groupdate/version"
 require "groupdate/magic"
 
