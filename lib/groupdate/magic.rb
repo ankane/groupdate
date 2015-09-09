@@ -218,7 +218,7 @@ module Groupdate
           end
         end
 
-      series = 
+      series =
         if multiple_groups
           keys = count.keys.map { |k| k[0...@group_index] + k[(@group_index + 1)..-1] }.uniq
           series = series.reverse if reverse
