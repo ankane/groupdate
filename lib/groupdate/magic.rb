@@ -108,7 +108,7 @@ module Groupdate
 
     def perform(relation, method, *args, &block)
       # undo reverse since we do not want this to appear in the query
-      reverse = relation.reverse_order_value
+      reverse = relation.send(:reverse_order_value)
       if reverse
         relation = relation.except(:reverse_order)
       end
@@ -212,18 +212,21 @@ module Groupdate
               series << next_step
             end
 
-            if multiple_groups
-              keys = count.keys.map { |k| k[0...@group_index] + k[(@group_index + 1)..-1] }.uniq
-              series = series.reverse if reverse
-              keys.flat_map do |k|
-                series.map { |s| k[0...@group_index] + [s] + k[@group_index..-1] }
-              end
-            else
-              series
-            end
+            series
           else
             []
           end
+        end
+
+      series =
+        if multiple_groups
+          keys = count.keys.map { |k| k[0...@group_index] + k[(@group_index + 1)..-1] }.uniq
+          series = series.reverse if reverse
+          keys.flat_map do |k|
+            series.map { |s| k[0...@group_index] + [s] + k[@group_index..-1] }
+          end
+        else
+          series
         end
 
       # reversed above if multiple groups

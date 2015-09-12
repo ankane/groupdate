@@ -15,7 +15,7 @@ Works with Rails 3.1+
 
 Supports PostgreSQL and MySQL, plus arrays and hashes
 
-[![Build Status](https://travis-ci.org/ankane/groupdate.png)](https://travis-ci.org/ankane/groupdate)
+[![Build Status](https://travis-ci.org/ankane/groupdate.svg?branch=master)](https://travis-ci.org/ankane/groupdate)
 
 :cupid: Goes hand in hand with [Chartkick](http://ankane.github.io/chartkick/)
 
