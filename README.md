@@ -151,6 +151,8 @@ Limit groupings with the `permit` option.
 User.group_by_period(params[:period], :created_at, permit: %w[day week]).count
 ```
 
+Raises an `ArgumentError` for unpermitted periods.
+
 ## Arrays and Hashes
 
 ```ruby
