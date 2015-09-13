@@ -769,11 +769,11 @@ module TestGroupdate
   end
 
   def test_permit_symbol_symbols
-    assert_equal ({}), User.group_by_period(:day, :created_at, permit: %i[day]).count
+    assert_equal ({}), User.group_by_period(:day, :created_at, permit: [:day]).count
   end
 
   def test_permit_string_symbols
-    assert_equal ({}), User.group_by_period("day", :created_at, permit: %i[day]).count
+    assert_equal ({}), User.group_by_period("day", :created_at, permit: [:day]).count
   end
 
   def test_permit_symbol_strings
