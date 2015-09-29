@@ -140,10 +140,10 @@ User.group_by_day(:created_at).order("day desc").count
 To get keys in a different format, use:
 
 ```ruby
-User.group_by_day(:created_at, format: "%b %-e, %Y").count
+User.group_by_month(:created_at, format: "%b %Y").count
 # {
-#   "Jan 1, 2015" => 10
-#   "Jan 2, 2015" => 12
+#   "Jan 2015" => 10
+#   "Feb 2015" => 12
 # }
 ```
 
