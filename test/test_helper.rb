@@ -778,6 +778,10 @@ module TestGroupdate
     assert_raises(ArgumentError, "Unpermitted period") { User.group_by_period(:day, :created_at, permit: %w[week]).count }
   end
 
+  def test_permit_bad_period
+    assert_raises(ArgumentError, "Unpermitted period") { User.group_by_period(:bad_period, :created_at).count }
+  end
+
   def test_permit_symbol_symbols
     assert_equal ({}), User.group_by_period(:day, :created_at, permit: [:day]).count
   end
