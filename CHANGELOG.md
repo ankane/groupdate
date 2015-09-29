@@ -1,4 +1,4 @@
-## 2.5.0 [unreleased]
+## 2.5.0
 
 - Added `group_by_period` method
 - Added `current` option

@@ -115,7 +115,7 @@ To get the most recent time periods, use:
 User.group_by_week(:created_at, last: 8).count # last 8 weeks
 ```
 
-To exclude the current period, use: [master]
+To exclude the current period, use:
 
 ```ruby
 User.group_by_week(:created_at, last: 8, current: false).count
@@ -160,7 +160,7 @@ User.group_by_hour_of_day(:created_at, format: "%-l %P").count
 
 Takes a `String`, which is passed to [strftime](http://strfti.me/), or a `Proc`.  You can pass a locale with the `locale` option.
 
-### Dynamic Grouping [master, may change]
+### Dynamic Grouping
 
 ```ruby
 User.group_by_period(:day, :created_at).count
