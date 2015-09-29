@@ -167,6 +167,7 @@ module Groupdate
           step = 1.send(field) if 1.respond_to?(field)
           if step
             now = Time.now
+            now -= step if options[:current] == false
             time_range = round_time(now - (options[:last].to_i - 1).send(field))..now
           end
         end

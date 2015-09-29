@@ -115,6 +115,12 @@ To get the most recent time periods, use:
 User.group_by_week(:created_at, last: 8).count # last 8 weeks
 ```
 
+To exclude the current period, use: [master]
+
+```ruby
+User.group_by_week(:created_at, last: 8, current: false).count
+```
+
 ### Order
 
 You can order in descending order with:

@@ -1,6 +1,7 @@
 ## 2.5.0 [unreleased]
 
 - Added `group_by_period` method
+- Added `current` option
 - Raise `ArgumentError` if no block given to enumerable
 
 ## 2.4.0

@@ -698,6 +698,16 @@ module TestGroupdate
     assert_equal expected, User.group_by_year(:created_at, last: 3).count
   end
 
+  def test_current
+    create_user "2012-05-01 00:00:00 UTC"
+    create_user "2014-05-01 00:00:00 UTC"
+    expected = {
+      utc.parse("2013-01-01 00:00:00 UTC") => 0,
+      utc.parse("2014-01-01 00:00:00 UTC") => 1
+    }
+    assert_equal expected, User.group_by_year(:created_at, last: 2, current: false).count
+  end
+
   def test_format_day
     create_user "2014-03-01 00:00:00 UTC"
     assert_format :day, "March 1, 2014", "%B %-e, %Y"
