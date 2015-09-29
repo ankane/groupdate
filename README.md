@@ -129,12 +129,27 @@ or
 User.group_by_day(:created_at).order("day desc").count
 ```
 
-### Pretty Keys
+### Format
 
 To get keys in a different format, use:
 
 ```ruby
-User.group_by_hour_of_day(:created_at, format: "%l %P").count.keys.first # 12 am
+User.group_by_day(:created_at, format: "%b %-e, %Y").count
+# {
+#   "Jan 1, 2015" => 10
+#   "Jan 2, 2015" => 12
+# }
+```
+
+or
+
+```ruby
+User.group_by_hour_of_day(:created_at, format: "%-l %P").count
+# {
+#    "12 am" => 15,
+#    "1 am"  => 11
+#    ...
+# }
 ```
 
 Takes a `String`, which is passed to [strftime](http://strfti.me/), or a `Proc`.  You can pass a locale with the `locale` option.
