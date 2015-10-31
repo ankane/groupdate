@@ -36,7 +36,7 @@ module Groupdate
       adapter_name = relation.connection.adapter_name
       query =
         case adapter_name
-        when "MySQL", "Mysql2"
+        when "MySQL", "Mysql2", "Mysql2Spatial"
           case field
           when :day_of_week # Sunday = 0, Monday = 1, etc
             # use CONCAT for consistent return type (String)
