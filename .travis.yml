@@ -10,7 +10,8 @@ gemfile:
   - gemfiles/activerecord40.gemfile
   - gemfiles/activerecord41.gemfile
 script: bundle exec rake test
-before_script:
+before_install:
+  - gem install bundler
   - mysql -e 'create database groupdate_test;'
   - mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
   - psql -c 'create database groupdate_test;' -U postgres
