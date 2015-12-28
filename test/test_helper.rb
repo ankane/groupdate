@@ -798,6 +798,17 @@ module TestGroupdate
     assert_equal ({}), User.group_by_period("day", :created_at, permit: %w[day]).count
   end
 
+  # default value
+
+  def test_default_value
+    create_user "2015-05-01 00:00:00 UTC"
+    expected = {
+      utc.parse("2014-01-01 00:00:00 UTC") => nil,
+      utc.parse("2015-01-01 00:00:00 UTC") => 1
+    }
+    assert_equal expected, User.group_by_year(:created_at, last: 2, default_value: nil).count
+  end
+
   # associations
 
   def test_associations

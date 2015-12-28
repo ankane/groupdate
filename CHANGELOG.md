@@ -1,3 +1,7 @@
+## 2.5.1 [unreleased]
+
+- Added `default_value` option
+
 ## 2.5.0
 
 - Added `group_by_period` method
