@@ -140,7 +140,7 @@ module Groupdate
           raise "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
         end
 
-      series(count, 0, multiple_groups, reverse)
+      series(count, (options.has_key?(:default_value) ? options[:default_value] : 0), multiple_groups, reverse)
     end
 
     protected
