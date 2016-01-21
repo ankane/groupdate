@@ -688,22 +688,22 @@ module TestGroupdate
   end
 
   def test_last
-    create_user "2012-05-01 00:00:00 UTC"
-    create_user "2014-05-01 00:00:00 UTC"
+    create_user "#{this_year - 3}-01-01 00:00:00 UTC"
+    create_user "#{this_year - 1}-01-01 00:00:00 UTC"
     expected = {
-      utc.parse("2013-01-01 00:00:00 UTC") => 0,
-      utc.parse("2014-01-01 00:00:00 UTC") => 1,
-      utc.parse("2015-01-01 00:00:00 UTC") => 0
+      utc.parse("#{this_year - 2}-01-01 00:00:00 UTC") => 0,
+      utc.parse("#{this_year - 1}-01-01 00:00:00 UTC") => 1,
+      utc.parse("#{this_year    }-01-01 00:00:00 UTC") => 0
     }
     assert_equal expected, User.group_by_year(:created_at, last: 3).count
   end
 
   def test_current
-    create_user "2012-05-01 00:00:00 UTC"
-    create_user "2014-05-01 00:00:00 UTC"
+    create_user "#{this_year - 3}-01-01 00:00:00 UTC"
+    create_user "#{this_year - 1}-01-01 00:00:00 UTC"
     expected = {
-      utc.parse("2013-01-01 00:00:00 UTC") => 0,
-      utc.parse("2014-01-01 00:00:00 UTC") => 1
+      utc.parse("#{this_year - 2}-01-01 00:00:00 UTC") => 0,
+      utc.parse("#{this_year - 1}-01-01 00:00:00 UTC") => 1
     }
     assert_equal expected, User.group_by_year(:created_at, last: 2, current: false).count
   end
@@ -801,10 +801,10 @@ module TestGroupdate
   # default value
 
   def test_default_value
-    create_user "2015-05-01 00:00:00 UTC"
+    create_user "#{this_year    }-01-01 00:00:00 UTC"
     expected = {
-      utc.parse("2014-01-01 00:00:00 UTC") => nil,
-      utc.parse("2015-01-01 00:00:00 UTC") => 1
+      utc.parse("#{this_year - 1}-01-01 00:00:00 UTC") => nil,
+      utc.parse("#{this_year    }-01-01 00:00:00 UTC") => 1
     }
     assert_equal expected, User.group_by_year(:created_at, last: 2, default_value: nil).count
   end
@@ -882,6 +882,10 @@ module TestGroupdate
 
   def create_user(created_at, score = 1)
     User.create! :name => "Andrew", :score => score, :created_at => utc.parse(created_at)
+  end
+
+  def this_year
+    Time.now.utc.year
   end
 
   def utc
