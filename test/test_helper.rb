@@ -17,6 +17,10 @@ ActiveRecord::Base.time_zone_aware_attributes = true
 
 class User < ActiveRecord::Base
   has_many :posts
+
+  def self.count_method
+    count
+  end
 end
 
 class Post < ActiveRecord::Base
@@ -807,6 +811,16 @@ module TestGroupdate
       utc.parse("#{this_year}-01-01 00:00:00 UTC") => 1
     }
     assert_equal expected, User.group_by_year(:created_at, last: 2, default_value: nil).count
+  end
+
+  # method
+
+  def test_method
+    user = create_user("2014-03-01 00:00:00 UTC")
+    expected = {
+      utc.parse("2014-01-01 00:00:00 UTC") => 1
+    }
+    assert_equal expected, User.group_by_year(:created_at).count_method
   end
 
   # associations
