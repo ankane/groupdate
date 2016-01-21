@@ -8,13 +8,9 @@ module Groupdate
       @field = field
       @options = options
 
-      unless time_zone
-        raise "Unrecognized time zone"
-      end
+      raise "Unrecognized time zone" unless time_zone
 
-      if field == :week && !week_start
-        raise "Unrecognized :week_start option"
-      end
+      raise "Unrecognized :week_start option" if field == :week && !week_start
     end
 
     def group_by(enum, &_block)
@@ -109,9 +105,7 @@ module Groupdate
     def perform(relation, method, *args, &block)
       # undo reverse since we do not want this to appear in the query
       reverse = relation.send(:reverse_order_value)
-      if reverse
-        relation = relation.except(:reverse_order)
-      end
+      relation = relation.except(:reverse_order) if reverse
       order = relation.order_values.first
       if order.is_a?(String)
         parts = order.split(" ")
@@ -231,9 +225,7 @@ module Groupdate
         end
 
       # reversed above if multiple groups
-      if !multiple_groups && reverse
-        series = series.to_a.reverse
-      end
+      series = series.to_a.reverse if !multiple_groups && reverse
 
       locale = options[:locale] || I18n.locale
       key_format =

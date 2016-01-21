@@ -693,7 +693,7 @@ module TestGroupdate
     expected = {
       utc.parse("#{this_year - 2}-01-01 00:00:00 UTC") => 0,
       utc.parse("#{this_year - 1}-01-01 00:00:00 UTC") => 1,
-      utc.parse("#{this_year    }-01-01 00:00:00 UTC") => 0
+      utc.parse("#{this_year}-01-01 00:00:00 UTC") => 0
     }
     assert_equal expected, User.group_by_year(:created_at, last: 3).count
   end
@@ -775,7 +775,7 @@ module TestGroupdate
   # permit
 
   def test_permit
-    assert_raises(ArgumentError, "Unpermitted period") { User.group_by_period(:day, :created_at, permit: %w[week]).count }
+    assert_raises(ArgumentError, "Unpermitted period") { User.group_by_period(:day, :created_at, permit: %w(week)).count }
   end
 
   def test_permit_bad_period
@@ -791,20 +791,20 @@ module TestGroupdate
   end
 
   def test_permit_symbol_strings
-    assert_equal ({}), User.group_by_period(:day, :created_at, permit: %w[day]).count
+    assert_equal ({}), User.group_by_period(:day, :created_at, permit: %w(day)).count
   end
 
   def test_permit_string_strings
-    assert_equal ({}), User.group_by_period("day", :created_at, permit: %w[day]).count
+    assert_equal ({}), User.group_by_period("day", :created_at, permit: %w(day)).count
   end
 
   # default value
 
   def test_default_value
-    create_user "#{this_year    }-01-01 00:00:00 UTC"
+    create_user "#{this_year}-01-01 00:00:00 UTC"
     expected = {
       utc.parse("#{this_year - 1}-01-01 00:00:00 UTC") => nil,
-      utc.parse("#{this_year    }-01-01 00:00:00 UTC") => 1
+      utc.parse("#{this_year}-01-01 00:00:00 UTC") => 1
     }
     assert_equal expected, User.group_by_year(:created_at, last: 2, default_value: nil).count
   end
