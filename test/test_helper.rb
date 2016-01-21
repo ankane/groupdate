@@ -24,21 +24,21 @@ end
 
 # i18n
 I18n.enforce_available_locales = true
-I18n.backend.store_translations :de, :date => {
-  :abbr_month_names => %w(Jan Feb Mar Apr Mai Jun Jul Aug Sep Okt Nov Dez).unshift(nil)
+I18n.backend.store_translations :de, date: {
+  abbr_month_names: %w(Jan Feb Mar Apr Mai Jun Jul Aug Sep Okt Nov Dez).unshift(nil)
 }
 
 # migrations
 %w(postgresql mysql2).each do |adapter|
-  ActiveRecord::Base.establish_connection :adapter => adapter, :database => "groupdate_test", :username => adapter == "mysql2" ? "root" : nil
+  ActiveRecord::Base.establish_connection adapter: adapter, database: "groupdate_test", username: adapter == "mysql2" ? "root" : nil
 
-  ActiveRecord::Migration.create_table :users, :force => true do |t|
+  ActiveRecord::Migration.create_table :users, force: true do |t|
     t.string :name
     t.integer :score
     t.timestamp :created_at
   end
 
-  ActiveRecord::Migration.create_table :posts, :force => true do |t|
+  ActiveRecord::Migration.create_table :posts, force: true do |t|
     t.references :user
     t.timestamp :created_at
   end
@@ -104,19 +104,19 @@ module TestGroupdate
   # day hour starts at 2 am
 
   def test_test_day_end_of_day_day_start_2am
-    assert_result_time :day, "2013-05-03 02:00:00 UTC", "2013-05-04 01:59:59", false, :day_start => 2
+    assert_result_time :day, "2013-05-03 02:00:00 UTC", "2013-05-04 01:59:59", false, day_start: 2
   end
 
   def test_test_day_start_of_day_day_start_2am
-    assert_result_time :day, "2013-05-03 02:00:00 UTC", "2013-05-03 02:00:00", false, :day_start => 2
+    assert_result_time :day, "2013-05-03 02:00:00 UTC", "2013-05-03 02:00:00", false, day_start: 2
   end
 
   def test_test_day_end_of_day_with_time_zone_day_start_2am
-    assert_result_time :day, "2013-05-03 02:00:00 PDT", "2013-05-04 07:59:59", true, :day_start => 2
+    assert_result_time :day, "2013-05-03 02:00:00 PDT", "2013-05-04 07:59:59", true, day_start: 2
   end
 
   def test_test_day_start_of_day_with_time_zone_day_start_2am
-    assert_result_time :day, "2013-05-03 02:00:00 PDT", "2013-05-03 09:00:00", true, :day_start => 2
+    assert_result_time :day, "2013-05-03 02:00:00 PDT", "2013-05-03 09:00:00", true, day_start: 2
   end
 
   # week
@@ -176,19 +176,19 @@ module TestGroupdate
   # week starting at 2am
 
   def test_week_end_of_week_day_start_2am
-    assert_result_time :week, "2013-03-17 02:00:00 UTC", "2013-03-24 01:59:59", false, :day_start => 2
+    assert_result_time :week, "2013-03-17 02:00:00 UTC", "2013-03-24 01:59:59", false, day_start: 2
   end
 
   def test_week_start_of_week_day_start_2am
-    assert_result_time :week, "2013-03-17 02:00:00 UTC", "2013-03-17 02:00:00", false, :day_start => 2
+    assert_result_time :week, "2013-03-17 02:00:00 UTC", "2013-03-17 02:00:00", false, day_start: 2
   end
 
   def test_week_end_of_week_day_with_time_zone_start_2am
-    assert_result_time :week, "2013-03-17 02:00:00 PDT", "2013-03-24 08:59:59", true, :day_start => 2
+    assert_result_time :week, "2013-03-17 02:00:00 PDT", "2013-03-24 08:59:59", true, day_start: 2
   end
 
   def test_week_start_of_week_day_with_time_zone_start_2am
-    assert_result_time :week, "2013-03-17 02:00:00 PDT", "2013-03-17 09:00:00", true, :day_start => 2
+    assert_result_time :week, "2013-03-17 02:00:00 PDT", "2013-03-17 09:00:00", true, day_start: 2
   end
 
   # month
@@ -212,19 +212,19 @@ module TestGroupdate
   # month starts at 2am
 
   def test_month_end_of_month_day_start_2am
-    assert_result_time :month, "2013-03-01 02:00:00 UTC", "2013-04-01 01:59:59", false, :day_start => 2
+    assert_result_time :month, "2013-03-01 02:00:00 UTC", "2013-04-01 01:59:59", false, day_start: 2
   end
 
   def test_month_start_of_month_day_start_2am
-    assert_result_time :month, "2013-03-01 02:00:00 UTC", "2013-03-01 02:00:00", false, :day_start => 2
+    assert_result_time :month, "2013-03-01 02:00:00 UTC", "2013-03-01 02:00:00", false, day_start: 2
   end
 
   def test_month_end_of_month_with_time_zone_day_start_2am
-    assert_result_time :month, "2013-03-01 02:00:00 PST", "2013-04-01 08:59:59", true, :day_start => 2
+    assert_result_time :month, "2013-03-01 02:00:00 PST", "2013-04-01 08:59:59", true, day_start: 2
   end
 
   def test_month_start_of_month_with_time_zone_day_start_2am
-    assert_result_time :month, "2013-03-01 02:00:00 PST", "2013-03-01 10:00:00", true, :day_start => 2
+    assert_result_time :month, "2013-03-01 02:00:00 PST", "2013-03-01 10:00:00", true, day_start: 2
   end
 
   # year
@@ -248,19 +248,19 @@ module TestGroupdate
   # year starts at 2am
 
   def test_year_end_of_year_day_start_2am
-    assert_result_time :year, "2013-01-01 02:00:00 UTC", "2014-01-01 01:59:59", false, :day_start => 2
+    assert_result_time :year, "2013-01-01 02:00:00 UTC", "2014-01-01 01:59:59", false, day_start: 2
   end
 
   def test_year_start_of_year_day_start_2am
-    assert_result_time :year, "2013-01-01 02:00:00 UTC", "2013-01-01 02:00:00", false, :day_start => 2
+    assert_result_time :year, "2013-01-01 02:00:00 UTC", "2013-01-01 02:00:00", false, day_start: 2
   end
 
   def test_year_end_of_year_with_time_zone_day_start_2am
-    assert_result_time :year, "2013-01-01 02:00:00 PST", "2014-01-01 09:59:59", true, :day_start => 2
+    assert_result_time :year, "2013-01-01 02:00:00 PST", "2014-01-01 09:59:59", true, day_start: 2
   end
 
   def test_year_start_of_year_with_time_zone_day_start_2am
-    assert_result_time :year, "2013-01-01 02:00:00 PST", "2013-01-01 10:00:00", true, :day_start => 2
+    assert_result_time :year, "2013-01-01 02:00:00 PST", "2013-01-01 10:00:00", true, day_start: 2
   end
 
   # hour of day
@@ -284,19 +284,19 @@ module TestGroupdate
   # hour of day starts at 2am
 
   def test_hour_of_day_end_of_day_day_start_2am
-    assert_result :hour_of_day, 23, "2013-01-01 01:59:59", false, :day_start => 2
+    assert_result :hour_of_day, 23, "2013-01-01 01:59:59", false, day_start: 2
   end
 
   def test_hour_of_day_start_of_day_day_start_2am
-    assert_result :hour_of_day, 0, "2013-01-01 02:00:00", false, :day_start => 2
+    assert_result :hour_of_day, 0, "2013-01-01 02:00:00", false, day_start: 2
   end
 
   def test_hour_of_day_end_of_day_with_time_zone_day_start_2am
-    assert_result :hour_of_day, 23, "2013-01-01 09:59:59", true, :day_start => 2
+    assert_result :hour_of_day, 23, "2013-01-01 09:59:59", true, day_start: 2
   end
 
   def test_hour_of_day_start_of_day_with_time_zone_day_start_2am
-    assert_result :hour_of_day, 0, "2013-01-01 10:00:00", true, :day_start => 2
+    assert_result :hour_of_day, 0, "2013-01-01 10:00:00", true, day_start: 2
   end
 
   # day of week
@@ -320,19 +320,19 @@ module TestGroupdate
   # day of week starts at 2am
 
   def test_day_of_week_end_of_day_day_start_2am
-    assert_result :day_of_week, 3, "2013-01-03 01:59:59", false, :day_start => 2
+    assert_result :day_of_week, 3, "2013-01-03 01:59:59", false, day_start: 2
   end
 
   def test_day_of_week_start_of_day_day_start_2am
-    assert_result :day_of_week, 3, "2013-01-02 02:00:00", false, :day_start => 2
+    assert_result :day_of_week, 3, "2013-01-02 02:00:00", false, day_start: 2
   end
 
   def test_day_of_week_end_of_day_with_time_zone_day_start_2am
-    assert_result :day_of_week, 3, "2013-01-03 09:59:59", true, :day_start => 2
+    assert_result :day_of_week, 3, "2013-01-03 09:59:59", true, day_start: 2
   end
 
   def test_day_of_week_start_of_day_with_time_zone_day_start_2am
-    assert_result :day_of_week, 3, "2013-01-02 10:00:00", true, :day_start => 2
+    assert_result :day_of_week, 3, "2013-01-02 10:00:00", true, day_start: 2
   end
 
   # day of month
@@ -360,19 +360,19 @@ module TestGroupdate
   # day of month starts at 2am
 
   def test_day_of_month_end_of_day_day_start_2am
-    assert_result :day_of_month, 31, "2013-01-01 01:59:59", false, :day_start => 2
+    assert_result :day_of_month, 31, "2013-01-01 01:59:59", false, day_start: 2
   end
 
   def test_day_of_month_start_of_day_day_start_2am
-    assert_result :day_of_month, 1, "2013-01-01 02:00:00", false, :day_start => 2
+    assert_result :day_of_month, 1, "2013-01-01 02:00:00", false, day_start: 2
   end
 
   def test_day_of_month_end_of_day_with_time_zone_day_start_2am
-    assert_result :day_of_month, 31, "2013-01-01 09:59:59", true, :day_start => 2
+    assert_result :day_of_month, 31, "2013-01-01 09:59:59", true, day_start: 2
   end
 
   def test_day_of_month_start_of_day_with_time_zone_day_start_2am
-    assert_result :day_of_month, 1, "2013-01-01 10:00:00", true, :day_start => 2
+    assert_result :day_of_month, 1, "2013-01-01 10:00:00", true, day_start: 2
   end
 
   # month of year
@@ -396,19 +396,19 @@ module TestGroupdate
   # month of year starts at 2am
 
   def test_month_of_year_end_of_month_day_start_2am
-    assert_result :month_of_year, 12, "2013-01-01 01:59:59", false, :day_start => 2
+    assert_result :month_of_year, 12, "2013-01-01 01:59:59", false, day_start: 2
   end
 
   def test_month_of_year_start_of_month_day_start_2am
-    assert_result :month_of_year, 1, "2013-01-01 02:00:00", false, :day_start => 2
+    assert_result :month_of_year, 1, "2013-01-01 02:00:00", false, day_start: 2
   end
 
   def test_month_of_year_end_of_month_with_time_zone_day_start_2am
-    assert_result :month_of_year, 12, "2013-01-01 09:59:59", true, :day_start => 2
+    assert_result :month_of_year, 12, "2013-01-01 09:59:59", true, day_start: 2
   end
 
   def test_month_of_year_start_of_month_with_time_zone_day_start_2am
-    assert_result :month_of_year, 1, "2013-01-01 10:00:00", true, :day_start => 2
+    assert_result :month_of_year, 1, "2013-01-01 10:00:00", true, day_start: 2
   end
 
   # zeros
@@ -881,7 +881,7 @@ module TestGroupdate
   end
 
   def create_user(created_at, score = 1)
-    User.create! :name => "Andrew", :score => score, :created_at => utc.parse(created_at)
+    User.create! name: "Andrew", score: score, created_at: utc.parse(created_at)
   end
 
   def this_year

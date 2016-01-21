@@ -5,6 +5,6 @@ class TestPostgresql < Minitest::Test
 
   def setup
     super
-    User.establish_connection :adapter => "postgresql", :database => "groupdate_test"
+    User.establish_connection adapter: "postgresql", database: "groupdate_test"
   end
 end

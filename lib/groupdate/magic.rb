@@ -273,11 +273,11 @@ module Groupdate
       time =
         case field
         when :second
-          time.change(:usec => 0)
+          time.change(usec: 0)
         when :minute
-          time.change(:sec => 0)
+          time.change(sec: 0)
         when :hour
-          time.change(:min => 0)
+          time.change(min: 0)
         when :day
           time.beginning_of_day
         when :week
