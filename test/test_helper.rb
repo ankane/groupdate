@@ -26,6 +26,9 @@ end
 I18n.enforce_available_locales = true
 I18n.backend.store_translations :de, date: {
   abbr_month_names: %w(Jan Feb Mar Apr Mai Jun Jul Aug Sep Okt Nov Dez).unshift(nil)
+},
+time: {
+  formats: {special: '%b %e, %Y'}
 }
 
 # migrations
@@ -756,6 +759,11 @@ module TestGroupdate
   def test_format_locale
     create_user "2014-10-01 00:00:00 UTC"
     assert_equal ({"Okt" => 1}), User.group_by_day(:created_at, format: "%b", locale: :de).count
+  end
+
+  def test_format_locale_by_symbol
+    create_user "2014-10-01 00:00:00 UTC"
+    assert_equal ({"Okt  1, 2014" => 1}), User.group_by_day(:created_at, format: :special, locale: :de).count
   end
 
   def test_format_locale_global
