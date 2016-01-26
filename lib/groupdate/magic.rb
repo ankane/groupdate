@@ -245,7 +245,7 @@ module Groupdate
               when :month_of_year
                 key = Date.new(2014, key, 1).to_time
               end
-              I18n.localize(key, format: options[:format].to_s, locale: locale)
+              I18n.localize(key, format: options[:format], locale: locale)
             end
           end
         else
