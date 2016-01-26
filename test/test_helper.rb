@@ -28,7 +28,7 @@ I18n.backend.store_translations :de, date: {
   abbr_month_names: %w(Jan Feb Mar Apr Mai Jun Jul Aug Sep Okt Nov Dez).unshift(nil)
 },
 time: {
-  formats: {special: '%b %e, %Y'}
+  formats: {special: "%b %e, %Y"}
 }
 
 # migrations
