@@ -1,6 +1,7 @@
 ## 2.5.1 [unreleased]
 
 - Added `default_value` option
+- Accept symbol for `format` option
 
 ## 2.5.0
 
