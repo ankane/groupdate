@@ -17,16 +17,17 @@ end
 
 # hack for **unfixed** rails issue
 # https://github.com/rails/rails/issues/7121
-module Groupdate
+module ActiveRecord
   module Calculations
-    def column_alias_for(*keys)
+    private
+
+    def column_alias_for_with_hack(*keys)
       if keys.first.is_a?(Groupdate::OrderHack)
         keys.first.field
       else
-        super
+        column_alias_for_without_hack(*keys)
       end
     end
+    alias_method_chain :column_alias_for, :hack
   end
 end
-
-ActiveRecord::Calculations.prepend(Groupdate::Calculations)
