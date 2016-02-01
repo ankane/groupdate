@@ -15,19 +15,21 @@ module ActiveRecord
   end
 end
 
-# hack for **unfixed** rails issue
+# hack for issue before Rails 5
 # https://github.com/rails/rails/issues/7121
 module ActiveRecord
   module Calculations
     private
 
-    def column_alias_for_with_hack(*keys)
-      if keys.first.is_a?(Groupdate::OrderHack)
-        keys.first.field
-      else
-        column_alias_for_without_hack(*keys)
+    if ActiveRecord::VERSION::MAJOR < 5
+      def column_alias_for_with_hack(*keys)
+        if keys.first.is_a?(Groupdate::OrderHack)
+          keys.first.field
+        else
+          column_alias_for_without_hack(*keys)
+        end
       end
+      alias_method_chain :column_alias_for, :hack
     end
-    alias_method_chain :column_alias_for, :hack
   end
 end
