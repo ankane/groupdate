@@ -1,13 +1,13 @@
 module Groupdate
   module Scopes
     Groupdate::PERIODS.each do |period|
-      define_method :"group_by_#{period}" do |*args|
+      define_method :"group_by_#{period}" do |field, *args|
         args = args.dup
         options = args[-1].is_a?(Hash) ? args.pop : {}
-        options[:time_zone] ||= args[1] unless args[1].nil?
-        options[:range] ||= args[2] unless args[2].nil?
+        options[:time_zone] ||= args[0] unless args[0].nil?
+        options[:range] ||= args[1] unless args[1].nil?
 
-        Groupdate::Magic.new(period, options).relation(args[0], self)
+        Groupdate::Magic.new(period, options).relation(field, self)
       end
     end
 
