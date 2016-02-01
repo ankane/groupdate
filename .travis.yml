@@ -5,10 +5,10 @@ rvm:
   - jruby
 gemfile:
   - Gemfile
-  - gemfiles/activerecord31.gemfile
-  - gemfiles/activerecord32.gemfile
-  - gemfiles/activerecord40.gemfile
-  - gemfiles/activerecord41.gemfile
+  - test/gemfiles/activerecord31.gemfile
+  - test/gemfiles/activerecord32.gemfile
+  - test/gemfiles/activerecord40.gemfile
+  - test/gemfiles/activerecord41.gemfile
 script: bundle exec rake test
 before_install:
   - gem install bundler
