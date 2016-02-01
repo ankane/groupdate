@@ -1,6 +1,6 @@
 language: ruby
 rvm:
-  - 2.2
+  - 2.2.4
   - jruby
 gemfile:
   - Gemfile
@@ -9,6 +9,7 @@ gemfile:
   - test/gemfiles/activerecord40.gemfile
   - test/gemfiles/activerecord41.gemfile
   - test/gemfiles/activerecord50.gemfile
+sudo: false
 script: bundle exec rake test
 before_install:
   - gem install bundler
