@@ -9,6 +9,7 @@ gemfile:
   - test/gemfiles/activerecord32.gemfile
   - test/gemfiles/activerecord40.gemfile
   - test/gemfiles/activerecord41.gemfile
+  - test/gemfiles/activerecord50.gemfile
 script: bundle exec rake test
 before_install:
   - gem install bundler
@@ -23,3 +24,4 @@ matrix:
   allow_failures:
     - rvm: jruby
       gemfile: Gemfile
+    - gemfile: test/gemfiles/activerecord50.gemfile

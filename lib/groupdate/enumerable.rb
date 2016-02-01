@@ -1,8 +1,10 @@
 module Enumerable
   Groupdate::FIELDS.each do |field|
-    define_method :"group_by_#{field}" do |options = {}, &block|
+    define_method :"group_by_#{field}" do |*args, &block|
       if block
-        Groupdate::Magic.new(field, options).group_by(self, &block)
+        Groupdate::Magic.new(field, args[0] || {}).group_by(self, &block)
+      elsif respond_to?(:scoping)
+        scoping { @klass.send(:"group_by_#{field}", *args, &block) }
       else
         raise ArgumentError, "no block given"
       end
