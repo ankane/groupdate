@@ -65,19 +65,26 @@ module Groupdate
             ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} HOUR), '+00:00', ?), '#{format}'), ?, '+00:00'), INTERVAL #{day_start} HOUR)", time_zone, time_zone]
           end
         when "PostgreSQL", "PostGIS"
+          ajust_time_zone = " AT TIME ZONE #{relation.connection.quote(time_zone)}" unless time_zone == 'Etc/UTC'
+          ajust_day_start = " - INTERVAL '#{day_start} hour'" unless day_start == 0
+          ajust_day_start_back = " + INTERVAL '#{day_start} hour'" unless day_start == 0
+          ajust_week_start = " - INTERVAL '#{week_start} day'" unless week_start == 0
+          ajust_week_start_back = " + INTERVAL '#{week_start} day'" unless week_start == 0
           case field
           when :day_of_week
-            ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour')::integer", time_zone]
+            ["EXTRACT(DOW from #{column}::timestamptz#{ ajust_time_zone }#{ ajust_day_start })::integer"]
           when :hour_of_day
-            ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour')::integer", time_zone]
+            ["EXTRACT(HOUR from #{column}::timestamptz#{ ajust_time_zone }#{ ajust_day_start })::integer"]
           when :day_of_month
-            ["EXTRACT(DAY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour')::integer", time_zone]
+            ["EXTRACT(DAY from #{column}::timestamptz#{ ajust_time_zone }#{ ajust_day_start })::integer"]
           when :month_of_year
-            ["EXTRACT(MONTH from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} hour')::integer", time_zone]
+            ["EXTRACT(MONTH from #{column}::timestamptz#{ ajust_time_zone }#{ ajust_day_start })::integer"]
           when :week # start on Sunday, not PostgreSQL default Monday
-            ["(DATE_TRUNC('#{field}', (#{column}::timestamptz - INTERVAL '#{week_start} day' - INTERVAL '#{day_start}' hour) AT TIME ZONE ?) + INTERVAL '#{week_start} day' + INTERVAL '#{day_start}' hour) AT TIME ZONE ?", time_zone, time_zone]
+            ["(DATE_TRUNC('#{field}', (#{column}::timestamptz#{ ajust_week_start }#{ ajust_day_start })" +
+              "#{ ajust_time_zone })#{ ajust_week_start_back }#{ ajust_day_start_back })#{ ajust_time_zone}"]
           else
-            ["(DATE_TRUNC('#{field}', (#{column}::timestamptz - INTERVAL '#{day_start} hour') AT TIME ZONE ?) + INTERVAL '#{day_start} hour') AT TIME ZONE ?", time_zone, time_zone]
+            ["(DATE_TRUNC('#{field}', (#{column}::timestamptz#{ ajust_day_start })#{ ajust_time_zone })" +
+              "#{ ajust_day_start_back })#{ ajust_time_zone }"]
           end
         else
           raise "Connection adapter not supported: #{adapter_name}"
