@@ -4,7 +4,7 @@ require "groupdate/version"
 require "groupdate/magic"
 
 module Groupdate
-  FIELDS = [:second, :minute, :hour, :day, :week, :month, :year, :day_of_week, :hour_of_day, :day_of_month, :month_of_year]
+  FIELDS = [:second, :minute, :hour, :day, :week, :month, :quarter, :year, :day_of_week, :hour_of_day, :day_of_month, :month_of_year]
   METHODS = FIELDS.map { |v| :"group_by_#{v}" }
 
   mattr_accessor :week_start, :day_start, :time_zone
