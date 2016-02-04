@@ -1,7 +1,9 @@
 ## 2.5.1 [unreleased]
 
+- Added `group_by_quarter`
 - Added `default_value` option
 - Accept symbol for `format` option
+- Raise `ArgumentError` if no field specified
 
 ## 2.5.0
 
