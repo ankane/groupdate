@@ -230,6 +230,42 @@ module TestGroupdate
     assert_result_time :month, "2013-03-01 02:00:00 PST", "2013-03-01 10:00:00", true, day_start: 2
   end
 
+  # quarter
+
+  def test_quarter_end_of_quarter
+    assert_result_time :quarter, "2013-04-01 00:00:00 UTC", "2013-06-30 23:59:59"
+  end
+
+  def test_quarter_start_of_quarter
+    assert_result_time :quarter, "2013-04-01 00:00:00 UTC", "2013-04-01 00:00:00"
+  end
+
+  def test_quarter_end_of_quarter_with_time_zone
+    assert_result_time :quarter, "2013-04-01 00:00:00 PDT", "2013-07-01 06:59:59", true
+  end
+
+  def test_quarter_start_of_quarter_with_time_zone
+    assert_result_time :quarter, "2013-04-01 00:00:00 PDT", "2013-04-01 07:00:00", true
+  end
+
+  # quarter starts at 2am
+
+  def test_quarter_end_of_quarter_day_start_2am
+    assert_result_time :quarter, "2013-04-01 02:00:00 UTC", "2013-07-01 01:59:59", false, day_start: 2
+  end
+
+  def test_quarter_start_of_quarter_day_start_2am
+    assert_result_time :quarter, "2013-04-01 02:00:00 UTC", "2013-04-01 02:00:00", false, day_start: 2
+  end
+
+  def test_quarter_end_of_quarter_with_time_zone_day_start_2am
+    assert_result_time :quarter, "2013-01-01 02:00:00 PST", "2013-04-01 08:59:59", true, day_start: 2
+  end
+
+  def test_quarter_start_of_quarter_with_time_zone_day_start_2am
+    assert_result_time :quarter, "2013-01-01 02:00:00 PST", "2013-01-01 10:00:00", true, day_start: 2
+  end
+
   # year
 
   def test_year_end_of_year
@@ -466,6 +502,14 @@ module TestGroupdate
 
   def test_zeros_month_time_zone
     assert_zeros :month, "2013-04-16 20:00:00 PDT", ["2013-03-01 00:00:00 PST", "2013-04-01 00:00:00 PDT", "2013-05-01 00:00:00 PDT"], "2013-03-01 00:00:00 PST", "2013-05-31 23:59:59 PDT", true
+  end
+
+  def test_zeros_quarter
+    assert_zeros :quarter, "2013-04-16 20:00:00 UTC", ["2013-01-01 00:00:00 UTC", "2013-04-01 00:00:00 UTC", "2013-07-01 00:00:00 UTC"], "2013-01-01 00:00:00 UTC", "2013-09-30 23:59:59 UTC"
+  end
+
+  def test_zeros_quarter_time_zone
+    assert_zeros :quarter, "2013-04-16 20:00:00 PDT", ["2013-01-01 00:00:00 PST", "2013-04-01 00:00:00 PDT", "2013-07-01 00:00:00 PDT"], "2013-01-01 00:00:00 PST", "2013-09-30 23:59:59 PDT", true
   end
 
   def test_zeros_year
@@ -719,6 +763,11 @@ module TestGroupdate
   def test_format_month
     create_user "2014-03-01 00:00:00 UTC"
     assert_format :month, "March 2014", "%B %Y"
+  end
+
+  def test_format_quarter
+    create_user "2014-03-05 00:00:00 UTC"
+    assert_format :quarter, "January 1, 2014", "%B %-e, %Y"
   end
 
   def test_format_year
