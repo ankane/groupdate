@@ -45,6 +45,8 @@ module Groupdate
             ["MONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} HOUR), '+00:00', ?))", time_zone]
           when :week
             ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL ((#{7 - week_start} + WEEKDAY(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} HOUR)) % 7) DAY) - INTERVAL #{day_start} HOUR, '+00:00', ?), '%Y-%m-%d 00:00:00') + INTERVAL #{day_start} HOUR, ?, '+00:00')", time_zone, time_zone, time_zone]
+          when :quarter
+            ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(EXTRACT(YEAR FROM CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} HOUR), '+00:00', ?)), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} HOUR), '+00:00', ?)) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S'), ?, '+00:00'), INTERVAL #{day_start} HOUR)", time_zone, time_zone, time_zone]
           else
             format =
               case field
@@ -201,7 +203,11 @@ module Groupdate
           if time_range.first
             series = [round_time(time_range.first)]
 
-            step = 1.send(field)
+            if field == :quarter
+              step = 3.months
+            else
+              step = 1.send(field)
+            end
 
             while (next_step = round_time(series.last + step)) && time_range.cover?(next_step)
               series << next_step
@@ -278,6 +284,8 @@ module Groupdate
           (time - ((7 - week_start + weekday) % 7).days).midnight
         when :month
           time.beginning_of_month
+        when :quarter
+          time.beginning_of_quarter
         when :year
           time.beginning_of_year
         when :hour_of_day

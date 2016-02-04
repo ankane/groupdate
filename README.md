@@ -41,6 +41,7 @@ You can also group by:
 - hour
 - week
 - month
+- quarter
 - year
 
 and
