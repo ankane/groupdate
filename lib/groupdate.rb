@@ -9,9 +9,10 @@ module Groupdate
   FIELDS = PERIODS
   METHODS = PERIODS.map { |v| :"group_by_#{v}" }
 
-  mattr_accessor :week_start, :day_start, :time_zone
+  mattr_accessor :week_start, :day_start, :time_zone, :dates
   self.week_start = :sun
   self.day_start = 0
+  self.dates = false
 end
 
 require "groupdate/enumerable"

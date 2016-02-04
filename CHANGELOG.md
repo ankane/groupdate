@@ -1,3 +1,7 @@
+## 2.5.2 [unreleased]
+
+- Added `dates` option to return dates for day, week, month, quarter, and year
+
 ## 2.5.1
 
 - Added `group_by_quarter`

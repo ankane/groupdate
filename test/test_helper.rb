@@ -906,6 +906,13 @@ module TestGroupdate
     assert_equal 2, User.group_by_day(:created_at, carry_forward: true).count[utc.parse("2014-05-02 00:00:00 UTC")]
   end
 
+  # dates
+
+  def test_dates
+    create_user "2014-03-01 12:00:00 UTC"
+    assert_equal ({Date.parse("2014-03-01") => 1}), User.group_by_day(:created_at, dates: true).count
+  end
+
   # helpers
 
   def assert_format(method, expected, format, options = {})
