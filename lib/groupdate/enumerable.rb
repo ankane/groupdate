@@ -4,7 +4,7 @@ module Enumerable
       if block
         Groupdate::Magic.new(period, options).group_by(self, &block)
       elsif respond_to?(:scoping)
-        scoping { @klass.send(:"group_by_#{field}", *args, &block) }
+        scoping { @klass.send(:"group_by_#{period}", options, *args, &block) }
       else
         raise ArgumentError, "no block given"
       end
