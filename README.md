@@ -34,6 +34,17 @@ User.group_by_day(:created_at).count
 
 Results are returned in ascending order by default, so no need to sort.
 
+If you want to include 0 counts, just include default_value:true.
+
+```ruby
+User.group_by_day(:created_at, default_value:true).count
+# {
+#   2013-04-16 00:00:00 UTC => 50,
+#   2013-04-17 00:00:00 UTC => 0,
+#   2013-04-18 00:00:00 UTC => 34
+# }
+```
+
 You can also group by:
 
 - second
