@@ -1,4 +1,4 @@
-## 2.5.2 [unreleased]
+## 2.5.2
 
 - Added `dates` option to return dates for day, week, month, quarter, and year
 

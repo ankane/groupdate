@@ -136,7 +136,24 @@ or
 User.group_by_day(:created_at).order("day desc").count
 ```
 
-### Format
+### Keys
+
+To get keys as date objects instead of time objects, use:
+
+```ruby
+User.group_by_day(:created_at, dates: true).count
+# {
+#   2013-03-10 => 70,
+#   2013-03-17 => 54,
+#   2013-03-24 => 80
+# }
+```
+
+or make this the default with:
+
+```ruby
+Groupdate.dates = true
+```
 
 To get keys in a different format, use:
 
