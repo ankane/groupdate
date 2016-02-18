@@ -21,8 +21,6 @@ Supports PostgreSQL and MySQL, plus arrays and hashes
 
 ## Get Started
 
-Group by day
-
 ```ruby
 User.group_by_day(:created_at).count
 # {
@@ -34,11 +32,12 @@ User.group_by_day(:created_at).count
 
 Results are returned in ascending order by default, so no need to sort.
 
-You can also group by:
+You can group by:
 
 - second
 - minute
 - hour
+- day
 - week
 - month
 - quarter
