@@ -222,7 +222,7 @@ module Groupdate
       series =
         if multiple_groups
           keys = count.keys.map { |k| k[0...@group_index] + k[(@group_index + 1)..-1] }.uniq
-          series = series.reverse if reverse
+          series = series.to_a.reverse if reverse
           keys.flat_map do |k|
             series.map { |s| k[0...@group_index] + [s] + k[@group_index..-1] }
           end
