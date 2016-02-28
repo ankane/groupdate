@@ -1,8 +1,10 @@
 require "bundler/setup"
 Bundler.require(:default)
 require "minitest/autorun"
-require "minitest/pride"
 require "logger"
+require "minitest/reporters"
+
+Minitest::Reporters.use! [Minitest::Reporters::SpecReporter.new]
 
 Minitest::Test = Minitest::Unit::TestCase unless defined?(Minitest::Test)
 
@@ -31,10 +33,10 @@ time: {
   formats: {special: "%b %e, %Y"}
 }
 
-# migrations
-%w(postgresql mysql2).each do |adapter|
-  ActiveRecord::Base.establish_connection adapter: adapter, database: "groupdate_test", username: adapter == "mysql2" ? "root" : nil
+ActiveRecord::Migration.verbose = false
 
+# migrations
+def create_tables
   ActiveRecord::Migration.create_table :users, force: true do |t|
     t.string :name
     t.integer :score

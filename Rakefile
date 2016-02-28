@@ -1,5 +1,6 @@
 require "bundler/gem_tasks"
 require "rake/testtask"
+require "parallel_tests/tasks"
 
 task default: :test
 Rake::TestTask.new do |t|
