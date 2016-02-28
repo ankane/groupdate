@@ -33,10 +33,10 @@ time: {
   formats: {special: "%b %e, %Y"}
 }
 
-ActiveRecord::Migration.verbose = false
-
 # migrations
 def create_tables
+  ActiveRecord::Migration.verbose = false
+
   ActiveRecord::Migration.create_table :users, force: true do |t|
     t.string :name
     t.integer :score
@@ -49,6 +49,278 @@ def create_tables
   end
 end
 
+module TestDatabase
+  def test_zeros_previous_scope
+    create_user "2013-05-01 00:00:00 UTC"
+    expected = {
+      utc.parse("2013-05-01 00:00:00 UTC") => 0
+    }
+    assert_equal expected, User.where("id = 0").group_by_day(:created_at, range: Time.parse("2013-05-01 00:00:00 UTC")..Time.parse("2013-05-01 23:59:59 UTC")).count
+  end
+
+  def test_order_hour_of_day
+    assert_equal 23, User.group_by_hour_of_day(:created_at).order("hour_of_day desc").count.keys.first
+  end
+
+  def test_order_hour_of_day_case
+    assert_equal 23, User.group_by_hour_of_day(:created_at).order("hour_of_day DESC").count.keys.first
+  end
+
+  def test_order_hour_of_day_reverse
+    skip if ActiveRecord::VERSION::MAJOR == 5
+    assert_equal 23, User.group_by_hour_of_day(:created_at).reverse_order.count.keys.first
+  end
+
+  def test_order_hour_of_day_order_reverse
+    skip if ActiveRecord::VERSION::MAJOR == 5
+    assert_equal 0, User.group_by_hour_of_day(:created_at).order("hour_of_day desc").reverse_order.count.keys.first
+  end
+
+  def test_table_name
+    assert_empty User.group_by_day("users.created_at").count
+  end
+
+  def test_previous_scopes
+    create_user "2013-05-01 00:00:00 UTC"
+    assert_empty User.where("id = 0").group_by_day(:created_at).count
+  end
+
+  def test_where_after
+    create_user "2013-05-01 00:00:00 UTC"
+    create_user "2013-05-02 00:00:00 UTC"
+    expected = {utc.parse("2013-05-02 00:00:00 UTC") => 1}
+    assert_equal expected, User.group_by_day(:created_at).where("created_at > ?", "2013-05-01 00:00:00 UTC").count
+  end
+
+  def test_group_before
+    create_user "2013-05-01 00:00:00 UTC", 1
+    create_user "2013-05-02 00:00:00 UTC", 2
+    create_user "2013-05-03 00:00:00 UTC", 2
+    expected = {
+      [1, utc.parse("2013-05-01 00:00:00 UTC")] => 1,
+      [1, utc.parse("2013-05-02 00:00:00 UTC")] => 0,
+      [1, utc.parse("2013-05-03 00:00:00 UTC")] => 0,
+      [2, utc.parse("2013-05-01 00:00:00 UTC")] => 0,
+      [2, utc.parse("2013-05-02 00:00:00 UTC")] => 1,
+      [2, utc.parse("2013-05-03 00:00:00 UTC")] => 1
+    }
+    assert_equal expected, User.group(:score).group_by_day(:created_at).order(:score).count
+  end
+
+  def test_group_after
+    create_user "2013-05-01 00:00:00 UTC", 1
+    create_user "2013-05-02 00:00:00 UTC", 2
+    create_user "2013-05-03 00:00:00 UTC", 2
+    expected = {
+      [utc.parse("2013-05-01 00:00:00 UTC"), 1] => 1,
+      [utc.parse("2013-05-02 00:00:00 UTC"), 1] => 0,
+      [utc.parse("2013-05-03 00:00:00 UTC"), 1] => 0,
+      [utc.parse("2013-05-01 00:00:00 UTC"), 2] => 0,
+      [utc.parse("2013-05-02 00:00:00 UTC"), 2] => 1,
+      [utc.parse("2013-05-03 00:00:00 UTC"), 2] => 1
+    }
+    assert_equal expected, User.group_by_day(:created_at).group(:score).order(:score).count
+  end
+
+  def test_group_day_of_week
+    create_user "2013-05-01 00:00:00 UTC", 1
+    create_user "2013-05-02 00:00:00 UTC", 2
+    create_user "2013-05-03 00:00:00 UTC", 2
+    expected = {
+      [1, 0] => 0,
+      [1, 1] => 0,
+      [1, 2] => 0,
+      [1, 3] => 1,
+      [1, 4] => 0,
+      [1, 5] => 0,
+      [1, 6] => 0,
+      [2, 0] => 0,
+      [2, 1] => 0,
+      [2, 2] => 0,
+      [2, 3] => 0,
+      [2, 4] => 1,
+      [2, 5] => 1,
+      [2, 6] => 0
+    }
+    assert_equal expected, User.group(:score).group_by_day_of_week(:created_at).count
+  end
+
+  def test_groupdate_multiple
+    create_user "2013-05-01 00:00:00 UTC", 1
+    expected = {
+      [utc.parse("2013-05-01 00:00:00 UTC"), utc.parse("2013-01-01 00:00:00 UTC")] => 1
+    }
+    assert_equal expected, User.group_by_day(:created_at).group_by_year(:created_at).count
+  end
+
+  def test_not_modified
+    create_user "2013-05-01 00:00:00 UTC"
+    expected = {utc.parse("2013-05-01 00:00:00 UTC") => 1}
+    relation = User.group_by_day(:created_at)
+    relation.where("created_at > ?", "2013-05-01 00:00:00 UTC")
+    assert_equal expected, relation.count
+  end
+
+  def test_bad_method
+    assert_raises(NoMethodError) { User.group_by_day(:created_at).no_such_method }
+  end
+
+  def test_respond_to_where
+    assert User.group_by_day(:created_at).respond_to?(:order)
+  end
+
+  def test_respond_to_bad_method
+    assert !User.group_by_day(:created_at).respond_to?(:no_such_method)
+  end
+
+  def test_last
+    create_user "#{this_year - 3}-01-01 00:00:00 UTC"
+    create_user "#{this_year - 1}-01-01 00:00:00 UTC"
+    expected = {
+      utc.parse("#{this_year - 2}-01-01 00:00:00 UTC") => 0,
+      utc.parse("#{this_year - 1}-01-01 00:00:00 UTC") => 1,
+      utc.parse("#{this_year}-01-01 00:00:00 UTC") => 0
+    }
+    assert_equal expected, User.group_by_year(:created_at, last: 3).count
+  end
+
+  def test_current
+    create_user "#{this_year - 3}-01-01 00:00:00 UTC"
+    create_user "#{this_year - 1}-01-01 00:00:00 UTC"
+    expected = {
+      utc.parse("#{this_year - 2}-01-01 00:00:00 UTC") => 0,
+      utc.parse("#{this_year - 1}-01-01 00:00:00 UTC") => 1
+    }
+    assert_equal expected, User.group_by_year(:created_at, last: 2, current: false).count
+  end
+
+  def test_format_locale
+    create_user "2014-10-01 00:00:00 UTC"
+    assert_equal ({"Okt" => 1}), User.group_by_day(:created_at, format: "%b", locale: :de).count
+  end
+
+  def test_format_locale_by_symbol
+    create_user "2014-10-01 00:00:00 UTC"
+    assert_equal ({"Okt  1, 2014" => 1}), User.group_by_day(:created_at, format: :special, locale: :de).count
+  end
+
+  def test_format_locale_global
+    create_user "2014-10-01 00:00:00 UTC"
+    I18n.locale = :de
+    assert_equal ({"Okt" => 1}), User.group_by_day(:created_at, format: "%b").count
+  ensure
+    I18n.locale = :en
+  end
+
+  def test_format_multiple_groups
+    create_user "2014-03-01 00:00:00 UTC"
+    assert_equal ({["Sun", 1] => 1}), User.group_by_week(:created_at, format: "%a").group(:score).count
+    assert_equal ({[1, "Sun"] => 1}), User.group(:score).group_by_week(:created_at, format: "%a").count
+  end
+
+  # permit
+
+  def test_permit
+    assert_raises(ArgumentError, "Unpermitted period") { User.group_by_period(:day, :created_at, permit: %w(week)).count }
+  end
+
+  def test_permit_bad_period
+    assert_raises(ArgumentError, "Unpermitted period") { User.group_by_period(:bad_period, :created_at).count }
+  end
+
+  def test_permit_symbol_symbols
+    assert_equal ({}), User.group_by_period(:day, :created_at, permit: [:day]).count
+  end
+
+  def test_permit_string_symbols
+    assert_equal ({}), User.group_by_period("day", :created_at, permit: [:day]).count
+  end
+
+  def test_permit_symbol_strings
+    assert_equal ({}), User.group_by_period(:day, :created_at, permit: %w(day)).count
+  end
+
+  def test_permit_string_strings
+    assert_equal ({}), User.group_by_period("day", :created_at, permit: %w(day)).count
+  end
+
+  # default value
+
+  def test_default_value
+    create_user "#{this_year}-01-01 00:00:00 UTC"
+    expected = {
+      utc.parse("#{this_year - 1}-01-01 00:00:00 UTC") => nil,
+      utc.parse("#{this_year}-01-01 00:00:00 UTC") => 1
+    }
+    assert_equal expected, User.group_by_year(:created_at, last: 2, default_value: nil).count
+  end
+
+  # associations
+
+  def test_associations
+    user = create_user("2014-03-01 00:00:00 UTC")
+    assert_empty user.posts.group_by_day(:created_at).count
+  end
+
+  # activerecord default_timezone option
+
+  def test_default_timezone_local
+    User.default_timezone = :local
+    assert_raises(RuntimeError) { User.group_by_day(:created_at).count }
+  ensure
+    User.default_timezone = :utc
+  end
+
+  # Brasilia Summer Time
+
+  def test_brasilia_summer_time
+    # must parse and convert to UTC for ActiveRecord 3.1
+    create_user(brasilia.parse("2014-10-19 02:00:00").utc.to_s)
+    create_user(brasilia.parse("2014-10-20 02:00:00").utc.to_s)
+    expected = {
+      brasilia.parse("2014-10-19 01:00:00") => 1,
+      brasilia.parse("2014-10-20 00:00:00") => 1
+    }
+    assert_equal expected, User.group_by_day(:created_at, time_zone: "Brasilia").count
+  end
+
+  # carry_forward option
+
+  def test_carry_forward
+    create_user "2014-05-01 00:00:00 UTC"
+    create_user "2014-05-01 00:00:00 UTC"
+    create_user "2014-05-03 00:00:00 UTC"
+    assert_equal 2, User.group_by_day(:created_at, carry_forward: true).count[utc.parse("2014-05-02 00:00:00 UTC")]
+  end
+
+  # dates
+
+  def test_dates
+    create_user "2014-03-01 12:00:00 UTC"
+    assert_equal ({Date.parse("2014-03-01") => 1}), User.group_by_day(:created_at, dates: true).count
+  end
+
+  def test_no_column
+    assert_raises(ArgumentError) { User.group_by_day.first }
+  end
+
+  def call_method(method, field, options)
+    User.group_by_period(method, field, options).count
+  end
+
+  def create_user(created_at, score = 1)
+    User.create! name: "Andrew", score: score, created_at: created_at ? utc.parse(created_at) : nil
+  end
+
+  def teardown
+    User.delete_all
+  end
+
+  def enumerable_test?
+    false
+  end
+end
+
 module TestGroupdate
   def setup
     Groupdate.week_start = :sun
@@ -57,7 +329,7 @@ module TestGroupdate
   # second
 
   def test_second_end_of_second
-    if ActiveRecord::Base.connection.adapter_name == "Mysql2" && ActiveRecord::VERSION::STRING.starts_with?("4.2.")
+    if enumerable_test? || (ActiveRecord::Base.connection.adapter_name == "Mysql2" && ActiveRecord::VERSION::STRING.starts_with?("4.2."))
       skip # no millisecond precision
     else
       assert_result_time :second, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:00.999"
@@ -566,14 +838,6 @@ module TestGroupdate
     assert_equal expected, call_method(:day, :created_at, range: Time.parse("2013-05-01 00:00:00 UTC")...Time.parse("2013-05-02 00:00:00 UTC"))
   end
 
-  def test_zeros_previous_scope
-    create_user "2013-05-01 00:00:00 UTC"
-    expected = {
-      utc.parse("2013-05-01 00:00:00 UTC") => 0
-    }
-    assert_equal expected, User.where("id = 0").group_by_day(:created_at, range: Time.parse("2013-05-01 00:00:00 UTC")..Time.parse("2013-05-01 23:59:59 UTC")).count
-  end
-
   def test_zeros_datetime
     create_user "2013-05-01 00:00:00 UTC"
     expected = {
@@ -583,8 +847,7 @@ module TestGroupdate
   end
 
   def test_zeros_null_value
-    user = User.create!(name: "Andrew")
-    user.update_column :created_at, nil
+    create_user nil
     assert_equal 0, call_method(:hour_of_day, :created_at, range: true)[0]
   end
 
@@ -613,150 +876,14 @@ module TestGroupdate
 
   # misc
 
-  def test_order_hour_of_day
-    assert_equal 23, User.group_by_hour_of_day(:created_at).order("hour_of_day desc").count.keys.first
-  end
-
-  def test_order_hour_of_day_case
-    assert_equal 23, User.group_by_hour_of_day(:created_at).order("hour_of_day DESC").count.keys.first
-  end
-
-  def test_order_hour_of_day_reverse
-    skip if ActiveRecord::VERSION::MAJOR == 5
-    assert_equal 23, User.group_by_hour_of_day(:created_at).reverse_order.count.keys.first
-  end
-
-  def test_order_hour_of_day_order_reverse
-    skip if ActiveRecord::VERSION::MAJOR == 5
-    assert_equal 0, User.group_by_hour_of_day(:created_at).order("hour_of_day desc").reverse_order.count.keys.first
-  end
-
   def test_order_hour_of_day_reverse_option
     assert_equal 23, call_method(:hour_of_day, :created_at, reverse: true).keys.first
-  end
-
-  def test_table_name
-    assert_empty User.group_by_day("users.created_at").count
-  end
-
-  def test_previous_scopes
-    create_user "2013-05-01 00:00:00 UTC"
-    assert_empty User.where("id = 0").group_by_day(:created_at).count
   end
 
   def test_time_zone
     create_user "2013-05-01 00:00:00 UTC"
     time_zone = "Pacific Time (US & Canada)"
     assert_equal time_zone, call_method(:day, :created_at, time_zone: time_zone).keys.first.time_zone.name
-  end
-
-  def test_where_after
-    create_user "2013-05-01 00:00:00 UTC"
-    create_user "2013-05-02 00:00:00 UTC"
-    expected = {utc.parse("2013-05-02 00:00:00 UTC") => 1}
-    assert_equal expected, User.group_by_day(:created_at).where("created_at > ?", "2013-05-01 00:00:00 UTC").count
-  end
-
-  def test_group_before
-    create_user "2013-05-01 00:00:00 UTC", 1
-    create_user "2013-05-02 00:00:00 UTC", 2
-    create_user "2013-05-03 00:00:00 UTC", 2
-    expected = {
-      [1, utc.parse("2013-05-01 00:00:00 UTC")] => 1,
-      [1, utc.parse("2013-05-02 00:00:00 UTC")] => 0,
-      [1, utc.parse("2013-05-03 00:00:00 UTC")] => 0,
-      [2, utc.parse("2013-05-01 00:00:00 UTC")] => 0,
-      [2, utc.parse("2013-05-02 00:00:00 UTC")] => 1,
-      [2, utc.parse("2013-05-03 00:00:00 UTC")] => 1
-    }
-    assert_equal expected, User.group(:score).group_by_day(:created_at).order(:score).count
-  end
-
-  def test_group_after
-    create_user "2013-05-01 00:00:00 UTC", 1
-    create_user "2013-05-02 00:00:00 UTC", 2
-    create_user "2013-05-03 00:00:00 UTC", 2
-    expected = {
-      [utc.parse("2013-05-01 00:00:00 UTC"), 1] => 1,
-      [utc.parse("2013-05-02 00:00:00 UTC"), 1] => 0,
-      [utc.parse("2013-05-03 00:00:00 UTC"), 1] => 0,
-      [utc.parse("2013-05-01 00:00:00 UTC"), 2] => 0,
-      [utc.parse("2013-05-02 00:00:00 UTC"), 2] => 1,
-      [utc.parse("2013-05-03 00:00:00 UTC"), 2] => 1
-    }
-    assert_equal expected, User.group_by_day(:created_at).group(:score).order(:score).count
-  end
-
-  def test_group_day_of_week
-    create_user "2013-05-01 00:00:00 UTC", 1
-    create_user "2013-05-02 00:00:00 UTC", 2
-    create_user "2013-05-03 00:00:00 UTC", 2
-    expected = {
-      [1, 0] => 0,
-      [1, 1] => 0,
-      [1, 2] => 0,
-      [1, 3] => 1,
-      [1, 4] => 0,
-      [1, 5] => 0,
-      [1, 6] => 0,
-      [2, 0] => 0,
-      [2, 1] => 0,
-      [2, 2] => 0,
-      [2, 3] => 0,
-      [2, 4] => 1,
-      [2, 5] => 1,
-      [2, 6] => 0
-    }
-    assert_equal expected, User.group(:score).group_by_day_of_week(:created_at).count
-  end
-
-  def test_groupdate_multiple
-    create_user "2013-05-01 00:00:00 UTC", 1
-    expected = {
-      [utc.parse("2013-05-01 00:00:00 UTC"), utc.parse("2013-01-01 00:00:00 UTC")] => 1
-    }
-    assert_equal expected, User.group_by_day(:created_at).group_by_year(:created_at).count
-  end
-
-  def test_not_modified
-    create_user "2013-05-01 00:00:00 UTC"
-    expected = {utc.parse("2013-05-01 00:00:00 UTC") => 1}
-    relation = User.group_by_day(:created_at)
-    relation.where("created_at > ?", "2013-05-01 00:00:00 UTC")
-    assert_equal expected, relation.count
-  end
-
-  def test_bad_method
-    assert_raises(NoMethodError) { User.group_by_day(:created_at).no_such_method }
-  end
-
-  def test_respond_to_where
-    assert User.group_by_day(:created_at).respond_to?(:order)
-  end
-
-  def test_respond_to_bad_method
-    assert !User.group_by_day(:created_at).respond_to?(:no_such_method)
-  end
-
-  def test_last
-    create_user "#{this_year - 3}-01-01 00:00:00 UTC"
-    create_user "#{this_year - 1}-01-01 00:00:00 UTC"
-    expected = {
-      utc.parse("#{this_year - 2}-01-01 00:00:00 UTC") => 0,
-      utc.parse("#{this_year - 1}-01-01 00:00:00 UTC") => 1,
-      utc.parse("#{this_year}-01-01 00:00:00 UTC") => 0
-    }
-    assert_equal expected, User.group_by_year(:created_at, last: 3).count
-  end
-
-  def test_current
-    create_user "#{this_year - 3}-01-01 00:00:00 UTC"
-    create_user "#{this_year - 1}-01-01 00:00:00 UTC"
-    expected = {
-      utc.parse("#{this_year - 2}-01-01 00:00:00 UTC") => 0,
-      utc.parse("#{this_year - 1}-01-01 00:00:00 UTC") => 1
-    }
-    assert_equal expected, User.group_by_year(:created_at, last: 2, current: false).count
   end
 
   def test_format_day
@@ -809,112 +936,6 @@ module TestGroupdate
     assert_format :month_of_year, "Jan", "%b"
   end
 
-  def test_format_locale
-    create_user "2014-10-01 00:00:00 UTC"
-    assert_equal ({"Okt" => 1}), User.group_by_day(:created_at, format: "%b", locale: :de).count
-  end
-
-  def test_format_locale_by_symbol
-    create_user "2014-10-01 00:00:00 UTC"
-    assert_equal ({"Okt  1, 2014" => 1}), User.group_by_day(:created_at, format: :special, locale: :de).count
-  end
-
-  def test_format_locale_global
-    create_user "2014-10-01 00:00:00 UTC"
-    I18n.locale = :de
-    assert_equal ({"Okt" => 1}), User.group_by_day(:created_at, format: "%b").count
-  ensure
-    I18n.locale = :en
-  end
-
-  def test_format_multiple_groups
-    create_user "2014-03-01 00:00:00 UTC"
-    assert_equal ({["Sun", 1] => 1}), User.group_by_week(:created_at, format: "%a").group(:score).count
-    assert_equal ({[1, "Sun"] => 1}), User.group(:score).group_by_week(:created_at, format: "%a").count
-  end
-
-  # permit
-
-  def test_permit
-    assert_raises(ArgumentError, "Unpermitted period") { User.group_by_period(:day, :created_at, permit: %w(week)).count }
-  end
-
-  def test_permit_bad_period
-    assert_raises(ArgumentError, "Unpermitted period") { User.group_by_period(:bad_period, :created_at).count }
-  end
-
-  def test_permit_symbol_symbols
-    assert_equal ({}), User.group_by_period(:day, :created_at, permit: [:day]).count
-  end
-
-  def test_permit_string_symbols
-    assert_equal ({}), User.group_by_period("day", :created_at, permit: [:day]).count
-  end
-
-  def test_permit_symbol_strings
-    assert_equal ({}), User.group_by_period(:day, :created_at, permit: %w(day)).count
-  end
-
-  def test_permit_string_strings
-    assert_equal ({}), User.group_by_period("day", :created_at, permit: %w(day)).count
-  end
-
-  # default value
-
-  def test_default_value
-    create_user "#{this_year}-01-01 00:00:00 UTC"
-    expected = {
-      utc.parse("#{this_year - 1}-01-01 00:00:00 UTC") => nil,
-      utc.parse("#{this_year}-01-01 00:00:00 UTC") => 1
-    }
-    assert_equal expected, User.group_by_year(:created_at, last: 2, default_value: nil).count
-  end
-
-  # associations
-
-  def test_associations
-    user = create_user("2014-03-01 00:00:00 UTC")
-    assert_empty user.posts.group_by_day(:created_at).count
-  end
-
-  # activerecord default_timezone option
-
-  def test_default_timezone_local
-    User.default_timezone = :local
-    assert_raises(RuntimeError) { User.group_by_day(:created_at).count }
-  ensure
-    User.default_timezone = :utc
-  end
-
-  # Brasilia Summer Time
-
-  def test_brasilia_summer_time
-    # must parse and convert to UTC for ActiveRecord 3.1
-    create_user(brasilia.parse("2014-10-19 02:00:00").utc.to_s)
-    create_user(brasilia.parse("2014-10-20 02:00:00").utc.to_s)
-    expected = {
-      brasilia.parse("2014-10-19 01:00:00") => 1,
-      brasilia.parse("2014-10-20 00:00:00") => 1
-    }
-    assert_equal expected, User.group_by_day(:created_at, time_zone: "Brasilia").count
-  end
-
-  # carry_forward option
-
-  def test_carry_forward
-    create_user "2014-05-01 00:00:00 UTC"
-    create_user "2014-05-01 00:00:00 UTC"
-    create_user "2014-05-03 00:00:00 UTC"
-    assert_equal 2, User.group_by_day(:created_at, carry_forward: true).count[utc.parse("2014-05-02 00:00:00 UTC")]
-  end
-
-  # dates
-
-  def test_dates
-    create_user "2014-03-01 12:00:00 UTC"
-    assert_equal ({Date.parse("2014-03-01") => 1}), User.group_by_day(:created_at, dates: true).count
-  end
-
   # helpers
 
   def assert_format(method, expected, format, options = {})
@@ -944,14 +965,6 @@ module TestGroupdate
     assert_equal expected, call_method(method, :created_at, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil, range: Time.parse(range_start)..Time.parse(range_end)))
   end
 
-  def call_method(method, field, options)
-    User.group_by_period(method, field, options).count
-  end
-
-  def create_user(created_at, score = 1)
-    User.create! name: "Andrew", score: score, created_at: utc.parse(created_at)
-  end
-
   def this_year
     Time.now.utc.year
   end
@@ -962,9 +975,5 @@ module TestGroupdate
 
   def brasilia
     ActiveSupport::TimeZone["Brasilia"]
-  end
-
-  def teardown
-    User.delete_all
   end
 end
