@@ -185,6 +185,12 @@ module Groupdate
         when :month_of_year
           1..12
         else
+          if field == :quarter
+            step = 3.months
+          else
+            step = 1.send(field)
+          end
+
           time_range = self.time_range
           time_range =
             if time_range.is_a?(Range)
@@ -197,17 +203,14 @@ module Groupdate
                 else
                   count.keys.sort
                 end
-              sorted_keys.first..sorted_keys.last
+
+              now = Time.now
+              now -= step if options[:current] == false
+              sorted_keys.first..[sorted_keys.last, now].max
             end
 
           if time_range.first
             series = [round_time(time_range.first)]
-
-            if field == :quarter
-              step = 3.months
-            else
-              step = 1.send(field)
-            end
 
             while (next_step = round_time(series.last + step)) && time_range.cover?(next_step)
               series << next_step
