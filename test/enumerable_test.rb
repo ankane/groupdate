@@ -20,8 +20,6 @@ class TestEnumerable < Minitest::Test
   end
 
   def call_method(method, field, options)
-    # p @users.group_by_period(method, options) { |u| u.send(field) }
-    # p field
     Hash[@users.group_by_period(method, options) { |u| u.send(field) }.map { |k, v| [k, v.size] }]
   end
 
