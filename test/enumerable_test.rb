@@ -26,7 +26,13 @@ class TestEnumerable < Minitest::Test
   end
 
   def create_user(created_at, score = 1)
-    user = OpenStruct.new(name: "Andrew", score: score, created_at: created_at ? utc.parse(created_at) : nil)
+    user =
+      OpenStruct.new(
+        name: "Andrew",
+        score: score,
+        created_at: created_at ? utc.parse(created_at) : nil,
+        created_on: created_at ? Date.parse(created_at) : nil
+      )
     @users << user
     user
   end

@@ -39,6 +39,7 @@ def create_tables
     t.string :name
     t.integer :score
     t.timestamp :created_at
+    t.date :created_on
   end
 
   ActiveRecord::Migration.create_table :posts, force: true do |t|
@@ -307,7 +308,12 @@ module TestDatabase
   end
 
   def create_user(created_at, score = 1)
-    User.create! name: "Andrew", score: score, created_at: created_at ? utc.parse(created_at) : nil
+    User.create!(
+      name: "Andrew",
+      score: score,
+      created_at: created_at ? utc.parse(created_at) : nil,
+      created_on: created_at ? Date.parse(created_at) : nil
+    )
   end
 
   def teardown
@@ -932,6 +938,24 @@ module TestGroupdate
   def test_format_month_of_year
     create_user "2014-01-01 00:00:00 UTC"
     assert_format :month_of_year, "Jan", "%b"
+  end
+
+  # date column
+
+  def test_date_column
+    expected = {
+      Date.parse("2013-05-03") => 1
+    }
+    assert_equal expected, result(:day, "2013-05-03", false, dates: true)
+  end
+
+  def test_date_column_with_time_zone
+    # TODO change for Groupdate 3.0
+    skip
+    expected = {
+      Date.parse("2013-05-03") => 1
+    }
+    assert_equal expected, result(:day, "2013-05-03", true, dates: true)
   end
 
   # helpers
