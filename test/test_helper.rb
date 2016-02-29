@@ -367,217 +367,217 @@ module TestGroupdate
   # day
 
   def test_day_end_of_day
-    assert_result_time :day, "2013-05-03 00:00:00 UTC", "2013-05-03 23:59:59"
+    assert_result_date :day, "2013-05-03 00:00:00 UTC", "2013-05-03 23:59:59"
   end
 
   def test_day_start_of_day
-    assert_result_time :day, "2013-05-04 00:00:00 UTC", "2013-05-04 00:00:00"
+    assert_result_date :day, "2013-05-04 00:00:00 UTC", "2013-05-04 00:00:00"
   end
 
   def test_day_end_of_day_with_time_zone
-    assert_result_time :day, "2013-05-02 00:00:00 PDT", "2013-05-03 06:59:59", true
+    assert_result_date :day, "2013-05-02 00:00:00 PDT", "2013-05-03 06:59:59", true
   end
 
   def test_day_start_of_day_with_time_zone
-    assert_result_time :day, "2013-05-03 00:00:00 PDT", "2013-05-03 07:00:00", true
+    assert_result_date :day, "2013-05-03 00:00:00 PDT", "2013-05-03 07:00:00", true
   end
 
   # day hour starts at 2 am
 
   def test_test_day_end_of_day_day_start_2am
-    assert_result_time :day, "2013-05-03 02:00:00 UTC", "2013-05-04 01:59:59", false, day_start: 2
+    assert_result_date :day, "2013-05-03 02:00:00 UTC", "2013-05-04 01:59:59", false, day_start: 2
   end
 
   def test_test_day_start_of_day_day_start_2am
-    assert_result_time :day, "2013-05-03 02:00:00 UTC", "2013-05-03 02:00:00", false, day_start: 2
+    assert_result_date :day, "2013-05-03 02:00:00 UTC", "2013-05-03 02:00:00", false, day_start: 2
   end
 
   def test_test_day_end_of_day_with_time_zone_day_start_2am
-    assert_result_time :day, "2013-05-03 02:00:00 PDT", "2013-05-04 07:59:59", true, day_start: 2
+    assert_result_date :day, "2013-05-03 02:00:00 PDT", "2013-05-04 07:59:59", true, day_start: 2
   end
 
   def test_test_day_start_of_day_with_time_zone_day_start_2am
-    assert_result_time :day, "2013-05-03 02:00:00 PDT", "2013-05-03 09:00:00", true, day_start: 2
+    assert_result_date :day, "2013-05-03 02:00:00 PDT", "2013-05-03 09:00:00", true, day_start: 2
   end
 
   # week
 
   def test_week_end_of_week
-    assert_result_time :week, "2013-03-17 00:00:00 UTC", "2013-03-23 23:59:59"
+    assert_result_date :week, "2013-03-17 00:00:00 UTC", "2013-03-23 23:59:59"
   end
 
   def test_week_start_of_week
-    assert_result_time :week, "2013-03-24 00:00:00 UTC", "2013-03-24 00:00:00"
+    assert_result_date :week, "2013-03-24 00:00:00 UTC", "2013-03-24 00:00:00"
   end
 
   def test_week_end_of_week_with_time_zone
-    assert_result_time :week, "2013-03-10 00:00:00 PST", "2013-03-17 06:59:59", true
+    assert_result_date :week, "2013-03-10 00:00:00 PST", "2013-03-17 06:59:59", true
   end
 
   def test_week_start_of_week_with_time_zone
-    assert_result_time :week, "2013-03-17 00:00:00 PDT", "2013-03-17 07:00:00", true
+    assert_result_date :week, "2013-03-17 00:00:00 PDT", "2013-03-17 07:00:00", true
   end
 
   # week starting on monday
 
   def test_week_end_of_week_mon
-    assert_result_time :week, "2013-03-18 00:00:00 UTC", "2013-03-24 23:59:59", false, week_start: :mon
+    assert_result_date :week, "2013-03-18 00:00:00 UTC", "2013-03-24 23:59:59", false, week_start: :mon
   end
 
   def test_week_start_of_week_mon
-    assert_result_time :week, "2013-03-25 00:00:00 UTC", "2013-03-25 00:00:00", false, week_start: :mon
+    assert_result_date :week, "2013-03-25 00:00:00 UTC", "2013-03-25 00:00:00", false, week_start: :mon
   end
 
   def test_week_end_of_week_with_time_zone_mon
-    assert_result_time :week, "2013-03-11 00:00:00 PDT", "2013-03-18 06:59:59", true, week_start: :mon
+    assert_result_date :week, "2013-03-11 00:00:00 PDT", "2013-03-18 06:59:59", true, week_start: :mon
   end
 
   def test_week_start_of_week_with_time_zone_mon
-    assert_result_time :week, "2013-03-18 00:00:00 PDT", "2013-03-18 07:00:00", true, week_start: :mon
+    assert_result_date :week, "2013-03-18 00:00:00 PDT", "2013-03-18 07:00:00", true, week_start: :mon
   end
 
   # week starting on saturday
 
   def test_week_end_of_week_sat
-    assert_result_time :week, "2013-03-16 00:00:00 UTC", "2013-03-22 23:59:59", false, week_start: :sat
+    assert_result_date :week, "2013-03-16 00:00:00 UTC", "2013-03-22 23:59:59", false, week_start: :sat
   end
 
   def test_week_start_of_week_sat
-    assert_result_time :week, "2013-03-23 00:00:00 UTC", "2013-03-23 00:00:00", false, week_start: :sat
+    assert_result_date :week, "2013-03-23 00:00:00 UTC", "2013-03-23 00:00:00", false, week_start: :sat
   end
 
   def test_week_end_of_week_with_time_zone_sat
-    assert_result_time :week, "2013-03-09 00:00:00 PST", "2013-03-16 06:59:59", true, week_start: :sat
+    assert_result_date :week, "2013-03-09 00:00:00 PST", "2013-03-16 06:59:59", true, week_start: :sat
   end
 
   def test_week_start_of_week_with_time_zone_sat
-    assert_result_time :week, "2013-03-16 00:00:00 PDT", "2013-03-16 07:00:00", true, week_start: :sat
+    assert_result_date :week, "2013-03-16 00:00:00 PDT", "2013-03-16 07:00:00", true, week_start: :sat
   end
 
   # week starting at 2am
 
   def test_week_end_of_week_day_start_2am
-    assert_result_time :week, "2013-03-17 02:00:00 UTC", "2013-03-24 01:59:59", false, day_start: 2
+    assert_result_date :week, "2013-03-17 02:00:00 UTC", "2013-03-24 01:59:59", false, day_start: 2
   end
 
   def test_week_start_of_week_day_start_2am
-    assert_result_time :week, "2013-03-17 02:00:00 UTC", "2013-03-17 02:00:00", false, day_start: 2
+    assert_result_date :week, "2013-03-17 02:00:00 UTC", "2013-03-17 02:00:00", false, day_start: 2
   end
 
   def test_week_end_of_week_day_with_time_zone_start_2am
-    assert_result_time :week, "2013-03-17 02:00:00 PDT", "2013-03-24 08:59:59", true, day_start: 2
+    assert_result_date :week, "2013-03-17 02:00:00 PDT", "2013-03-24 08:59:59", true, day_start: 2
   end
 
   def test_week_start_of_week_day_with_time_zone_start_2am
-    assert_result_time :week, "2013-03-17 02:00:00 PDT", "2013-03-17 09:00:00", true, day_start: 2
+    assert_result_date :week, "2013-03-17 02:00:00 PDT", "2013-03-17 09:00:00", true, day_start: 2
   end
 
   # month
 
   def test_month_end_of_month
-    assert_result_time :month, "2013-05-01 00:00:00 UTC", "2013-05-31 23:59:59"
+    assert_result_date :month, "2013-05-01 00:00:00 UTC", "2013-05-31 23:59:59"
   end
 
   def test_month_start_of_month
-    assert_result_time :month, "2013-06-01 00:00:00 UTC", "2013-06-01 00:00:00"
+    assert_result_date :month, "2013-06-01 00:00:00 UTC", "2013-06-01 00:00:00"
   end
 
   def test_month_end_of_month_with_time_zone
-    assert_result_time :month, "2013-05-01 00:00:00 PDT", "2013-06-01 06:59:59", true
+    assert_result_date :month, "2013-05-01 00:00:00 PDT", "2013-06-01 06:59:59", true
   end
 
   def test_month_start_of_month_with_time_zone
-    assert_result_time :month, "2013-06-01 00:00:00 PDT", "2013-06-01 07:00:00", true
+    assert_result_date :month, "2013-06-01 00:00:00 PDT", "2013-06-01 07:00:00", true
   end
 
   # month starts at 2am
 
   def test_month_end_of_month_day_start_2am
-    assert_result_time :month, "2013-03-01 02:00:00 UTC", "2013-04-01 01:59:59", false, day_start: 2
+    assert_result_date :month, "2013-03-01 02:00:00 UTC", "2013-04-01 01:59:59", false, day_start: 2
   end
 
   def test_month_start_of_month_day_start_2am
-    assert_result_time :month, "2013-03-01 02:00:00 UTC", "2013-03-01 02:00:00", false, day_start: 2
+    assert_result_date :month, "2013-03-01 02:00:00 UTC", "2013-03-01 02:00:00", false, day_start: 2
   end
 
   def test_month_end_of_month_with_time_zone_day_start_2am
-    assert_result_time :month, "2013-03-01 02:00:00 PST", "2013-04-01 08:59:59", true, day_start: 2
+    assert_result_date :month, "2013-03-01 02:00:00 PST", "2013-04-01 08:59:59", true, day_start: 2
   end
 
   def test_month_start_of_month_with_time_zone_day_start_2am
-    assert_result_time :month, "2013-03-01 02:00:00 PST", "2013-03-01 10:00:00", true, day_start: 2
+    assert_result_date :month, "2013-03-01 02:00:00 PST", "2013-03-01 10:00:00", true, day_start: 2
   end
 
   # quarter
 
   def test_quarter_end_of_quarter
-    assert_result_time :quarter, "2013-04-01 00:00:00 UTC", "2013-06-30 23:59:59"
+    assert_result_date :quarter, "2013-04-01 00:00:00 UTC", "2013-06-30 23:59:59"
   end
 
   def test_quarter_start_of_quarter
-    assert_result_time :quarter, "2013-04-01 00:00:00 UTC", "2013-04-01 00:00:00"
+    assert_result_date :quarter, "2013-04-01 00:00:00 UTC", "2013-04-01 00:00:00"
   end
 
   def test_quarter_end_of_quarter_with_time_zone
-    assert_result_time :quarter, "2013-04-01 00:00:00 PDT", "2013-07-01 06:59:59", true
+    assert_result_date :quarter, "2013-04-01 00:00:00 PDT", "2013-07-01 06:59:59", true
   end
 
   def test_quarter_start_of_quarter_with_time_zone
-    assert_result_time :quarter, "2013-04-01 00:00:00 PDT", "2013-04-01 07:00:00", true
+    assert_result_date :quarter, "2013-04-01 00:00:00 PDT", "2013-04-01 07:00:00", true
   end
 
   # quarter starts at 2am
 
   def test_quarter_end_of_quarter_day_start_2am
-    assert_result_time :quarter, "2013-04-01 02:00:00 UTC", "2013-07-01 01:59:59", false, day_start: 2
+    assert_result_date :quarter, "2013-04-01 02:00:00 UTC", "2013-07-01 01:59:59", false, day_start: 2
   end
 
   def test_quarter_start_of_quarter_day_start_2am
-    assert_result_time :quarter, "2013-04-01 02:00:00 UTC", "2013-04-01 02:00:00", false, day_start: 2
+    assert_result_date :quarter, "2013-04-01 02:00:00 UTC", "2013-04-01 02:00:00", false, day_start: 2
   end
 
   def test_quarter_end_of_quarter_with_time_zone_day_start_2am
-    assert_result_time :quarter, "2013-01-01 02:00:00 PST", "2013-04-01 08:59:59", true, day_start: 2
+    assert_result_date :quarter, "2013-01-01 02:00:00 PST", "2013-04-01 08:59:59", true, day_start: 2
   end
 
   def test_quarter_start_of_quarter_with_time_zone_day_start_2am
-    assert_result_time :quarter, "2013-01-01 02:00:00 PST", "2013-01-01 10:00:00", true, day_start: 2
+    assert_result_date :quarter, "2013-01-01 02:00:00 PST", "2013-01-01 10:00:00", true, day_start: 2
   end
 
   # year
 
   def test_year_end_of_year
-    assert_result_time :year, "2013-01-01 00:00:00 UTC", "2013-12-31 23:59:59"
+    assert_result_date :year, "2013-01-01 00:00:00 UTC", "2013-12-31 23:59:59"
   end
 
   def test_year_start_of_year
-    assert_result_time :year, "2014-01-01 00:00:00 UTC", "2014-01-01 00:00:00"
+    assert_result_date :year, "2014-01-01 00:00:00 UTC", "2014-01-01 00:00:00"
   end
 
   def test_year_end_of_year_with_time_zone
-    assert_result_time :year, "2013-01-01 00:00:00 PST", "2014-01-01 07:59:59", true
+    assert_result_date :year, "2013-01-01 00:00:00 PST", "2014-01-01 07:59:59", true
   end
 
   def test_year_start_of_year_with_time_zone
-    assert_result_time :year, "2014-01-01 00:00:00 PST", "2014-01-01 08:00:00", true
+    assert_result_date :year, "2014-01-01 00:00:00 PST", "2014-01-01 08:00:00", true
   end
 
   # year starts at 2am
 
   def test_year_end_of_year_day_start_2am
-    assert_result_time :year, "2013-01-01 02:00:00 UTC", "2014-01-01 01:59:59", false, day_start: 2
+    assert_result_date :year, "2013-01-01 02:00:00 UTC", "2014-01-01 01:59:59", false, day_start: 2
   end
 
   def test_year_start_of_year_day_start_2am
-    assert_result_time :year, "2013-01-01 02:00:00 UTC", "2013-01-01 02:00:00", false, day_start: 2
+    assert_result_date :year, "2013-01-01 02:00:00 UTC", "2013-01-01 02:00:00", false, day_start: 2
   end
 
   def test_year_end_of_year_with_time_zone_day_start_2am
-    assert_result_time :year, "2013-01-01 02:00:00 PST", "2014-01-01 09:59:59", true, day_start: 2
+    assert_result_date :year, "2013-01-01 02:00:00 PST", "2014-01-01 09:59:59", true, day_start: 2
   end
 
   def test_year_start_of_year_with_time_zone_day_start_2am
-    assert_result_time :year, "2013-01-01 02:00:00 PST", "2013-01-01 10:00:00", true, day_start: 2
+    assert_result_date :year, "2013-01-01 02:00:00 PST", "2013-01-01 10:00:00", true, day_start: 2
   end
 
   # hour of day
@@ -870,12 +870,12 @@ module TestGroupdate
 
   def test_week_start
     Groupdate.week_start = :mon
-    assert_result_time :week, "2013-03-18 00:00:00 UTC", "2013-03-24 23:59:59"
+    assert_result_date :week, "2013-03-18 00:00:00 UTC", "2013-03-24 23:59:59"
   end
 
   def test_week_start_and_start_option
     Groupdate.week_start = :mon
-    assert_result_time :week, "2013-03-16 00:00:00 UTC", "2013-03-22 23:59:59", false, week_start: :sat
+    assert_result_date :week, "2013-03-16 00:00:00 UTC", "2013-03-22 23:59:59", false, week_start: :sat
   end
 
   # misc
@@ -967,6 +967,13 @@ module TestGroupdate
   def assert_result_time(method, expected, time_str, time_zone = false, options = {})
     expected = {utc.parse(expected).in_time_zone(time_zone ? "Pacific Time (US & Canada)" : utc) => 1}
     assert_equal expected, result(method, time_str, time_zone, options)
+  end
+
+  def assert_result_date(method, expected_str, time_str, time_zone = false, options = {})
+    expected = {utc.parse(expected_str).in_time_zone(time_zone ? "Pacific Time (US & Canada)" : utc) => 1}
+    assert_equal expected, result(method, time_str, time_zone, options)
+    expected = {Date.parse(expected_str) => 1}
+    assert_equal expected, call_method(method, :created_at, {dates: true}.merge(options).merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
   end
 
   def assert_result(method, expected, time_str, time_zone = false, options = {})
