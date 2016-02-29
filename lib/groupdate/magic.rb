@@ -254,7 +254,7 @@ module Groupdate
               I18n.localize(key, format: options[:format], locale: locale)
             end
           end
-        elsif (options[:dates] || (Groupdate.dates && !options.key?(:dates))) && [:day, :week, :month, :quarter, :year].include?(field)
+        elsif [:day, :week, :month, :quarter, :year].include?(field)
           lambda { |k| k.to_date }
         else
           lambda { |k| k }

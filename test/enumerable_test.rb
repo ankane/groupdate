@@ -8,9 +8,9 @@ class TestEnumerable < Minitest::Test
     user_a = create_user("2014-01-21")
     user_b = create_user("2014-03-14")
     expected = {
-      utc.parse("2014-01-01") => [user_a],
-      utc.parse("2014-02-01") => [],
-      utc.parse("2014-03-01") => [user_b]
+      Date.parse("2014-01-01") => [user_a],
+      Date.parse("2014-02-01") => [],
+      Date.parse("2014-03-01") => [user_b]
     }
     assert_equal expected, [user_a, user_b].group_by_month(&:created_at)
   end
