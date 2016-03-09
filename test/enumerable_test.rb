@@ -20,13 +20,17 @@ class TestEnumerable < Minitest::Test
   end
 
   def call_method(method, field, options)
-    # p @users.group_by_period(method, options) { |u| u.send(field) }
-    # p field
     Hash[@users.group_by_period(method, options) { |u| u.send(field) }.map { |k, v| [k, v.size] }]
   end
 
   def create_user(created_at, score = 1)
-    user = OpenStruct.new(name: "Andrew", score: score, created_at: created_at ? utc.parse(created_at) : nil)
+    user =
+      OpenStruct.new(
+        name: "Andrew",
+        score: score,
+        created_at: created_at ? utc.parse(created_at) : nil,
+        created_on: created_at ? Date.parse(created_at) : nil
+      )
     @users << user
     user
   end
