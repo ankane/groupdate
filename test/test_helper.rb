@@ -2,7 +2,6 @@ require "bundler/setup"
 Bundler.require(:default)
 require "minitest/autorun"
 require "minitest/pride"
-require "minitest/hell"
 require "logger"
 
 Minitest::Test = Minitest::Unit::TestCase unless defined?(Minitest::Test)
