@@ -71,7 +71,7 @@ User.group_by_week(:created_at, time_zone: "Pacific Time (US & Canada)").count
 # }
 ```
 
-Time zone objects also work.
+Time zone objects also work. In Rails, to see all available time zones, run `$ rake time:zones:all`
 
 ### Week Start
 
