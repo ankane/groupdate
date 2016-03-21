@@ -154,9 +154,12 @@ module TestDatabase
 
   def test_groupdate_multiple_hour_of_day_day_of_week
     create_user "2013-05-01 00:00:00 UTC", 1
-    expected = {
-      [0, 3] => 1
-    }
+    expected = {}
+    24.times do |i|
+      7.times do |j|
+        expected[[i, j]] = i == 0 && j == 3 ? 1 : 0
+      end
+    end
     assert_equal expected, User.group_by_hour_of_day(:created_at).group_by_day_of_week(:created_at).count
   end
 
