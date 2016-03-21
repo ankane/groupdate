@@ -16,9 +16,7 @@ module Groupdate
 end
 
 require "groupdate/enumerable"
-begin
-  require "active_record"
-rescue LoadError
-  # do nothing
+
+ActiveSupport.on_load(:active_record) do
+  require "groupdate/active_record"
 end
-require "groupdate/active_record" if defined?(ActiveRecord)

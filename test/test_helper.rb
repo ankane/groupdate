@@ -3,6 +3,7 @@ Bundler.require(:default)
 require "minitest/autorun"
 require "minitest/pride"
 require "logger"
+require "active_record"
 
 Minitest::Test = Minitest::Unit::TestCase unless defined?(Minitest::Test)
 
