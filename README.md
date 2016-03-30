@@ -137,7 +137,9 @@ User.group_by_day(:created_at).order("day desc").count
 
 ### Keys
 
-To get keys as date objects instead of time objects, use:
+Keys are returned as time objects for the start of the period.
+
+To get keys as date objects instead, use:
 
 ```ruby
 User.group_by_day(:created_at, dates: true).count
