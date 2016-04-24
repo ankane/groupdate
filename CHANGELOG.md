@@ -1,3 +1,7 @@
+## 2.5.3 [unreleased]
+
+- All tests green with `mysql` gem
+
 ## 2.5.2
 
 - Added `dates` option to return dates for day, week, month, quarter, and year
