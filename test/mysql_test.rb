@@ -7,7 +7,7 @@ class TestMysql < Minitest::Test
   def setup
     super
     @@setup ||= begin
-      ActiveRecord::Base.establish_connection adapter: "mysql2", database: "groupdate_test", username: "root"
+      ActiveRecord::Base.establish_connection adapter: "mysql", database: "groupdate_test", username: "root"
       create_tables
       true
     end

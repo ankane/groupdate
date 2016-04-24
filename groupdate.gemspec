@@ -30,6 +30,6 @@ Gem::Specification.new do |spec|
     spec.add_development_dependency "activerecord-jdbcmysql-adapter"
   else
     spec.add_development_dependency "pg"
-    spec.add_development_dependency "mysql2", "~> 0.3.20"
+    spec.add_development_dependency "mysql"
   end
 end
