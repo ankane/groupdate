@@ -130,7 +130,7 @@ module Groupdate
           lambda { |k| k.to_i }
         else
           utc = ActiveSupport::TimeZone["UTC"]
-          lambda { |k| (k.is_a?(String) ? utc.parse(k) : k.to_time).in_time_zone(time_zone) }
+          lambda { |k| (k.is_a?(String) || !k.respond_to?(:to_time) ? utc.parse(k.to_s) : k.to_time).in_time_zone(time_zone) }
         end
 
       count =

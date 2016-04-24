@@ -270,7 +270,11 @@ module TestDatabase
 
   def test_associations
     user = create_user("2014-03-01 00:00:00 UTC")
-    assert_empty user.posts.group_by_day(:created_at).count
+    user.posts.create!(created_at: "2014-04-01 00:00:00 UTC")
+    expected = {
+      utc.parse("2014-04-01 00:00:00 UTC") => 1
+    }
+    assert_equal expected, user.posts.group_by_day(:created_at).count
   end
 
   # activerecord default_timezone option
@@ -320,12 +324,18 @@ module TestDatabase
   end
 
   def create_user(created_at, score = 1)
-    User.create!(
-      name: "Andrew",
-      score: score,
-      created_at: created_at ? utc.parse(created_at) : nil,
-      created_on: created_at ? Date.parse(created_at) : nil
-    )
+    user =
+      User.create!(
+        name: "Andrew",
+        score: score,
+        created_at: created_at ? utc.parse(created_at) : nil,
+        created_on: created_at ? Date.parse(created_at) : nil
+      )
+
+    # hack for MySQL adapter
+    user.update_attributes(created_at: nil, created_on: nil) if created_at.nil?
+
+    user
   end
 
   def teardown
@@ -864,7 +874,6 @@ module TestGroupdate
 
   def test_zeros_null_value
     create_user nil
-    User.update_all created_at: nil, created_on: nil # for MySQL adapter
     assert_equal 0, call_method(:hour_of_day, :created_at, range: true)[0]
   end
 
