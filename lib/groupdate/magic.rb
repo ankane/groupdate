@@ -85,6 +85,10 @@ module Groupdate
           raise "Connection adapter not supported: #{adapter_name}"
         end
 
+      if adapter_name == "MySQL" && field == :week
+        query[0] = "CAST(#{query[0]} AS DATETIME)"
+      end
+
       group = relation.group(Groupdate::OrderHack.new(relation.send(:sanitize_sql_array, query), field, time_zone))
       if options[:series] == false
         group
@@ -126,7 +130,7 @@ module Groupdate
           lambda { |k| k.to_i }
         else
           utc = ActiveSupport::TimeZone["UTC"]
-          lambda { |k| (k.is_a?(String) ? utc.parse(k) : k.to_time).in_time_zone(time_zone) }
+          lambda { |k| (k.is_a?(String) ? utc.parse(k) : (k.is_a?(BigDecimal) ? Time.at(k) : k.to_time)).in_time_zone(time_zone) }
         end
 
       count =

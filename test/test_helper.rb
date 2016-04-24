@@ -864,6 +864,7 @@ module TestGroupdate
 
   def test_zeros_null_value
     create_user nil
+    User.update_all created_at: nil, created_on: nil # for MySQL adapter
     assert_equal 0, call_method(:hour_of_day, :created_at, range: true)[0]
   end
 
