@@ -333,7 +333,7 @@ module TestDatabase
       )
 
     # hack for MySQL adapter
-    user.update_attributes(created_at: nil, created_on: nil) if created_at.nil?
+    # user.update_attributes(created_at: nil, created_on: nil) if created_at.nil?
 
     user
   end
