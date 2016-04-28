@@ -26,7 +26,7 @@ module ActiveRecord
   module Associations
     class CollectionProxy
       if ActiveRecord::VERSION::MAJOR == 3
-        delegate *Groupdate::METHODS, to: :scoped
+        delegate(*Groupdate::METHODS, to: :scoped)
       end
     end
   end
