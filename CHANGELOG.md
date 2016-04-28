@@ -1,6 +1,7 @@
-## 2.5.3 [unreleased]
+## 2.5.3
 
 - All tests green with `mysql` gem
+- Added support for decimal day start
 
 ## 2.5.2
 
