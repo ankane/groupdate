@@ -172,7 +172,7 @@ The entire series is returned by default. To exclude points without data, use:
 User.group_by_day(:created_at, series: false).count
 ```
 
-Or you change the default value with:
+Or change the default value with:
 
 ```ruby
 User.group_by_day(:created_at, default_value: "missing").count
