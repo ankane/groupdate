@@ -166,7 +166,7 @@ Takes a `String`, which is passed to [strftime](http://strfti.me/), or a `Symbol
 
 ### Series
 
-The entire series is returned by default. To exclude points withouts data, use:
+The entire series is returned by default. To exclude points without data, use:
 
 ```ruby
 User.group_by_day(:created_at, series: false).count
