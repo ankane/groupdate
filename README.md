@@ -164,6 +164,20 @@ User.group_by_hour_of_day(:created_at, format: "%-l %P").count
 
 Takes a `String`, which is passed to [strftime](http://strfti.me/), or a `Symbol`, which is looked up by `I18n.localize` in `i18n` scope 'time.formats', or a `Proc`.  You can pass a locale with the `locale` option.
 
+### Series
+
+The entire series is returned by default. To exclude points withouts data, use:
+
+```ruby
+User.group_by_day(:created_at, series: false).count
+```
+
+Or you change the default value with:
+
+```ruby
+User.group_by_day(:created_at, default_value: "missing").count
+```
+
 ### Dynamic Grouping
 
 ```ruby
