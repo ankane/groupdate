@@ -7,7 +7,7 @@ The simplest way to group by:
 - hour of the day
 - and more (complete list below)
 
-:tada: Time zones supported!! **the best part**
+:tada: Time zones - including daylight saving time - supported!! **the best part**
 
 :cake: Get the entire series - **the other best part**
 
@@ -19,14 +19,16 @@ Supports PostgreSQL and MySQL, plus arrays and hashes
 
 :cupid: Goes hand in hand with [Chartkick](http://ankane.github.io/chartkick/)
 
+**Groupdate 3.0 was just released!** See [instructions for upgrading](#30). If you use Chartkick with Groupdate, we recommend Chartkick 2.0 and above.
+
 ## Get Started
 
 ```ruby
 User.group_by_day(:created_at).count
 # {
-#   2013-04-16 00:00:00 UTC => 50,
-#   2013-04-17 00:00:00 UTC => 100,
-#   2013-04-18 00:00:00 UTC => 34
+#   Sat, 28 May 2016 => 50,
+#   Sun, 29 May 2016 => 100,
+#   Mon, 30 May 2016 => 34
 # }
 ```
 
@@ -65,9 +67,9 @@ or
 ```ruby
 User.group_by_week(:created_at, time_zone: "Pacific Time (US & Canada)").count
 # {
-#   2013-03-10 00:00:00 PST => 70,
-#   2013-03-17 00:00:00 PDT => 54,
-#   2013-03-24 00:00:00 PDT => 80
+#   Sun, 06 Mar 2016 => 70,
+#   Sun, 13 Mar 2016 => 54,
+#   Sun, 20 Mar 2016 => 80
 # }
 ```
 
@@ -137,24 +139,7 @@ User.group_by_day(:created_at).order("day desc").count
 
 ### Keys
 
-Keys are returned as time objects for the start of the period.
-
-To get keys as date objects instead, use:
-
-```ruby
-User.group_by_day(:created_at, dates: true).count
-# {
-#   2013-03-10 => 70,
-#   2013-03-17 => 54,
-#   2013-03-24 => 80
-# }
-```
-
-or make this the default with:
-
-```ruby
-Groupdate.dates = true
-```
+Keys are returned as date or time objects for the start of the period.
 
 To get keys in a different format, use:
 
@@ -229,9 +214,19 @@ mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 
 or copy and paste [these statements](https://gist.githubusercontent.com/ankane/1d6b0022173186accbf0/raw/time_zone_support.sql) into a SQL console.
 
-## Upgrading to 2.0
+## Upgrading
 
-Groupdate 2.0 brings a number a great improvements.  Here are two things to be aware of:
+### 3.0
+
+Groupdate 3.0 brings a number of improvements.  Here are a few to be aware of:
+
+- `Date` objects are now returned for day, week, month, quarter, and year by default. Use `dates: false` for the previous behavior, or change this globally with `Groupdate.dates = false`.
+- Array and hash methods no longer return the entire series by default. Use `series: true` for the previous behavior.
+- The `series: false` option now returns the correct type and order, and plays nicely with other options.
+
+### 2.0
+
+Groupdate 2.0 brings a number of improvements.  Here are two things to be aware of:
 
 - the entire series is returned by default
 - `ActiveSupport::TimeWithZone` keys are now returned for every database adapter - adapters previously returned `Time` or `String` keys

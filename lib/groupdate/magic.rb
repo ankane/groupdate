@@ -15,11 +15,7 @@ module Groupdate
 
     def group_by(enum, &_block)
       group = enum.group_by { |v| v = yield(v); v ? round_time(v) : nil }
-      if options[:series] == false
-        group
-      else
-        series(group, [])
-      end
+      series(group, [], false, false, false)
     end
 
     def relation(column, relation)
@@ -90,22 +86,18 @@ module Groupdate
       end
 
       group = relation.group(Groupdate::OrderHack.new(relation.send(:sanitize_sql_array, query), field, time_zone))
-      if options[:series] == false
-        group
-      else
-        relation =
-          if time_range.is_a?(Range)
-            # doesn't matter whether we include the end of a ... range - it will be excluded later
-            group.where("#{column} >= ? AND #{column} <= ?", time_range.first, time_range.last)
-          else
-            group.where("#{column} IS NOT NULL")
-          end
+      relation =
+        if time_range.is_a?(Range)
+          # doesn't matter whether we include the end of a ... range - it will be excluded later
+          group.where("#{column} >= ? AND #{column} <= ?", time_range.first, time_range.last)
+        else
+          group.where("#{column} IS NOT NULL")
+        end
 
-        # TODO do not change object state
-        @group_index = group.group_values.size - 1
+      # TODO do not change object state
+      @group_index = group.group_values.size - 1
 
-        Groupdate::Series.new(self, relation)
-      end
+      Groupdate::Series.new(self, relation)
     end
 
     def perform(relation, method, *args, &block)
@@ -175,7 +167,7 @@ module Groupdate
       end
     end
 
-    def series(count, default_value, multiple_groups = false, reverse = false)
+    def series(count, default_value, multiple_groups = false, reverse = false, series_default = true)
       reverse = !reverse if options[:reverse]
 
       series =
@@ -238,6 +230,7 @@ module Groupdate
       series = series.to_a.reverse if !multiple_groups && reverse
 
       locale = options[:locale] || I18n.locale
+      use_dates = options.key?(:dates) ? options[:dates] : Groupdate.dates
       key_format =
         if options[:format]
           if options[:format].respond_to?(:call)
@@ -258,11 +251,16 @@ module Groupdate
               I18n.localize(key, format: options[:format], locale: locale)
             end
           end
-        elsif (options[:dates] || (Groupdate.dates && !options.key?(:dates))) && [:day, :week, :month, :quarter, :year].include?(field)
+        elsif [:day, :week, :month, :quarter, :year].include?(field) && use_dates
           lambda { |k| k.to_date }
         else
           lambda { |k| k }
         end
+
+      use_series = options.key?(:series) ? options[:series] : series_default
+      if use_series == false
+        series = series.select { |k| count[k] }
+      end
 
       value = 0
       Hash[series.map do |k|

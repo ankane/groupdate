@@ -1,3 +1,11 @@
+## 3.0.0 [unreleased]
+
+Breaking changes
+
+- `Date` objects are now returned for day, week, month, quarter, and year by default. Use `dates: false` for the previous behavior, or change this globally with `Groupdate.dates = false`.
+- Array and hash methods no longer return the entire series by default. Use `series: true` for the previous behavior.
+- The `series: false` option now returns the correct types and order, and plays nicely with other options.
+
 ## 2.5.3
 
 - All tests green with `mysql` gem

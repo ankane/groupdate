@@ -12,7 +12,7 @@ module Groupdate
   mattr_accessor :week_start, :day_start, :time_zone, :dates
   self.week_start = :sun
   self.day_start = 0
-  self.dates = false
+  self.dates = true
 end
 
 require "groupdate/enumerable"
