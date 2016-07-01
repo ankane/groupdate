@@ -352,9 +352,13 @@ module TestDatabase
     user = User.last if user.id.nil?
 
     # hack for MySQL & Redshift adapters
-    user.update_attributes(created_at: nil, created_on: nil) if created_at.nil?
+    user.update_attributes(created_at: nil, created_on: nil) if created_at.nil? && is_redshift?
 
     user
+  end
+
+  def is_redshift?
+    ActiveRecord::Base.connection.adapter_name == "Redshift"
   end
 
   def teardown
