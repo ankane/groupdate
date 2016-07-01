@@ -49,6 +49,22 @@ def create_tables
   end
 end
 
+def create_redshift_tables
+  ActiveRecord::Migration.verbose = false
+
+  if ActiveRecord::Migration.table_exists?(:users)
+    ActiveRecord::Migration.drop_table(:users, force: :cascade)
+  end
+
+  if ActiveRecord::Migration.table_exists?(:posts)
+    ActiveRecord::Migration.drop_table(:posts, force: :cascade)
+  end
+
+  ActiveRecord::Migration.execute "CREATE TABLE users (id INT IDENTITY(1,1) PRIMARY KEY, name VARCHAR(255), score INT, created_at DATETIME, created_on DATE);"
+
+  ActiveRecord::Migration.execute "CREATE TABLE posts (id INT IDENTITY(1,1) PRIMARY KEY, user_id INT REFERENCES users, created_at DATETIME);"
+end
+
 module TestDatabase
   def test_zeros_previous_scope
     create_user "2013-05-01"
@@ -332,8 +348,11 @@ module TestDatabase
         created_on: created_at ? Date.parse(created_at) : nil
       )
 
-    # hack for MySQL adapter
-    # user.update_attributes(created_at: nil, created_on: nil) if created_at.nil?
+    # hack for Redshift adapter, which doesn't return id on creation...
+    user = User.last if user.id.nil?
+
+    # hack for MySQL & Redshift adapters
+    user.update_attributes(created_at: nil, created_on: nil) if created_at.nil?
 
     user
   end
