@@ -1,3 +1,7 @@
+## 3.0.1 [unreleased]
+
+- Added support for Redshift
+
 ## 3.0.0
 
 Breaking changes
