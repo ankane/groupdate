@@ -1,7 +1,7 @@
 language: ruby
 rvm:
   - 2.2.4
-  - jruby
+  - jruby-9.0.5.0
 gemfile:
   - Gemfile
   - test/gemfiles/activerecord31.gemfile
