@@ -224,8 +224,14 @@ module Groupdate
               step = 1.send(field)
             end
 
-            while (next_step = round_time(series.last + step)) && time_range.cover?(next_step)
+            last_step = series.last
+            while (next_step = round_time(last_step + step)) && time_range.cover?(next_step)
+              if next_step == last_step
+                last_step += step
+                next
+              end
               series << next_step
+              last_step = next_step
             end
 
             series
