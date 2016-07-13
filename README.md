@@ -11,8 +11,6 @@ The simplest way to group by:
 
 :cake: Get the entire series - **the other best part**
 
-Works with Rails 3.1+
-
 Supports PostgreSQL, MySQL, and Redshift, plus arrays and hashes
 
 [![Build Status](https://travis-ci.org/ankane/groupdate.svg?branch=master)](https://travis-ci.org/ankane/groupdate)
