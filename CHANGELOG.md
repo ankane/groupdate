@@ -1,6 +1,7 @@
-## 3.0.1 [unreleased]
+## 3.0.1
 
 - Added support for Redshift
+- Fix for infinite loop in certain cases for Rails 5
 
 ## 3.0.0
 
