@@ -320,7 +320,7 @@ module Groupdate
         when :hour_of_day
           time.hour
         when :day_of_week
-          (7 - week_start + ((time.wday - 1) % 7) % 7)
+          time.wday
         when :day_of_month
           time.day
         when :month_of_year

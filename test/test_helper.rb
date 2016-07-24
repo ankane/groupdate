@@ -962,17 +962,17 @@ module TestGroupdate
 
   def test_format_hour_of_day_day_start
     create_user "2014-03-01"
-    assert_format :hour_of_day, "2 am", "%-l %P", day_start: 2
+    assert_format :hour_of_day, "12 am", "%-l %P", day_start: 2
   end
 
   def test_format_day_of_week
     create_user "2014-03-01"
-    assert_format :day_of_week, "Sun", "%a"
+    assert_format :day_of_week, "Sat", "%a"
   end
 
   def test_format_day_of_week_week_start
     create_user "2014-03-01"
-    assert_format :day_of_week, "Sun", "%a", week_start: :sat
+    assert_format :day_of_week, "Sat", "%a", week_start: :mon
   end
 
   def test_format_day_of_month
@@ -1016,7 +1016,7 @@ module TestGroupdate
   # helpers
 
   def assert_format(method, expected, format, options = {})
-    assert_equal expected, call_method(method, :created_at, options.merge(format: format, series: true)).keys.first
+    assert_equal({expected => 1}, call_method(method, :created_at, options.merge(format: format, series: false)))
   end
 
   def assert_result_time(method, expected, time_str, time_zone = false, options = {})
