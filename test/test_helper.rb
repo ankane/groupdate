@@ -378,7 +378,7 @@ module TestGroupdate
   # second
 
   def test_second_end_of_second
-    if enumerable_test? || (ActiveRecord::Base.connection.adapter_name == "Mysql2" && ActiveRecord::VERSION::STRING.starts_with?("4.2."))
+    if enumerable_test? || ActiveRecord::Base.connection.adapter_name == "Mysql2"
       skip # no millisecond precision
     else
       assert_result_time :second, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:00.999"
@@ -968,6 +968,11 @@ module TestGroupdate
   def test_format_day_of_week
     create_user "2014-03-01"
     assert_format :day_of_week, "Sat", "%a"
+  end
+
+  def test_format_day_of_week_day_start
+    create_user "2014-03-01"
+    assert_format :day_of_week, "Fri", "%a", day_start: 2
   end
 
   def test_format_day_of_week_week_start
