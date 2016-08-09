@@ -1,3 +1,8 @@
+## 3.0.2 [unreleased]
+
+- Fixed `group_by_period` with associations
+- Fixed `week_start` option for enumerables
+
 ## 3.0.1
 
 - Added support for Redshift
