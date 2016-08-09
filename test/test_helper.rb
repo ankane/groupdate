@@ -293,6 +293,15 @@ module TestDatabase
     assert_equal expected, user.posts.group_by_day(:created_at).count
   end
 
+  def test_associations_period
+    user = create_user("2014-03-01")
+    user.posts.create!(created_at: "2014-04-01 00:00:00 UTC")
+    expected = {
+      Date.parse("2014-04-01") => 1
+    }
+    assert_equal expected, user.posts.group_by_period(:day, :created_at).count
+  end
+
   # activerecord default_timezone option
 
   def test_default_timezone_local

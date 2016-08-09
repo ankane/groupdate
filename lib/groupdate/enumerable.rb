@@ -11,13 +11,20 @@ module Enumerable
     end
   end
 
-  def group_by_period(period, options = {}, &block)
-    # to_sym is unsafe on user input, so convert to strings
-    permitted_periods = ((options[:permit] || Groupdate::PERIODS).map(&:to_sym) & Groupdate::PERIODS).map(&:to_s)
-    if permitted_periods.include?(period.to_s)
-      send("group_by_#{period}", options, &block)
+  def group_by_period(*args, &block)
+    if block || !respond_to?(:scoping)
+      period = args[0]
+      options = args[1] || {}
+
+      # to_sym is unsafe on user input, so convert to strings
+      permitted_periods = ((options[:permit] || Groupdate::PERIODS).map(&:to_sym) & Groupdate::PERIODS).map(&:to_s)
+      if permitted_periods.include?(period.to_s)
+        send("group_by_#{period}", options, &block)
+      else
+        raise ArgumentError, "Unpermitted period"
+      end
     else
-      raise ArgumentError, "Unpermitted period"
+      scoping { @klass.send(:group_by_period, *args, &block) }
     end
   end
 end
