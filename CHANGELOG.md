@@ -1,4 +1,4 @@
-## 3.0.2 [unreleased]
+## 3.0.2
 
 - Fixed `group_by_period` with associations
 - Fixed `week_start` option for enumerables
