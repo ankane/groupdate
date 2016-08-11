@@ -251,9 +251,4 @@ Groupdate follows [Semantic Versioning](http://semver.org/)
 
 ## Contributing
 
-Everyone is encouraged to help improve this project. Here are a few ways you can help:
-
-- [Report bugs](https://github.com/ankane/groupdate/issues)
-- Fix bugs and [submit pull requests](https://github.com/ankane/groupdate/pulls)
-- Write, clarify, or fix documentation
-- Suggest or add new features
+To contribute to the Groupdate codebase, see the [CONTRIBUTING.md](/CONTRIBUTING.md) file.
