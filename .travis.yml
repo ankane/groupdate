@@ -2,6 +2,7 @@ language: ruby
 rvm:
   - 2.2.4
   - jruby
+  - jruby-9.0.5.0
 gemfile:
   - Gemfile
   - test/gemfiles/activerecord31.gemfile
@@ -22,6 +23,9 @@ notifications:
     on_success: never
     on_failure: change
 matrix:
+  exclude:
+    - gemfile: test/gemfiles/activerecord50.gemfile
+      rvm: jruby
   allow_failures:
     - rvm: jruby
       gemfile: Gemfile
