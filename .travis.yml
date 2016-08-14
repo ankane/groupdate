@@ -1,14 +1,17 @@
 language: ruby
 rvm:
-  - 2.2.4
+  - 2.3.1
+  - 2.2.5
+  - jruby-9.0.5.0
   - jruby
 gemfile:
   - Gemfile
-  - test/gemfiles/activerecord31.gemfile
-  - test/gemfiles/activerecord32.gemfile
-  - test/gemfiles/activerecord40.gemfile
-  - test/gemfiles/activerecord41.gemfile
+  - test/gemfiles/activerecord50.gemfile
   - test/gemfiles/activerecord42.gemfile
+  - test/gemfiles/activerecord41.gemfile
+  - test/gemfiles/activerecord40.gemfile
+  - test/gemfiles/activerecord32.gemfile
+  - test/gemfiles/activerecord31.gemfile
 sudo: false
 script: RUBYOPT=W0 bundle exec rake test
 before_install:
@@ -21,7 +24,16 @@ notifications:
     on_success: never
     on_failure: change
 matrix:
+  exclude:
+    - gemfile: test/gemfiles/activerecord50.gemfile
+      rvm: jruby
   allow_failures:
+    - rvm: 2.3.1
+      gemfile: test/gemfiles/activerecord31.gemfile
+    - rvm: jruby-9.0.5.0
+      gemfile: Gemfile
+    - rvm: jruby-9.0.5.0
+      gemfile: test/gemfiles/activerecord50.gemfile
     - rvm: jruby
       gemfile: Gemfile
     - rvm: jruby
