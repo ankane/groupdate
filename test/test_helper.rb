@@ -93,6 +93,8 @@ module TestDatabase
   end
 
   def test_table_name
+    # This test is to ensure there's not an error when using the table
+    # name as part of the column name.
     assert_empty User.group_by_day("users.created_at").count
   end
 
@@ -192,7 +194,7 @@ module TestDatabase
     assert_raises(NoMethodError) { User.group_by_day(:created_at).no_such_method }
   end
 
-  def test_respond_to_where
+  def test_respond_to_order
     assert User.group_by_day(:created_at).respond_to?(:order)
   end
 
@@ -343,6 +345,8 @@ module TestDatabase
   def test_no_column
     assert_raises(ArgumentError) { User.group_by_day.first }
   end
+
+  private
 
   def call_method(method, field, options)
     User.group_by_period(method, field, options).count
@@ -1026,6 +1030,8 @@ module TestGroupdate
   def test_day_start_decimal_start_of_day
     assert_result_date :day, "2013-05-03", "2013-05-03 02:30:00", false, day_start: 2.5
   end
+
+  private
 
   # helpers
 
