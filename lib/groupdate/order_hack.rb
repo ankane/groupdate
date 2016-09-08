@@ -4,7 +4,7 @@ module Groupdate
 
     def initialize(str, field, time_zone)
       super(str)
-      @field = field
+      @field = field.to_s
       @time_zone = time_zone
     end
   end

@@ -1,19 +1,15 @@
-require "test_helper"
+require_relative "test_helper"
 
-class TestMysql < Minitest::Unit::TestCase
+class TestMysql < Minitest::Test
   include TestGroupdate
+  include TestDatabase
 
   def setup
     super
-    User.establish_connection :adapter => "mysql2", :database => "groupdate_test", :username => "root"
+    @@setup ||= begin
+      ActiveRecord::Base.establish_connection adapter: "mysql2", database: "groupdate_test", username: "root"
+      create_tables
+      true
+    end
   end
-
-  def time_key(key)
-    key
-  end
-
-  def number_key(key)
-    key
-  end
-
 end
