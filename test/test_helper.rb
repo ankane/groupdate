@@ -304,15 +304,6 @@ module TestDatabase
     assert_equal expected, user.posts.group_by_period(:day, :created_at).count
   end
 
-  # activerecord default_timezone option
-
-  def test_default_timezone_local
-    User.default_timezone = :local
-    assert_raises(RuntimeError) { User.group_by_day(:created_at).count }
-  ensure
-    User.default_timezone = :utc
-  end
-
   # Brasilia Summer Time
 
   def test_brasilia_summer_time
