@@ -42,6 +42,7 @@ You can group by:
 - month
 - quarter
 - year
+- time_range
 
 and
 
@@ -137,6 +138,18 @@ To exclude the current period, use:
 
 ```ruby
 User.group_by_week(:created_at, last: 8, current: false).count
+```
+
+### Group by time range
+
+To group by specific time range, use:
+
+```ruby
+User.group_by_time_range(:created_at,
+  time_range_end: Time.now,
+  time_ranges_count: 6,
+  time_range_length: 2.weeks
+)
 ```
 
 ### Order
