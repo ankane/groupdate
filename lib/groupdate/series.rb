@@ -10,9 +10,9 @@ module Groupdate
     # clone to prevent modifying original variables
     def method_missing(method, *args, &block)
       # https://github.com/rails/rails/blob/master/activerecord/lib/active_record/relation/calculations.rb
-      if ActiveRecord::Calculations.method_defined?(method)
+      if ActiveRecord::Calculations.method_defined?(method) || custom_calculation_methods.include?(method)
         magic.perform(relation, method, *args, &block)
-      elsif @relation.respond_to?(method, true)
+      elsif relation.respond_to?(method, true)
         Groupdate::Series.new(magic, relation.send(method, *args, &block))
       else
         super
@@ -25,6 +25,16 @@ module Groupdate
 
     def reverse_order_value
       nil
+    end
+
+    private
+
+    def model
+      relation.try(:model)
+    end
+
+    def custom_calculation_methods
+      model.try(:groupdate_calculation_methods) || []
     end
   end
 end

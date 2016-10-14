@@ -18,6 +18,14 @@ ActiveRecord::Base.time_zone_aware_attributes = true
 
 class User < ActiveRecord::Base
   has_many :posts
+
+  def self.groupdate_calculation_methods
+    [:avg_score]
+  end
+
+  def self.avg_score
+    average(:score)
+  end
 end
 
 class Post < ActiveRecord::Base
@@ -1029,6 +1037,22 @@ module TestGroupdate
 
   def test_day_start_decimal_start_of_day
     assert_result_date :day, "2013-05-03", "2013-05-03 02:30:00", false, day_start: 2.5
+  end
+
+  # custom aggregate model methods
+
+  def test_custom_model_aggregate_method
+    create_user "2014-05-01 00:00:00 UTC", 11
+    create_user "2014-05-01 00:00:00 UTC",  5
+    create_user "2014-05-03 00:00:00 UTC", 20
+
+    expected = {
+      Date.parse("2014-05-01") => (16.0 / 2.0).to_d,
+      Date.parse("2014-05-02") => 0.0.to_d,
+      Date.parse("2014-05-03") => 20.0.to_d
+    }
+
+    assert_equal expected, User.group_by_day(:created_at).avg_score
   end
 
   private
