@@ -354,6 +354,22 @@ module TestDatabase
     assert_raises(ArgumentError) { User.group_by_day.first }
   end
 
+  # custom aggregate model methods
+
+  def test_custom_model_aggregate_method
+    create_user "2014-05-01 00:00:00 UTC", 11
+    create_user "2014-05-01 00:00:00 UTC",  5
+    create_user "2014-05-03 00:00:00 UTC", 20
+
+    expected = {
+      Date.parse("2014-05-01") => (16.0 / 2.0).to_d,
+      Date.parse("2014-05-02") => 0.0.to_d,
+      Date.parse("2014-05-03") => 20.0.to_d
+    }
+
+    assert_equal expected, User.group_by_day(:created_at).avg_score
+  end
+
   private
 
   def call_method(method, field, options)
@@ -1037,22 +1053,6 @@ module TestGroupdate
 
   def test_day_start_decimal_start_of_day
     assert_result_date :day, "2013-05-03", "2013-05-03 02:30:00", false, day_start: 2.5
-  end
-
-  # custom aggregate model methods
-
-  def test_custom_model_aggregate_method
-    create_user "2014-05-01 00:00:00 UTC", 11
-    create_user "2014-05-01 00:00:00 UTC",  5
-    create_user "2014-05-03 00:00:00 UTC", 20
-
-    expected = {
-      Date.parse("2014-05-01") => (16.0 / 2.0).to_d,
-      Date.parse("2014-05-02") => 0.0.to_d,
-      Date.parse("2014-05-03") => 20.0.to_d
-    }
-
-    assert_equal expected, User.group_by_day(:created_at).avg_score
   end
 
   private
