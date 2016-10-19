@@ -30,7 +30,9 @@ module Groupdate
     private
 
     def model
-      relation.try(:model)
+      return if !relation.respond_to?(:klass)
+
+      relation.klass
     end
 
     def custom_calculation_methods
