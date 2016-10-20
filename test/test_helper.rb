@@ -20,11 +20,11 @@ class User < ActiveRecord::Base
   has_many :posts
 
   def self.groupdate_calculation_methods
-    [:average_score]
+    [:distinct_scores_count]
   end
 
-  def self.average_score
-    average(:score)
+  def self.distinct_scores_count
+    distinct.count(:score)
   end
 end
 
@@ -357,17 +357,18 @@ module TestDatabase
   # custom aggregate model methods
 
   def test_custom_model_aggregate_method
-    create_user "2014-05-01", 11
-    create_user "2014-05-01",  5
-    create_user "2014-05-03", 20
+    create_user "2014-05-01", 1
+    create_user "2014-05-01", 1
+    create_user "2014-05-01", 2
+    create_user "2014-05-03", 3
 
     expected = {
-      Date.parse("2014-05-01") =>  8.0,
-      Date.parse("2014-05-02") =>  0.0,
-      Date.parse("2014-05-03") => 20.0
+      Date.parse("2014-05-01") => 2,
+      Date.parse("2014-05-02") => 0,
+      Date.parse("2014-05-03") => 1
     }
 
-    assert_equal expected, User.group_by_day(:created_at).average_score
+    assert_equal expected, User.group_by_day(:created_at).distinct_scores_count
   end
 
   private
