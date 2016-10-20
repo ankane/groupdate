@@ -361,9 +361,9 @@ module TestDatabase
   # custom model calculation methods
 
   def test_custom_model_calculation_method
-    create_user "2014-05-01", 1
-    create_user "2014-05-01", 2
-    create_user "2014-05-03", 3
+    create_user "2014-05-01"
+    create_user "2014-05-01"
+    create_user "2014-05-03"
 
     expected = {
       Date.parse("2014-05-01") => 2,
