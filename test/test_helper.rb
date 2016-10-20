@@ -18,6 +18,18 @@ ActiveRecord::Base.time_zone_aware_attributes = true
 
 class User < ActiveRecord::Base
   has_many :posts
+
+  def self.groupdate_calculation_methods
+    [:custom_count, :undefined_calculation]
+  end
+
+  def self.custom_count
+    count
+  end
+
+  def self.unlisted_calculation
+    count
+  end
 end
 
 class Post < ActiveRecord::Base
@@ -344,6 +356,32 @@ module TestDatabase
 
   def test_no_column
     assert_raises(ArgumentError) { User.group_by_day.first }
+  end
+
+  # custom model calculation methods
+
+  def test_custom_model_calculation_method
+    create_user "2014-05-01", 1
+    create_user "2014-05-01", 2
+    create_user "2014-05-03", 3
+
+    expected = {
+      Date.parse("2014-05-01") => 2,
+      Date.parse("2014-05-02") => 0,
+      Date.parse("2014-05-03") => 1
+    }
+
+    assert_equal expected, User.group_by_day(:created_at).custom_count
+  end
+
+  def test_using_unlisted_calculation_method_returns_new_series_instance
+    assert_instance_of Groupdate::Series, User.group_by_day(:created_at).unlisted_calculation
+  end
+
+  def test_using_listed_but_undefined_custom_calculation_method_raises_error
+    assert_raises(RuntimeError) do
+      User.group_by_day(:created_at).undefined_calculation
+    end
   end
 
   private
