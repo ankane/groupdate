@@ -20,11 +20,11 @@ class User < ActiveRecord::Base
   has_many :posts
 
   def self.groupdate_calculation_methods
-    [:distinct_scores_count]
+    [:custom_count]
   end
 
-  def self.distinct_scores_count
-    distinct.count(:score)
+  def self.custom_count
+    count
   end
 end
 
@@ -358,7 +358,6 @@ module TestDatabase
 
   def test_custom_model_aggregate_method
     create_user "2014-05-01", 1
-    create_user "2014-05-01", 1
     create_user "2014-05-01", 2
     create_user "2014-05-03", 3
 
@@ -368,7 +367,7 @@ module TestDatabase
       Date.parse("2014-05-03") => 1
     }
 
-    assert_equal expected, User.group_by_day(:created_at).distinct_scores_count
+    assert_equal expected, User.group_by_day(:created_at).custom_count
   end
 
   private
