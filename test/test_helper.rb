@@ -379,7 +379,7 @@ module TestDatabase
   end
 
   def test_using_listed_but_undefined_custom_calculation_method_raises_error
-    assert_raises do
+    assert_raises(RuntimeError) do
       User.group_by_day(:created_at).undefined_calculation
     end
   end
