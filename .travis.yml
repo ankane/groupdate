@@ -4,7 +4,6 @@ rvm:
   - jruby-9.1.5.0
 gemfile:
   - Gemfile
-  - test/gemfiles/activerecord31.gemfile
   - test/gemfiles/activerecord32.gemfile
   - test/gemfiles/activerecord40.gemfile
   - test/gemfiles/activerecord41.gemfile
