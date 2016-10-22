@@ -1,3 +1,7 @@
+## 3.1.0 [unreleased]
+
+- Better date range handling for `range` option
+
 ## 3.0.2
 
 - Fixed `group_by_period` with associations

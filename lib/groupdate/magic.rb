@@ -174,7 +174,12 @@ module Groupdate
     def time_range
       @time_range ||= begin
         time_range = options[:range]
-        if !time_range && options[:last]
+        if time_range.is_a?(Range) && time_range.first.is_a?(Date)
+          # convert range of dates to range of times
+          last = time_range.last.in_time_zone(time_zone)
+          last += 1.day unless time_range.exclude_end?
+          time_range = Range.new(time_range.first.in_time_zone(time_zone), last, true)
+        elsif !time_range && options[:last]
           step = 1.send(field) if 1.respond_to?(field)
           if step
             now = Time.now

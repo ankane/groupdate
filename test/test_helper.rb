@@ -1059,6 +1059,31 @@ module TestGroupdate
     assert_equal expected, result(:day, "2013-05-03", true, dates: true)
   end
 
+  # date range
+
+  def test_date_range
+    ENV["TZ"] = "Europe/Oslo"
+    expected = {
+      Date.parse("2013-05-01") => 0,
+      Date.parse("2013-05-02") => 0,
+      Date.parse("2013-05-03") => 0
+    }
+    assert_equal expected, User.group_by_day(:created_at, range: Date.parse("2013-05-01")..Date.parse("2013-05-03")).count
+  ensure
+    ENV["TZ"] = "UTC"
+  end
+
+  def test_date_range_exclude_end
+    ENV["TZ"] = "Europe/Oslo"
+    expected = {
+      Date.parse("2013-05-01") => 0,
+      Date.parse("2013-05-02") => 0
+    }
+    assert_equal expected, User.group_by_day(:created_at, range: Date.parse("2013-05-01")...Date.parse("2013-05-03")).count
+  ensure
+    ENV["TZ"] = "UTC"
+  end
+
   # day start
 
   def test_day_start_decimal_end_of_day
