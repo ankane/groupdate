@@ -1046,7 +1046,6 @@ module TestGroupdate
   end
 
   def test_date_column_with_time_zone
-    # TODO change for Groupdate 3.0
     expected = {
       Date.parse("2013-05-02") => 1
     }
