@@ -347,12 +347,7 @@ module TestDatabase
     assert_equal 2, User.group_by_day(:created_at, carry_forward: true).count[Date.parse("2014-05-02")]
   end
 
-  # dates
-
-  def test_dates
-    create_user "2014-03-01 12:00:00 UTC"
-    assert_equal ({Date.parse("2014-03-01") => 1}), User.group_by_day(:created_at, dates: true).count
-  end
+  # no column
 
   def test_no_column
     assert_raises(ArgumentError) { User.group_by_day.first }
@@ -1047,16 +1042,26 @@ module TestGroupdate
     expected = {
       Date.parse("2013-05-03") => 1
     }
-    assert_equal expected, result(:day, "2013-05-03", false, dates: true)
+    assert_equal expected, result(:day, "2013-05-03", false)
   end
 
   def test_date_column_with_time_zone
     # TODO change for Groupdate 3.0
-    skip
+    expected = {
+      Date.parse("2013-05-02") => 1
+    }
+    assert_equal expected, result(:day, "2013-05-03", true)
+  end
+
+  def test_date_column_with_time_zone_false
+    Time.zone = pt
+    create_user "2013-05-03"
     expected = {
       Date.parse("2013-05-03") => 1
     }
-    assert_equal expected, result(:day, "2013-05-03", true, dates: true)
+    assert_equal expected, call_method(:day, :created_at, time_zone: false)
+  ensure
+    Time.zone = nil
   end
 
   # date range

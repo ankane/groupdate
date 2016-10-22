@@ -190,6 +190,14 @@ User.group_by_period(params[:period], :created_at, permit: %w[day week]).count
 
 Raises an `ArgumentError` for unpermitted periods.
 
+### Date Columns [master]
+
+If grouping on date columns which don’t need time zone conversion, use:
+
+```ruby
+User.group_by_period(:day, :created_on, time_zone: false).count
+```
+
 ## Arrays and Hashes
 
 ```ruby

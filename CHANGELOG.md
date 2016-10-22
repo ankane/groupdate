@@ -1,5 +1,6 @@
 ## 3.1.0 [unreleased]
 
+- Better support for date columns with `time_zone: false`
 - Better date range handling for `range` option
 
 ## 3.0.2
