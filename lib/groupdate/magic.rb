@@ -182,11 +182,15 @@ module Groupdate
           last += 1.day unless time_range.exclude_end?
           time_range = Range.new(time_zone.parse(time_range.first.to_s), last, true)
         elsif !time_range && options[:last]
-          step = 1.send(field) if 1.respond_to?(field)
+          if field == :quarter
+            step = 3.months
+          else
+            step = 1.send(field) if 1.respond_to?(field)
+          end
           if step
             now = Time.now
             now -= step if options[:current] == false
-            time_range = round_time(now - (options[:last].to_i - 1).send(field))..now
+            time_range = round_time(now - (options[:last].to_i - 1) * step)..now
           end
         end
         time_range

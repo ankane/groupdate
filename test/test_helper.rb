@@ -235,6 +235,16 @@ module TestDatabase
     assert_equal expected, User.group_by_year(:created_at, last: 2, current: false).count
   end
 
+  def test_quarter_and_last
+    create_user "#{this_year}-#{this_quarters_month}-01"
+    create_user "#{this_year}-#{this_quarters_month - 6}-01"
+    expected = {
+      Date.parse("#{this_year}-#{this_quarters_month - 3}-01") => 0,
+      Date.parse("#{this_year}-#{this_quarters_month}-01") => 1
+    }
+    assert_equal expected, User.group_by_quarter(:created_at, last: 2).count
+  end
+
   def test_format_locale
     create_user "2014-10-01"
     assert_equal ({"Okt" => 1}), User.group_by_day(:created_at, format: "%b", locale: :de).count
@@ -1145,6 +1155,10 @@ module TestGroupdate
       expected[Date.parse(key)] = i == 1 ? 1 : 0
     end
     assert_equal expected, call_method(method, :created_at, options.merge(series: true, time_zone: time_zone ? "Pacific Time (US & Canada)" : nil, range: Time.parse(range_start)..Time.parse(range_end)))
+  end
+
+  def this_quarters_month
+    Time.now.utc.beginning_of_quarter.month
   end
 
   def this_year
