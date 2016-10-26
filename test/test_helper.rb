@@ -225,6 +225,11 @@ module TestDatabase
     assert_equal expected, User.group_by_year(:created_at, last: 3).count
   end
 
+  def test_last_hour_of_day
+    error = assert_raises(ArgumentError) { User.group_by_hour_of_day(:created_at, last: 3).count }
+    assert_equal "Cannot use last option with hour_of_day", error.message
+  end
+
   def test_current
     create_user "#{this_year - 3}-01-01"
     create_user "#{this_year - 1}-01-01"
@@ -272,11 +277,13 @@ module TestDatabase
   # permit
 
   def test_permit
-    assert_raises(ArgumentError, "Unpermitted period") { User.group_by_period(:day, :created_at, permit: %w(week)).count }
+    error = assert_raises(ArgumentError) { User.group_by_period(:day, :created_at, permit: %w(week)).count }
+    assert_equal "Unpermitted period", error.message
   end
 
   def test_permit_bad_period
-    assert_raises(ArgumentError, "Unpermitted period") { User.group_by_period(:bad_period, :created_at).count }
+    error = assert_raises(ArgumentError) { User.group_by_period(:bad_period, :created_at).count }
+    assert_equal "Unpermitted period", error.message
   end
 
   def test_permit_symbol_symbols

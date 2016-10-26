@@ -2,6 +2,7 @@
 
 - Fixed `current: false`
 - Fixed `last` with `group_by_quarter`
+- Raise `ArgumentError` when `last` option is not supported
 
 ## 3.1.0
 

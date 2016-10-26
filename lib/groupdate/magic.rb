@@ -184,8 +184,10 @@ module Groupdate
         elsif !time_range && options[:last]
           if field == :quarter
             step = 3.months
+          elsif 1.respond_to?(field)
+            step = 1.send(field)
           else
-            step = 1.send(field) if 1.respond_to?(field)
+            raise ArgumentError, "Cannot use last option with #{field}"
           end
           if step
             now = Time.now
