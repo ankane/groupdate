@@ -1,4 +1,4 @@
-## 3.1.1 [unreleased]
+## 3.1.1
 
 - Fixed `current: false`
 - Fixed `last` with `group_by_quarter`
