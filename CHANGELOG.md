@@ -1,3 +1,8 @@
+## 3.1.1 [unreleased]
+
+- Fixed `current: false`
+- Fixed `last` with `group_by_quarter`
+
 ## 3.1.0
 
 - Better support for date columns with `time_zone: false`

@@ -189,13 +189,18 @@ module Groupdate
           end
           if step
             now = Time.now
-            now -= step if options[:current] == false
             # loop instead of multiply to change start_at - see #151
             start_at = now
             (options[:last].to_i - 1).times do
               start_at -= step
             end
-            time_range = round_time(start_at)..now
+
+            time_range =
+              if options[:current] == false
+                round_time(start_at - step)...round_time(now)
+              else
+                round_time(start_at)..now
+              end
           end
         end
         time_range
