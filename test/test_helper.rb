@@ -225,6 +225,18 @@ module TestDatabase
     assert_equal expected, User.group_by_year(:created_at, last: 3).count
   end
 
+  def test_last_date
+    Time.zone = pt
+    create_user Date.today.to_s
+    expected = {
+      Date.parse("#{this_year}-#{this_month - 1}-01") => 0,
+      Date.parse("#{this_year}-#{this_month}-01") => 1
+    }
+    assert_equal expected, User.group_by_month(:created_on, last: 2).count
+  ensure
+    Time.zone = nil
+  end
+
   def test_last_hour_of_day
     error = assert_raises(ArgumentError) { User.group_by_hour_of_day(:created_at, last: 3).count }
     assert_equal "Cannot use last option with hour_of_day", error.message
@@ -1165,11 +1177,15 @@ module TestGroupdate
   end
 
   def this_quarters_month
-    Time.now.utc.beginning_of_quarter.month
+    Time.now.beginning_of_quarter.month
   end
 
   def this_year
-    Time.now.utc.year
+    Time.now.year
+  end
+
+  def this_month
+    Time.now.month
   end
 
   def utc
