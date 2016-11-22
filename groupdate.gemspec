@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name          = "groupdate"
   spec.version       = Groupdate::VERSION
   spec.authors       = ["Andrew Kane"]
-  spec.email         = ["acekane1@gmail.com"]
+  spec.email         = ["andrew@chartkick.com"]
   spec.description   = "The simplest way to group temporal data"
   spec.summary       = "The simplest way to group temporal data"
   spec.homepage      = "https://github.com/ankane/groupdate"
