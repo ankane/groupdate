@@ -25,6 +25,25 @@ class TestEnumerable < Minitest::Test
     assert_equal expected, [user_a, user_b].group_by_month(series: true, &:created_at)
   end
 
+  def test_missing_required_options_for_time_range
+    assert_raises(RuntimeError) { [].group_by_time_range(&:created_at) }
+  end
+
+  def test_group_by_time_range
+    user_a = create_user("2014-01-07")
+    user_b = create_user("2014-01-14")
+    user_c = create_user("2014-02-04")
+    expected = {
+      Date.parse("2014-01-06") => [user_a, user_b],
+      Date.parse("2014-01-20") => [],
+      Date.parse("2014-02-03") => [user_c]
+    }
+    assert_equal expected, [user_a, user_b, user_c].group_by_time_range(
+      series: true,
+      time_range_end: Date.parse("2014-02-17"), time_range_length: 2.weeks, time_ranges_count: 3,
+      &:created_at)
+  end
+
   def test_no_block
     assert_raises(ArgumentError) { [].group_by_day(:created_at) }
   end

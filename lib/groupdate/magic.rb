@@ -11,6 +11,10 @@ module Groupdate
       raise "Unrecognized time zone" unless time_zone
 
       raise "Unrecognized :week_start option" if field == :week && !week_start
+
+      if field == :time_range && [:time_range_end, :time_range_length, :time_ranges_count].any? { |o| options[o].blank? }
+        raise "You need to provide :time_range_end, :time_range_length and :time_ranges_count"
+      end
     end
 
     def group_by(enum, &_block)
@@ -18,31 +22,49 @@ module Groupdate
       series(group, [], false, false, false)
     end
 
+    def time_zone_name
+      @time_zone_name ||= self.time_zone.tzinfo.name
+    end
+
+    def database_time_zone_name
+      @database_time_zone_name ||= self.database_time_zone.tzinfo.name
+    end
+
+    def query_with_timezone(query, options = {})
+      [query, options.merge(database_time_zone: database_time_zone_name, time_zone: time_zone_name)]
+    end
+
     def relation(column, relation)
-      if relation.default_timezone == :local
-        raise "ActiveRecord::Base.default_timezone must be :utc to use Groupdate"
+      adapter_name = relation.connection.adapter_name
+      klass = relation
+
+      if field == :time_range
+        time_series = ranges.map { |day| "CONVERT_TZ('#{day}', :database_time_zone, :time_zone)" }
+        time_series_subquery = time_series.map { |day| "select #{day} as day" }.join(" union ")
+        join_query = klass.send(:sanitize_sql_array, ["CROSS JOIN (SELECT sub.day FROM (#{time_series_subquery}) sub) joined ON #{column} > joined.day AND #{column} < DATE_ADD(joined.day, INTERVAL :time_range_length SECOND)",
+                                  time_range_length: options[:time_range_length], time_zone: time_zone_name, database_time_zone: database_time_zone_name])
+        relation = relation.joins(join_query)
       end
 
-      time_zone = self.time_zone.tzinfo.name
-
-      adapter_name = relation.connection.adapter_name
       query =
         case adapter_name
         when "MySQL", "Mysql2", "Mysql2Spatial"
           case field
           when :day_of_week # Sunday = 0, Monday = 1, etc
             # use CONCAT for consistent return type (String)
-            ["DAYOFWEEK(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)) - 1", time_zone]
+            query_with_timezone("DAYOFWEEK(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), :database_time_zone, :time_zone)) - 1")
           when :hour_of_day
-            ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) + 24 - #{day_start / 3600}) % 24", time_zone]
+            query_with_timezone("(EXTRACT(HOUR from CONVERT_TZ(#{column}, :database_time_zone, :time_zone)) + 24 - #{day_start / 3600}) % 24")
           when :day_of_month
-            ["DAYOFMONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?))", time_zone]
+            query_with_timezone("DAYOFMONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), :database_time_zone, :time_zone))")
           when :month_of_year
-            ["MONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?))", time_zone]
+            query_with_timezone("MONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), :database_time_zone, :time_zone))")
           when :week
-            ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL ((#{7 - week_start} + WEEKDAY(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} second)) % 7) DAY) - INTERVAL #{day_start} second, '+00:00', ?), '%Y-%m-%d 00:00:00') + INTERVAL #{day_start} second, ?, '+00:00')", time_zone, time_zone, time_zone]
+            query_with_timezone("CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL ((#{7 - week_start} + WEEKDAY(CONVERT_TZ(#{column}, :database_time_zone, :time_zone) - INTERVAL #{day_start} second)) % 7) DAY) - INTERVAL #{day_start} second, :database_time_zone, :time_zone), '%Y-%m-%d 00:00:00') + INTERVAL #{day_start} second, :time_zone, :database_time_zone)")
+          when :time_range
+            query_with_timezone("CONVERT_TZ(joined.day, :time_zone, :database_time_zone)")
           when :quarter
-            ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(EXTRACT(YEAR FROM CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S'), ?, '+00:00'), INTERVAL #{day_start} second)", time_zone, time_zone, time_zone]
+            query_with_timezone("DATE_ADD(CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(EXTRACT(YEAR FROM CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), :database_time_zone, :time_zone)), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), :database_time_zone, :time_zone)) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S'), :time_zone, :database_time_zone), INTERVAL #{day_start} second)")
           else
             format =
               case field
@@ -60,41 +82,41 @@ module Groupdate
                 "%Y-01-01 00:00:00"
               end
 
-            ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?), '#{format}'), ?, '+00:00'), INTERVAL #{day_start} second)", time_zone, time_zone]
+            query_with_timezone("DATE_ADD(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), :database_time_zone, :time_zone), '#{format}'), :time_zone, :database_time_zone), INTERVAL #{day_start} second)")
           end
         when "PostgreSQL", "PostGIS"
           case field
           when :day_of_week
-            ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
+            query_with_timezone("EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE :time_zone - INTERVAL '#{day_start} second')::integer")
           when :hour_of_day
-            ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
+            query_with_timezone("EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE :time_zone - INTERVAL '#{day_start} second')::integer")
           when :day_of_month
-            ["EXTRACT(DAY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
+            query_with_timezone("EXTRACT(DAY from #{column}::timestamptz AT TIME ZONE :time_zone - INTERVAL '#{day_start} second')::integer")
           when :month_of_year
-            ["EXTRACT(MONTH from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
+            query_with_timezone("EXTRACT(MONTH from #{column}::timestamptz AT TIME ZONE :time_zone - INTERVAL '#{day_start} second')::integer")
           when :week # start on Sunday, not PostgreSQL default Monday
-            ["(DATE_TRUNC('#{field}', (#{column}::timestamptz - INTERVAL '#{week_start} day' - INTERVAL '#{day_start} second') AT TIME ZONE ?) + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second') AT TIME ZONE ?", time_zone, time_zone]
+            query_with_timezone("(DATE_TRUNC('#{field}', (#{column}::timestamptz - INTERVAL '#{week_start} day' - INTERVAL '#{day_start} second') AT TIME ZONE :time_zone) + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second') AT TIME ZONE :time_zone")
           else
-            ["(DATE_TRUNC('#{field}', (#{column}::timestamptz - INTERVAL '#{day_start} second') AT TIME ZONE ?) + INTERVAL '#{day_start} second') AT TIME ZONE ?", time_zone, time_zone]
+            query_with_timezone("(DATE_TRUNC('#{field}', (#{column}::timestamptz - INTERVAL '#{day_start} second') AT TIME ZONE :time_zone) + INTERVAL '#{day_start} second') AT TIME ZONE :time_zone")
           end
         when "Redshift"
           case field
           when :day_of_week # Sunday = 0, Monday = 1, etc.
-            ["EXTRACT(DOW from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
+            query_with_timezone("EXTRACT(DOW from CONVERT_TIMEZONE(:time_zone, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer")
           when :hour_of_day
-            ["EXTRACT(HOUR from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
+            query_with_timezone("EXTRACT(HOUR from CONVERT_TIMEZONE(:time_zone, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer")
           when :day_of_month
-            ["EXTRACT(DAY from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
+            query_with_timezone("EXTRACT(DAY from CONVERT_TIMEZONE(:time_zone, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer")
           when :month_of_year
-            ["EXTRACT(MONTH from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
+            query_with_timezone("EXTRACT(MONTH from CONVERT_TIMEZONE(:time_zone, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer")
           when :week # start on Sunday, not Redshift default Monday
             # Redshift does not return timezone information; it
             # always says it is in UTC time, so we must convert
             # back to UTC to play properly with the rest of Groupdate.
             #
-            ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, CONVERT_TIMEZONE(?, #{column}) - INTERVAL '#{week_start} day' - INTERVAL '#{day_start} second'))::timestamp + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second'", time_zone, field, time_zone]
+            query_with_timezone("CONVERT_TIMEZONE(:time_zone, 'Etc/UTC', DATE_TRUNC(:field, CONVERT_TIMEZONE(:time_zone, #{column}) - INTERVAL '#{week_start} day' - INTERVAL '#{day_start} second'))::timestamp + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second'", field: field)
           else
-            ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, CONVERT_TIMEZONE(?, #{column}) - INTERVAL '#{day_start} second'))::timestamp + INTERVAL '#{day_start} second'", time_zone, field, time_zone]
+            query_with_timezone("CONVERT_TIMEZONE(:time_zone, 'Etc/UTC', DATE_TRUNC(:field, CONVERT_TIMEZONE(:time_zone, #{column}) - INTERVAL '#{day_start} second'))::timestamp + INTERVAL '#{day_start} second'", field: field)
           end
         else
           raise "Connection adapter not supported: #{adapter_name}"
@@ -104,7 +126,7 @@ module Groupdate
         query[0] = "CAST(#{query[0]} AS DATETIME)"
       end
 
-      group = relation.group(Groupdate::OrderHack.new(relation.send(:sanitize_sql_array, query), field, time_zone))
+      group = relation.group(Groupdate::OrderHack.new(klass.send(:sanitize_sql_array, query), field, time_zone_name))
       relation =
         if time_range.is_a?(Range)
           # doesn't matter whether we include the end of a ... range - it will be excluded later
@@ -140,8 +162,7 @@ module Groupdate
         when :day_of_week, :hour_of_day, :day_of_month, :month_of_year
           lambda { |k| k.to_i }
         else
-          utc = ActiveSupport::TimeZone["UTC"]
-          lambda { |k| (k.is_a?(String) || !k.respond_to?(:to_time) ? utc.parse(k.to_s) : k.to_time).in_time_zone(time_zone) }
+          lambda { |k| (k.is_a?(String) || !k.respond_to?(:to_time) ? database_time_zone.parse(k.to_s) : k.to_time).in_time_zone(time_zone) }
         end
 
       count =
@@ -155,6 +176,13 @@ module Groupdate
     end
 
     protected
+
+    def database_time_zone
+      @database_time_zone ||= begin
+        database_time_zone = options[:database_time_zone] || Groupdate.database_time_zone || Time.zone || "Etc/UTC"
+        database_time_zone.is_a?(ActiveSupport::TimeZone) ? database_time_zone : ActiveSupport::TimeZone[database_time_zone]
+      end
+    end
 
     def time_zone
       @time_zone ||= begin
@@ -222,6 +250,8 @@ module Groupdate
           1..31
         when :month_of_year
           1..12
+        when :time_range
+          ranges
         else
           time_range = self.time_range
           time_range =
@@ -263,6 +293,7 @@ module Groupdate
           end
         end
 
+
       series =
         if multiple_groups
           keys = count.keys.map { |k| k[0...@group_index] + k[(@group_index + 1)..-1] }.uniq
@@ -299,7 +330,7 @@ module Groupdate
               I18n.localize(key, format: options[:format], locale: locale)
             end
           end
-        elsif [:day, :week, :month, :quarter, :year].include?(field) && use_dates
+        elsif [:day, :week, :month, :quarter, :year, :time_range].include?(field) && use_dates
           lambda { |k| k.to_date }
         else
           lambda { |k| k }
@@ -315,6 +346,10 @@ module Groupdate
         value = count[k] || (@options[:carry_forward] && value) || default_value
         [multiple_groups ? k[0...@group_index] + [key_format.call(k[@group_index])] + k[(@group_index + 1)..-1] : key_format.call(k), value]
       end]
+    end
+
+    def ranges
+      options[:time_ranges_count].times.map { |r| options[:time_range_end].to_time.in_time_zone(database_time_zone) - (r + 1) * options[:time_range_length] }
     end
 
     def round_time(time)
@@ -334,6 +369,8 @@ module Groupdate
           # same logic as MySQL group
           weekday = (time.wday - 1) % 7
           (time - ((7 - week_start + weekday) % 7).days).midnight
+        when :time_range
+          ranges.detect { |r| time > r && time < r + options[:time_range_length] }
         when :month
           time.beginning_of_month
         when :quarter

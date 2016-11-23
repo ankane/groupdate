@@ -214,6 +214,24 @@ module TestDatabase
     assert !User.group_by_day(:created_at).respond_to?(:no_such_method)
   end
 
+  def test_missing_required_options_for_time_range
+    assert_raises(RuntimeError) { User.group_by_time_range(:created_at) }
+  end
+
+  def test_group_by_time_range_relation
+    create_user("2014-01-07")
+    create_user("2014-01-14")
+    create_user("2014-02-04")
+    expected = {
+      Date.parse("2014-01-06") => 2,
+      Date.parse("2014-01-20") => 0,
+      Date.parse("2014-02-03") => 1
+    }
+    assert_equal expected, User.group_by_time_range(:created_at,
+      series: true,
+      time_range_end: Date.parse("2014-02-17"), time_range_length: 2.weeks, time_ranges_count: 3).count
+  end
+
   def test_last
     create_user "#{this_year - 3}-01-01"
     create_user "#{this_year - 1}-01-01"
@@ -343,15 +361,6 @@ module TestDatabase
       Date.parse("2014-04-01") => 1
     }
     assert_equal expected, user.posts.group_by_period(:day, :created_at).count
-  end
-
-  # activerecord default_timezone option
-
-  def test_default_timezone_local
-    User.default_timezone = :local
-    assert_raises(RuntimeError) { User.group_by_day(:created_at).count }
-  ensure
-    User.default_timezone = :utc
   end
 
   # Brasilia Summer Time
