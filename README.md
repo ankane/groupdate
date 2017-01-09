@@ -234,6 +234,14 @@ mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 
 or copy and paste [these statements](https://gist.githubusercontent.com/ankane/1d6b0022173186accbf0/raw/time_zone_support.sql) into a SQL console.
 
+You can confirm it worked with:
+
+```sql
+SELECT CONVERT_TZ(NOW(), '+00:00', 'Etc/UTC');
+```
+
+It should return the time instead of `NULL`.
+
 ## Upgrading
 
 ### 3.0

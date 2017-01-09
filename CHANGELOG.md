@@ -1,7 +1,3 @@
-## 3.1.2 [unreleased]
-
-- Added `debug_time_zone_support` option
-
 ## 3.1.1
 
 - Fixed `current: false`

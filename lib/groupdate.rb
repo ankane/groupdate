@@ -4,6 +4,8 @@ require "groupdate/version"
 require "groupdate/magic"
 
 module Groupdate
+  class Error < StandardError; end
+
   PERIODS = [:second, :minute, :hour, :day, :week, :month, :quarter, :year, :day_of_week, :hour_of_day, :day_of_month, :month_of_year]
   # backwards compatibility for anyone who happened to use it
   FIELDS = PERIODS
