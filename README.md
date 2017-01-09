@@ -71,6 +71,24 @@ User.group_by_week(:created_at, time_zone: "Pacific Time (US & Canada)").count
 # }
 ```
 
+In the same way you can set your database timezone:
+
+```ruby
+Groupdate.database_time_zone = "Pacific Time (US & Canada)"
+```
+
+or
+
+```ruby
+User.group_by_week(:created_at, database_time_zone: "Pacific Time (US & Canada)").count
+# {
+#   Sun, 06 Mar 2016 => 70,
+#   Sun, 13 Mar 2016 => 54,
+#   Sun, 20 Mar 2016 => 80
+# }
+```
+
+
 Time zone objects also work. To see a list of available time zones in Rails, run `rake time:zones:all`.
 
 ### Week Start

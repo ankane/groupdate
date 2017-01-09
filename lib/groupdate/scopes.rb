@@ -6,6 +6,7 @@ module Groupdate
         options = args[-1].is_a?(Hash) ? args.pop : {}
         options[:time_zone] ||= args[0] unless args[0].nil?
         options[:range] ||= args[1] unless args[1].nil?
+        options[:database_time_zone] ||= args[2] unless args[2].nil?
 
         Groupdate::Magic.new(period, options).relation(field, self)
       end
