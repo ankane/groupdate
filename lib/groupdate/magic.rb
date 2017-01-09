@@ -8,9 +8,9 @@ module Groupdate
       @field = field
       @options = options
 
-      raise "Unrecognized time zone" unless time_zone
+      raise Groupdate::Error, "Unrecognized time zone" unless time_zone
 
-      raise "Unrecognized :week_start option" if field == :week && !week_start
+      raise Groupdate::Error, "Unrecognized :week_start option" if field == :week && !week_start
     end
 
     def group_by(enum, &_block)
@@ -20,7 +20,7 @@ module Groupdate
 
     def relation(column, relation)
       if relation.default_timezone == :local
-        raise "ActiveRecord::Base.default_timezone must be :utc to use Groupdate"
+        raise Groupdate::Error, "ActiveRecord::Base.default_timezone must be :utc to use Groupdate"
       end
 
       time_zone = self.time_zone.tzinfo.name
@@ -97,7 +97,7 @@ module Groupdate
             ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, CONVERT_TIMEZONE(?, #{column}) - INTERVAL '#{day_start} second'))::timestamp + INTERVAL '#{day_start} second'", time_zone, field, time_zone]
           end
         else
-          raise "Connection adapter not supported: #{adapter_name}"
+          raise Groupdate::Error, "Connection adapter not supported: #{adapter_name}"
         end
 
       if adapter_name == "MySQL" && field == :week
@@ -349,7 +349,7 @@ module Groupdate
         when :month_of_year
           time.month
         else
-          raise "Invalid field"
+          raise Groupdate::Error, "Invalid field"
         end
 
       time.is_a?(Time) ? time + day_start.seconds : time
