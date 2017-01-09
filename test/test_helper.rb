@@ -227,10 +227,13 @@ module TestDatabase
 
   def test_last_date
     Time.zone = pt
-    create_user Date.today.to_s
+    today = Date.today
+    create_user today.to_s
+    this_month = today.in_time_zone(pt).beginning_of_month
+    last_month = this_month - 1.month
     expected = {
-      Date.parse("#{this_year}-#{this_month - 1}-01") => 0,
-      Date.parse("#{this_year}-#{this_month}-01") => 1
+      last_month.to_date => 0,
+      this_month.to_date => 1
     }
     assert_equal expected, User.group_by_month(:created_on, last: 2).count
   ensure
@@ -253,11 +256,13 @@ module TestDatabase
   end
 
   def test_quarter_and_last
-    create_user "#{this_year}-#{this_quarters_month}-01"
-    create_user "#{this_year}-#{this_quarters_month - 6}-01"
+    today = Date.today
+    create_user today.to_s
+    this_quarter = today.to_time.beginning_of_quarter
+    last_quarter = this_quarter - 3.months
     expected = {
-      Date.parse("#{this_year}-#{this_quarters_month - 3}-01") => 0,
-      Date.parse("#{this_year}-#{this_quarters_month}-01") => 1
+      last_quarter.to_date => 0,
+      this_quarter.to_date => 1
     }
     assert_equal expected, User.group_by_quarter(:created_at, last: 2).count
   end
