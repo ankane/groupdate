@@ -229,7 +229,7 @@ module TestDatabase
     Time.zone = pt
     today = Date.today
     create_user today.to_s
-    this_month = today.in_time_zone(pt).beginning_of_month
+    this_month = pt.parse(today.to_s).beginning_of_month
     last_month = this_month - 1.month
     expected = {
       last_month.to_date => 0,
