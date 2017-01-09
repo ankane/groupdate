@@ -354,7 +354,7 @@ module TestDatabase
 
   def test_default_timezone_local
     User.default_timezone = :local
-    assert_raises(RuntimeError) { User.group_by_day(:created_at).count }
+    assert_raises(Groupdate::Error) { User.group_by_day(:created_at).count }
   ensure
     User.default_timezone = :utc
   end
