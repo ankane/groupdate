@@ -147,7 +147,8 @@ module Groupdate
       count =
         begin
           Hash[relation.send(method, *args, &block).map { |k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] }]
-        rescue NoMethodError
+        rescue NoMethodError => e
+          raise e if options[:debug_time_zone_support]
           raise "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
         end
 
