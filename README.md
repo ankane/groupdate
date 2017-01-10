@@ -258,7 +258,7 @@ To install, add this line to your application’s Gemfile:
 gem 'groupdate', github: 'ankane/groupdate', branch: 'sqlite'
 ```
 
-If your application’s time zone is set to something other than `Etc/UTC`, create an initializer with:
+If your application’s time zone is set to something other than `Etc/UTC` (the default), create an initializer with:
 
 ```ruby
 Groupdate.time_zone = false
