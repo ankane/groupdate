@@ -13,6 +13,8 @@ The simplest way to group by:
 
 Supports PostgreSQL, MySQL, and Redshift, plus arrays and hashes
 
+Experimental support for [SQLite](#sqlite-experimental)
+
 [![Build Status](https://travis-ci.org/ankane/groupdate.svg?branch=master)](https://travis-ci.org/ankane/groupdate)
 
 :cupid: Goes hand in hand with [Chartkick](http://ankane.github.io/chartkick/)
@@ -241,6 +243,20 @@ SELECT CONVERT_TZ(NOW(), '+00:00', 'Etc/UTC');
 ```
 
 It should return the time instead of `NULL`.
+
+## SQLite [experimental]
+
+Groupdate has limited support for SQLite.
+
+- No time zone support
+- No `day_start` or `week_start` options
+- No `group_by_quarter` method
+
+To install, add this line to your application’s Gemfile:
+
+```ruby
+gem 'groupdate', github: 'ankane/groupdate', branch: 'sqlite'
+```
 
 ## Upgrading
 
