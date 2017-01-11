@@ -128,13 +128,7 @@ User.group_by_week(:created_at, last: 8, current: false).count
 You can order in descending order with:
 
 ```ruby
-User.group_by_day(:created_at).reverse_order.count
-```
-
-or
-
-```ruby
-User.group_by_day(:created_at).order("day desc").count
+User.group_by_day(:created_at, reverse: true).count
 ```
 
 ### Keys
