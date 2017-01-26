@@ -1,7 +1,7 @@
 require_relative "test_helper"
 require "ostruct"
 
-class TestEnumerable < Minitest::Test
+class EnumerableTest < Minitest::Test
   include TestGroupdate
 
   def test_enumerable

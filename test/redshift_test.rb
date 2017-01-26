@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-class TestRedshift < Minitest::Test
+class RedshiftTest < Minitest::Test
   include TestGroupdate
   include TestDatabase
 

@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-class TestPostgresql < Minitest::Test
+class PostgresqlTest < Minitest::Test
   include TestGroupdate
   include TestDatabase
 

@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-class TestMysql < Minitest::Test
+class MysqlTest < Minitest::Test
   include TestGroupdate
   include TestDatabase
 
