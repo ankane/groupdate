@@ -1,4 +1,4 @@
-## 3.1.2 [unreleased]
+## 3.2.0
 
 - Added limited support for SQLite
 
