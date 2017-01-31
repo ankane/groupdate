@@ -77,6 +77,42 @@ module Groupdate
           else
             ["(DATE_TRUNC('#{field}', (#{column}::timestamptz - INTERVAL '#{day_start} second') AT TIME ZONE ?) + INTERVAL '#{day_start} second') AT TIME ZONE ?", time_zone, time_zone]
           end
+        when "SQLite"
+          raise Groupdate::Error, "Time zones not supported for SQLite" unless self.time_zone.utc_offset.zero?
+          raise Groupdate::Error, "day_start not supported for SQLite" unless day_start.zero?
+          raise Groupdate::Error, "week_start not supported for SQLite" unless week_start == 6
+
+          if field == :week
+            ["strftime('%%Y-%%m-%%d 00:00:00 UTC', #{column}, '-6 days', 'weekday 0')"]
+          else
+            format =
+              case field
+                when :hour_of_day
+                  "%H"
+                when :day_of_week
+                  "%w"
+                when :day_of_month
+                  "%d"
+                when :month_of_year
+                  "%m"
+                when :second
+                  "%Y-%m-%d %H:%M:%S UTC"
+                when :minute
+                  "%Y-%m-%d %H:%M:00 UTC"
+                when :hour
+                  "%Y-%m-%d %H:00:00 UTC"
+                when :day
+                  "%Y-%m-%d 00:00:00 UTC"
+                when :month
+                  "%Y-%m-01 00:00:00 UTC"
+                when :quarter
+                  raise Groupdate::Error, "Quarter not supported for SQLite"
+                else # year
+                  "%Y-01-01 00:00:00 UTC"
+                end
+
+            ["strftime('#{format.gsub(/%/, '%%')}', #{column})"]
+          end
         when "Redshift"
           case field
           when :day_of_week # Sunday = 0, Monday = 1, etc.
@@ -159,7 +195,7 @@ module Groupdate
     def time_zone
       @time_zone ||= begin
         time_zone = "Etc/UTC" if options[:time_zone] == false
-        time_zone ||= options[:time_zone] || Groupdate.time_zone || Time.zone || "Etc/UTC"
+        time_zone ||= options[:time_zone] || Groupdate.time_zone || (Groupdate.time_zone == false && "Etc/UTC") || Time.zone || "Etc/UTC"
         time_zone.is_a?(ActiveSupport::TimeZone) ? time_zone : ActiveSupport::TimeZone[time_zone]
       end
     end

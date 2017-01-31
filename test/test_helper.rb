@@ -235,7 +235,7 @@ module TestDatabase
       last_month.to_date => 0,
       this_month.to_date => 1
     }
-    assert_equal expected, User.group_by_month(:created_on, last: 2).count
+    assert_equal expected, call_method(:month, :created_on, last: 2)
   ensure
     Time.zone = nil
   end
@@ -264,7 +264,7 @@ module TestDatabase
       last_quarter.to_date => 0,
       this_quarter.to_date => 1
     }
-    assert_equal expected, User.group_by_quarter(:created_at, last: 2).count
+    assert_equal expected, call_method(:quarter, :created_at, last: 2)
   end
 
   def test_format_locale
@@ -369,7 +369,7 @@ module TestDatabase
       Date.parse("2014-10-19") => 1,
       Date.parse("2014-10-20") => 1
     }
-    assert_equal expected, User.group_by_day(:created_at, time_zone: "Brasilia").count
+    assert_equal expected, call_method(:day, :created_at, time_zone: "Brasilia")
   end
 
   # carry_forward option

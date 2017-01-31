@@ -1,3 +1,7 @@
+## 3.1.2 [unreleased]
+
+- Added limited support for SQLite
+
 ## 3.1.1
 
 - Fixed `current: false`
