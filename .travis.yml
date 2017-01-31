@@ -15,8 +15,12 @@ before_install:
   - mysql -e 'create database groupdate_test;'
   - mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
   - psql -c 'create database groupdate_test;' -U postgres
-env:
-  - TRAVIS=t
+addons:
+  apt:
+    sources:
+      - travis-ci/sqlite3
+    packages:
+      - sqlite3
 notifications:
   email:
     on_success: never
