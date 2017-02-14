@@ -35,6 +35,8 @@ module Groupdate
             ["DAYOFWEEK(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)) - 1", time_zone]
           when :hour_of_day
             ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) + 24 - #{day_start / 3600}) % 24", time_zone]
+          when :minute_of_hour
+            ["(EXTRACT(MINUTE from CONVERT_TZ(#{column}, '+00:00', ?)))", time_zone]
           when :day_of_month
             ["DAYOFMONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?))", time_zone]
           when :month_of_year
@@ -68,6 +70,8 @@ module Groupdate
             ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
           when :hour_of_day
             ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
+          when :minute_of_hour
+            ["EXTRACT(MINUTE from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
           when :day_of_month
             ["EXTRACT(DAY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
           when :month_of_year
@@ -89,6 +93,8 @@ module Groupdate
               case field
                 when :hour_of_day
                   "%H"
+                when :minute_of_hour
+                  "%M"
                 when :day_of_week
                   "%w"
                 when :day_of_month
@@ -109,7 +115,7 @@ module Groupdate
                   raise Groupdate::Error, "Quarter not supported for SQLite"
                 else # year
                   "%Y-01-01 00:00:00 UTC"
-                end
+              end
 
             ["strftime('#{format.gsub(/%/, '%%')}', #{column})"]
           end
@@ -119,6 +125,8 @@ module Groupdate
             ["EXTRACT(DOW from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
           when :hour_of_day
             ["EXTRACT(HOUR from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
+          when :minute_of_hour
+            ["EXTRACT(MINUTE from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
           when :day_of_month
             ["EXTRACT(DAY from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
           when :month_of_year
@@ -173,7 +181,7 @@ module Groupdate
 
       cast_method =
         case field
-        when :day_of_week, :hour_of_day, :day_of_month, :month_of_year
+        when :day_of_week, :hour_of_day, :day_of_month, :month_of_year, :minute_of_hour
           lambda { |k| k.to_i }
         else
           utc = ActiveSupport::TimeZone["UTC"]
@@ -254,6 +262,8 @@ module Groupdate
           0..6
         when :hour_of_day
           0..23
+        when :minute_of_hour
+          0..59
         when :day_of_month
           1..31
         when :month_of_year
@@ -325,6 +335,8 @@ module Groupdate
               case field
               when :hour_of_day
                 key = sunday + key.hours + day_start.seconds
+              when :minute_of_hour
+                key = sunday + key.minutes + day_start.seconds
               when :day_of_week
                 key = sunday + key.days
               when :day_of_month
@@ -378,6 +390,8 @@ module Groupdate
           time.beginning_of_year
         when :hour_of_day
           time.hour
+        when :minute_of_hour
+          time.min
         when :day_of_week
           time.wday
         when :day_of_month
