@@ -1,3 +1,7 @@
+## 3.2.1 [unreleased]
+
+- Added `minute_of_hour`
+
 ## 3.2.0
 
 - Added limited support for SQLite

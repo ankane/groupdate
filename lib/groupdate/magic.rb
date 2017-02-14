@@ -115,7 +115,7 @@ module Groupdate
                   raise Groupdate::Error, "Quarter not supported for SQLite"
                 else # year
                   "%Y-01-01 00:00:00 UTC"
-              end
+                end
 
             ["strftime('#{format.gsub(/%/, '%%')}', #{column})"]
           end
