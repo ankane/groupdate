@@ -6,7 +6,7 @@ require "groupdate/magic"
 module Groupdate
   class Error < RuntimeError; end
 
-  PERIODS = [:second, :minute, :hour, :day, :week, :month, :quarter, :year, :day_of_week, :hour_of_day, :day_of_month, :month_of_year]
+  PERIODS = [:second, :minute, :hour, :day, :week, :month, :quarter, :year, :day_of_week, :hour_of_day, :minute_of_hour, :day_of_month, :month_of_year]
   # backwards compatibility for anyone who happened to use it
   FIELDS = PERIODS
   METHODS = PERIODS.map { |v| :"group_by_#{v}" } + [:group_by_period]

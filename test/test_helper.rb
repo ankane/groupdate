@@ -741,6 +741,16 @@ module TestGroupdate
     assert_result :hour_of_day, 0, "2013-01-01 10:00:00", true, day_start: 2
   end
 
+  # minute of hour
+
+  def test_minute_of_hour_end_of_hour
+    assert_result :minute_of_hour, 59, "2017-02-09 23:59:59"
+  end
+
+  def test_minute_of_hour_beginning_of_hour
+    assert_result :minute_of_hour, 0, "2017-02-09 00:00:00"
+  end
+
   # day of week
 
   def test_day_of_week_end_of_day
@@ -941,6 +951,15 @@ module TestGroupdate
     assert_equal expected, call_method(:hour_of_day, :created_at, {series: true})
   end
 
+  def test_zeros_minute_of_hour
+    create_user "2017-02-09 20:05:00 UTC"
+    expected = {}
+    60.times do |n|
+      expected[n] = n == 5 ? 1 : 0
+    end
+    assert_equal expected, call_method(:minute_of_hour, :created_at, {series: true})
+  end
+
   def test_zeros_day_of_month
     create_user "1978-12-18"
     expected = {}
@@ -1043,6 +1062,16 @@ module TestGroupdate
   def test_format_hour_of_day_day_start
     create_user "2014-03-01"
     assert_format :hour_of_day, "12 am", "%-l %P", day_start: 2
+  end
+
+  def test_format_minute_of_hour
+    create_user "2017-02-09"
+    assert_format :minute_of_hour, "0", "%-M"
+  end
+
+  def test_format_minute_of_hour_day_start
+    create_user "2017-02-09"
+    assert_format :minute_of_hour, "0", "%-M", day_start: 2
   end
 
   def test_format_day_of_week
