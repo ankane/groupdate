@@ -8,6 +8,7 @@ gemfile:
   - test/gemfiles/activerecord40.gemfile
   - test/gemfiles/activerecord41.gemfile
   - test/gemfiles/activerecord42.gemfile
+  - test/gemfiles/activerecord51.gemfile
 sudo: false
 script: RUBYOPT=W0 bundle exec rake test
 before_install:
