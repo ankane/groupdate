@@ -4,11 +4,8 @@ rvm:
   - jruby-9.1.5.0
 gemfile:
   - Gemfile
-  - test/gemfiles/activerecord32.gemfile
-  - test/gemfiles/activerecord40.gemfile
-  - test/gemfiles/activerecord41.gemfile
+  - test/gemfiles/activerecord50.gemfile
   - test/gemfiles/activerecord42.gemfile
-  - test/gemfiles/activerecord51.gemfile
 sudo: false
 script: RUBYOPT=W0 bundle exec rake test
 before_install:
@@ -27,4 +24,4 @@ matrix:
     - rvm: jruby-9.1.5.0
       gemfile: Gemfile
     - rvm: jruby-9.1.5.0
-      gemfile: test/gemfiles/activerecord51.gemfile
+      gemfile: test/gemfiles/activerecord50.gemfile
