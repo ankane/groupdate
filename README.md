@@ -19,8 +19,6 @@ Limited support for [SQLite](#for-sqlite)
 
 :cupid: Goes hand in hand with [Chartkick](http://ankane.github.io/chartkick/)
 
-**Groupdate 3.0 was just released!** See [instructions for upgrading](#30). If you use Chartkick with Groupdate, we recommend Chartkick 2.0 and above.
-
 ## Get Started
 
 ```ruby
