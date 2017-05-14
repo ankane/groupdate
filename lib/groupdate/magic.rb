@@ -91,31 +91,31 @@ module Groupdate
           else
             format =
               case field
-                when :hour_of_day
-                  "%H"
-                when :minute_of_hour
-                  "%M"
-                when :day_of_week
-                  "%w"
-                when :day_of_month
-                  "%d"
-                when :month_of_year
-                  "%m"
-                when :second
-                  "%Y-%m-%d %H:%M:%S UTC"
-                when :minute
-                  "%Y-%m-%d %H:%M:00 UTC"
-                when :hour
-                  "%Y-%m-%d %H:00:00 UTC"
-                when :day
-                  "%Y-%m-%d 00:00:00 UTC"
-                when :month
-                  "%Y-%m-01 00:00:00 UTC"
-                when :quarter
-                  raise Groupdate::Error, "Quarter not supported for SQLite"
-                else # year
-                  "%Y-01-01 00:00:00 UTC"
-                end
+              when :hour_of_day
+                "%H"
+              when :minute_of_hour
+                "%M"
+              when :day_of_week
+                "%w"
+              when :day_of_month
+                "%d"
+              when :month_of_year
+                "%m"
+              when :second
+                "%Y-%m-%d %H:%M:%S UTC"
+              when :minute
+                "%Y-%m-%d %H:%M:00 UTC"
+              when :hour
+                "%Y-%m-%d %H:00:00 UTC"
+              when :day
+                "%Y-%m-%d 00:00:00 UTC"
+              when :month
+                "%Y-%m-01 00:00:00 UTC"
+              when :quarter
+                raise Groupdate::Error, "Quarter not supported for SQLite"
+              else # year
+                "%Y-01-01 00:00:00 UTC"
+              end
 
             ["strftime('#{format.gsub(/%/, '%%')}', #{column})"]
           end
