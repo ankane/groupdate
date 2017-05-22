@@ -32,7 +32,7 @@ module Groupdate
           case field
           when :day_of_week # Sunday = 0, Monday = 1, etc
             # use CONCAT for consistent return type (String)
-            ["DAYOFWEEK(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)) - 1", time_zone]
+            ["DAYOFWEEK(CONVERT_TZ(DATE_SUB(DATE_SUB(#{column}, INTERVAL #{week_start + 1} day), INTERVAL #{day_start} second), '+00:00', ?)) - 1", time_zone]
           when :hour_of_day
             ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) + 24 - #{day_start / 3600}) % 24", time_zone]
           when :minute_of_hour
@@ -67,7 +67,7 @@ module Groupdate
         when "PostgreSQL", "PostGIS"
           case field
           when :day_of_week
-            ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
+            ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{week_start + 1} day' - INTERVAL '#{day_start} second')::integer", time_zone]
           when :hour_of_day
             ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
           when :minute_of_hour
@@ -122,7 +122,7 @@ module Groupdate
         when "Redshift"
           case field
           when :day_of_week # Sunday = 0, Monday = 1, etc.
-            ["EXTRACT(DOW from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
+            ["EXTRACT(DOW from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{week_start + 1} day' - INTERVAL '#{day_start} second')::integer", time_zone]
           when :hour_of_day
             ["EXTRACT(HOUR from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
           when :minute_of_hour
@@ -338,7 +338,7 @@ module Groupdate
               when :minute_of_hour
                 key = sunday + key.minutes + day_start.seconds
               when :day_of_week
-                key = sunday + key.days
+                key = sunday + key.days + (week_start + 1).days
               when :day_of_month
                 key = Date.new(2014, 1, key).to_time
               when :month_of_year
@@ -393,7 +393,7 @@ module Groupdate
         when :minute_of_hour
           time.min
         when :day_of_week
-          time.wday
+          (time.wday - 1 - week_start) % 7
         when :day_of_month
           time.day
         when :month_of_year
