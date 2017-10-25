@@ -26,5 +26,9 @@ module Groupdate
     def reverse_order_value
       nil
     end
+
+    def unscoped
+      @relation.unscoped
+    end
   end
 end

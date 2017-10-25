@@ -413,6 +413,12 @@ module TestDatabase
     end
   end
 
+  # unscope
+
+  def test_unscope
+    assert_equal User.all, User.group_by_day(:created_at).unscoped.all
+  end
+
   private
 
   def call_method(method, field, options)
