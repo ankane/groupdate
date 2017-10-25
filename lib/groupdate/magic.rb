@@ -2,15 +2,15 @@ require "i18n"
 
 module Groupdate
   class Magic
-    attr_accessor :field, :options
+    attr_accessor :period, :options
 
-    def initialize(field, options)
-      @field = field
+    def initialize(period, options)
+      @period = period
       @options = options
 
       raise Groupdate::Error, "Unrecognized time zone" unless time_zone
 
-      raise Groupdate::Error, "Unrecognized :week_start option" if field == :week && !week_start
+      raise Groupdate::Error, "Unrecognized :week_start option" if period == :week && !week_start
     end
 
     def group_by(enum, &_block)
@@ -29,7 +29,7 @@ module Groupdate
       query =
         case adapter_name
         when "MySQL", "Mysql2", "Mysql2Spatial"
-          case field
+          case period
           when :day_of_week # Sunday = 0, Monday = 1, etc
             # use CONCAT for consistent return type (String)
             ["DAYOFWEEK(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)) - 1", time_zone]
@@ -47,7 +47,7 @@ module Groupdate
             ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(EXTRACT(YEAR FROM CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S'), ?, '+00:00'), INTERVAL #{day_start} second)", time_zone, time_zone, time_zone]
           else
             format =
-              case field
+              case period
               when :second
                 "%Y-%m-%d %H:%i:%S"
               when :minute
@@ -65,7 +65,7 @@ module Groupdate
             ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?), '#{format}'), ?, '+00:00'), INTERVAL #{day_start} second)", time_zone, time_zone]
           end
         when "PostgreSQL", "PostGIS"
-          case field
+          case period
           when :day_of_week
             ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
           when :hour_of_day
@@ -77,20 +77,20 @@ module Groupdate
           when :month_of_year
             ["EXTRACT(MONTH from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
           when :week # start on Sunday, not PostgreSQL default Monday
-            ["(DATE_TRUNC('#{field}', (#{column}::timestamptz - INTERVAL '#{week_start} day' - INTERVAL '#{day_start} second') AT TIME ZONE ?) + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second') AT TIME ZONE ?", time_zone, time_zone]
+            ["(DATE_TRUNC('#{period}', (#{column}::timestamptz - INTERVAL '#{week_start} day' - INTERVAL '#{day_start} second') AT TIME ZONE ?) + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second') AT TIME ZONE ?", time_zone, time_zone]
           else
-            ["(DATE_TRUNC('#{field}', (#{column}::timestamptz - INTERVAL '#{day_start} second') AT TIME ZONE ?) + INTERVAL '#{day_start} second') AT TIME ZONE ?", time_zone, time_zone]
+            ["(DATE_TRUNC('#{period}', (#{column}::timestamptz - INTERVAL '#{day_start} second') AT TIME ZONE ?) + INTERVAL '#{day_start} second') AT TIME ZONE ?", time_zone, time_zone]
           end
         when "SQLite"
           raise Groupdate::Error, "Time zones not supported for SQLite" unless self.time_zone.utc_offset.zero?
           raise Groupdate::Error, "day_start not supported for SQLite" unless day_start.zero?
           raise Groupdate::Error, "week_start not supported for SQLite" unless week_start == 6
 
-          if field == :week
+          if period == :week
             ["strftime('%%Y-%%m-%%d 00:00:00 UTC', #{column}, '-6 days', 'weekday 0')"]
           else
             format =
-              case field
+              case period
               when :hour_of_day
                 "%H"
               when :minute_of_hour
@@ -120,7 +120,7 @@ module Groupdate
             ["strftime('#{format.gsub(/%/, '%%')}', #{column})"]
           end
         when "Redshift"
-          case field
+          case period
           when :day_of_week # Sunday = 0, Monday = 1, etc.
             ["EXTRACT(DOW from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
           when :hour_of_day
@@ -136,19 +136,19 @@ module Groupdate
             # always says it is in UTC time, so we must convert
             # back to UTC to play properly with the rest of Groupdate.
             #
-            ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, CONVERT_TIMEZONE(?, #{column}) - INTERVAL '#{week_start} day' - INTERVAL '#{day_start} second'))::timestamp + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second'", time_zone, field, time_zone]
+            ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, CONVERT_TIMEZONE(?, #{column}) - INTERVAL '#{week_start} day' - INTERVAL '#{day_start} second'))::timestamp + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second'", time_zone, period, time_zone]
           else
-            ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, CONVERT_TIMEZONE(?, #{column}) - INTERVAL '#{day_start} second'))::timestamp + INTERVAL '#{day_start} second'", time_zone, field, time_zone]
+            ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, CONVERT_TIMEZONE(?, #{column}) - INTERVAL '#{day_start} second'))::timestamp + INTERVAL '#{day_start} second'", time_zone, period, time_zone]
           end
         else
           raise Groupdate::Error, "Connection adapter not supported: #{adapter_name}"
         end
 
-      if adapter_name == "MySQL" && field == :week
+      if adapter_name == "MySQL" && period == :week
         query[0] = "CAST(#{query[0]} AS DATETIME)"
       end
 
-      group = relation.group(Groupdate::OrderHack.new(relation.send(:sanitize_sql_array, query), field, time_zone))
+      group = relation.group(Groupdate::OrderHack.new(relation.send(:sanitize_sql_array, query), period, time_zone))
       relation =
         if time_range.is_a?(Range)
           # doesn't matter whether we include the end of a ... range - it will be excluded later
@@ -170,7 +170,7 @@ module Groupdate
       order = relation.order_values.first
       if order.is_a?(String)
         parts = order.split(" ")
-        reverse_order = (parts.size == 2 && (parts[0].to_sym == field || (activerecord42? && parts[0] == "#{relation.quoted_table_name}.#{relation.quoted_primary_key}")) && parts[1].to_s.downcase == "desc")
+        reverse_order = (parts.size == 2 && (parts[0].to_sym == period || (activerecord42? && parts[0] == "#{relation.quoted_table_name}.#{relation.quoted_primary_key}")) && parts[1].to_s.downcase == "desc")
         if reverse_order
           reverse = !reverse
           relation = relation.reorder(relation.order_values[1..-1])
@@ -180,7 +180,7 @@ module Groupdate
       multiple_groups = relation.group_values.size > 1
 
       cast_method =
-        case field
+        case period
         when :day_of_week, :hour_of_day, :day_of_month, :month_of_year, :minute_of_hour
           lambda { |k| k.to_i }
         else
@@ -226,12 +226,12 @@ module Groupdate
           last += 1.day unless time_range.exclude_end?
           time_range = Range.new(time_zone.parse(time_range.first.to_s), last, true)
         elsif !time_range && options[:last]
-          if field == :quarter
+          if period == :quarter
             step = 3.months
-          elsif 1.respond_to?(field)
-            step = 1.send(field)
+          elsif 1.respond_to?(period)
+            step = 1.send(period)
           else
-            raise ArgumentError, "Cannot use last option with #{field}"
+            raise ArgumentError, "Cannot use last option with #{period}"
           end
           if step
             now = Time.now
@@ -257,7 +257,7 @@ module Groupdate
       reverse = !reverse if options[:reverse]
 
       series =
-        case field
+        case period
         when :day_of_week
           0..6
         when :hour_of_day
@@ -287,10 +287,10 @@ module Groupdate
           if time_range.first
             series = [round_time(time_range.first)]
 
-            if field == :quarter
+            if period == :quarter
               step = 3.months
             else
-              step = 1.send(field)
+              step = 1.send(period)
             end
 
             last_step = series.last
@@ -332,7 +332,7 @@ module Groupdate
           else
             sunday = time_zone.parse("2014-03-02 00:00:00")
             lambda do |key|
-              case field
+              case period
               when :hour_of_day
                 key = sunday + key.hours + day_start.seconds
               when :minute_of_hour
@@ -347,7 +347,7 @@ module Groupdate
               I18n.localize(key, format: options[:format], locale: locale)
             end
           end
-        elsif [:day, :week, :month, :quarter, :year].include?(field) && use_dates
+        elsif [:day, :week, :month, :quarter, :year].include?(period) && use_dates
           lambda { |k| k.to_date }
         else
           lambda { |k| k }
@@ -369,7 +369,7 @@ module Groupdate
       time = time.to_time.in_time_zone(time_zone) - day_start.seconds
 
       time =
-        case field
+        case period
         when :second
           time.change(usec: 0)
         when :minute
@@ -399,7 +399,7 @@ module Groupdate
         when :month_of_year
           time.month
         else
-          raise Groupdate::Error, "Invalid field"
+          raise Groupdate::Error, "Invalid period"
         end
 
       time.is_a?(Time) ? time + day_start.seconds : time
