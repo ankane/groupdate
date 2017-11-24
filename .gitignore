@@ -1,4 +1,5 @@
 *.gem
+.idea
 *.rbc
 .bundle
 .config

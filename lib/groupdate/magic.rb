@@ -1,4 +1,5 @@
 require "i18n"
+require 'active_support/values/time_zone'
 
 module Groupdate
   class Magic
@@ -19,10 +20,11 @@ module Groupdate
     end
 
     def relation(column, relation)
-      if relation.default_timezone == :local
-        raise Groupdate::Error, "ActiveRecord::Base.default_timezone must be :utc to use Groupdate"
-      end
+      # if relation.default_timezone == :local
+      #   raise Groupdate::Error, "ActiveRecord::Base.default_timezone must be :utc to use Groupdate"
+      # end
 
+      str_time_zone = ActiveSupport::TimeZone.seconds_to_utc_offset Time.now.utc_offset
       time_zone = self.time_zone.tzinfo.name
 
       adapter_name = relation.connection.adapter_name
@@ -32,19 +34,19 @@ module Groupdate
           case period
           when :day_of_week # Sunday = 0, Monday = 1, etc
             # use CONCAT for consistent return type (String)
-            ["DAYOFWEEK(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)) - 1", time_zone]
+            ["DAYOFWEEK(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '#{str_time_zone}', ?)) - 1", time_zone]
           when :hour_of_day
-            ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) + 24 - #{day_start / 3600}) % 24", time_zone]
+            ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '#{str_time_zone}', ?)) + 24 - #{day_start / 3600}) % 24", time_zone]
           when :minute_of_hour
-            ["(EXTRACT(MINUTE from CONVERT_TZ(#{column}, '+00:00', ?)))", time_zone]
+            ["(EXTRACT(MINUTE from CONVERT_TZ(#{column}, '#{str_time_zone}', ?)))", time_zone]
           when :day_of_month
-            ["DAYOFMONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?))", time_zone]
+            ["DAYOFMONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '#{str_time_zone}', ?))", time_zone]
           when :month_of_year
-            ["MONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?))", time_zone]
+            ["MONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '#{str_time_zone}', ?))", time_zone]
           when :week
-            ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL ((#{7 - week_start} + WEEKDAY(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} second)) % 7) DAY) - INTERVAL #{day_start} second, '+00:00', ?), '%Y-%m-%d 00:00:00') + INTERVAL #{day_start} second, ?, '+00:00')", time_zone, time_zone, time_zone]
+            ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL ((#{7 - week_start} + WEEKDAY(CONVERT_TZ(#{column}, '#{str_time_zone}', ?) - INTERVAL #{day_start} second)) % 7) DAY) - INTERVAL #{day_start} second, '#{str_time_zone}', ?), '%Y-%m-%d 00:00:00') + INTERVAL #{day_start} second, ?, '#{str_time_zone}')", time_zone, time_zone, time_zone]
           when :quarter
-            ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(EXTRACT(YEAR FROM CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S'), ?, '+00:00'), INTERVAL #{day_start} second)", time_zone, time_zone, time_zone]
+            ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(EXTRACT(YEAR FROM CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '#{str_time_zone}', ?)), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '#{str_time_zone}', ?)) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S'), ?, '#{str_time_zone}'), INTERVAL #{day_start} second)", time_zone, time_zone, time_zone]
           else
             format =
               case period
@@ -62,7 +64,7 @@ module Groupdate
                 "%Y-01-01 00:00:00"
               end
 
-            ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?), '#{format}'), ?, '+00:00'), INTERVAL #{day_start} second)", time_zone, time_zone]
+            ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '#{str_time_zone}', ?), '#{format}'), ?, '#{str_time_zone}'), INTERVAL #{day_start} second)", time_zone, time_zone]
           end
         when "PostgreSQL", "PostGIS"
           case period
