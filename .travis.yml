@@ -22,6 +22,4 @@ notifications:
 matrix:
   allow_failures:
     - rvm: jruby-9.1.5.0
-      gemfile: Gemfile
-    - rvm: jruby-9.1.5.0
-      gemfile: test/gemfiles/activerecord50.gemfile
+      gemfile: test/gemfiles/activerecord42.gemfile
