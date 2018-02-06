@@ -13,7 +13,7 @@ The simplest way to group by:
 
 Supports PostgreSQL, MySQL, and Redshift, plus arrays and hashes (and limited support for [SQLite](#for-sqlite))
 
-:cupid: Goes hand in hand with [Chartkick](http://ankane.github.io/chartkick/)
+:cupid: Goes hand in hand with [Chartkick](https://www.chartkick.com)
 
 [![Build Status](https://travis-ci.org/ankane/groupdate.svg?branch=master)](https://travis-ci.org/ankane/groupdate)
 
