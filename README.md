@@ -11,9 +11,7 @@ The simplest way to group by:
 
 :cake: Get the entire series - **the other best part**
 
-Supports PostgreSQL, MySQL, and Redshift, plus arrays and hashes
-
-Limited support for [SQLite](#for-sqlite)
+Supports PostgreSQL, MySQL, and Redshift, plus arrays and hashes (and limited support for [SQLite](#for-sqlite))
 
 [![Build Status](https://travis-ci.org/ankane/groupdate.svg?branch=master)](https://travis-ci.org/ankane/groupdate)
 
