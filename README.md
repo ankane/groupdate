@@ -13,9 +13,9 @@ The simplest way to group by:
 
 Supports PostgreSQL, MySQL, and Redshift, plus arrays and hashes (and limited support for [SQLite](#for-sqlite))
 
-[![Build Status](https://travis-ci.org/ankane/groupdate.svg?branch=master)](https://travis-ci.org/ankane/groupdate)
-
 :cupid: Goes hand in hand with [Chartkick](http://ankane.github.io/chartkick/)
+
+[![Build Status](https://travis-ci.org/ankane/groupdate.svg?branch=master)](https://travis-ci.org/ankane/groupdate)
 
 ## Get Started
 
