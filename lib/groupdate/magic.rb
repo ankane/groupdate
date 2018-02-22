@@ -18,9 +18,12 @@ module Groupdate
       result
     end
 
-    def initialize(period, options)
+    def initialize(period, **options)
       @period = period
       @options = options
+
+      unknown_keywords = options.keys - [:day_start, :time_zone, :dates, :series, :week_start, :range, :format, :locale, :last, :current, :carry_forward, :default_value, :reverse]
+      raise ArgumentError, "unknown keywords: #{unknown_keywords.join(", ")}" if unknown_keywords.any?
 
       raise Groupdate::Error, "Unrecognized time zone" unless time_zone
 
