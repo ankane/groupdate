@@ -162,7 +162,7 @@ module Groupdate
         query[0] = "CAST(#{query[0]} AS DATETIME)"
       end
 
-      group = relation.group(Groupdate::OrderHack.new(relation.send(:sanitize_sql_array, query), period, time_zone))
+      group = relation.group(relation.send(:sanitize_sql_array, query))
       relation =
         if time_range.is_a?(Range)
           # doesn't matter whether we include the end of a ... range - it will be excluded later
@@ -175,7 +175,7 @@ module Groupdate
       @group_index = group.group_values.size - 1
 
       (relation.groupdate_values ||= []) << self
-      Groupdate::Series.new(self, relation)
+      relation
     end
 
     def before_perform(relation)
