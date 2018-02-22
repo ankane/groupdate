@@ -37,6 +37,31 @@ bundle exec rake test
 
 Feel free to open an issue to get feedback on your idea before spending too much time on it.
 
+## Dev Setup
+
+On Mac:
+
+```sh
+# install and run PostgreSQL
+brew install postgresql
+brew services start postgresql
+
+# install and run MySQL
+brew install mysql
+brew services start mysql
+
+# create databases
+createdb groupdate_test
+mysql -u root -e "create database groupdate_test"
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
+
+# clone the repo and run the tests
+git clone https://github.com/ankane/groupdate.git
+cd groupdate
+bundle install
+bundle exec rake test
+```
+
 ---
 
 This contributing guide is released under [CCO](https://creativecommons.org/publicdomain/zero/1.0/) (public domain). Use it for your own project without attribution.

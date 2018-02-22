@@ -208,6 +208,37 @@ Count
 Hash[ users.group_by_day { |u| u.created_at }.map { |k, v| [k, v.size] } ]
 ```
 
+## Custom Calculation Methods
+
+Groupdate knows all of the calculations defined by `ActiveRecord` like `count`,
+`sum`, or `average`. However you may have your own class level calculation
+methods that you need to tell Groupdate about. All you have to do is define the
+class method `groupdate_calculation_methods` returning an array of the method
+names as symbols.
+
+```ruby
+class User < ApplicationRecord
+  def self.groupdate_calculation_methods
+    [:total_sign_ins]
+  end
+
+  def self.total_sign_ins
+    all.sum(:sign_ins)
+  end
+end
+```
+
+Then you can use your custom calculation method:
+
+```ruby
+User.group_by_week(:created_at).total_sign_ins
+```
+
+Note that even if your method uses one of the calculations from `ActiveRecord`,
+you'll still need to add it to the `groupdate_calculation_methods` array to have
+it return the Hash of dates to values. Otherwise it will return a
+`Groupdate::Series` object.
+
 ## Installation
 
 Add this line to your application’s Gemfile:
