@@ -368,7 +368,12 @@ module Groupdate
           query[0] = "CAST(#{query[0]} AS DATETIME)"
         end
 
-        group = relation.group(relation.send(:sanitize_sql_array, query))
+        group_str = relation.send(:sanitize_sql_array, query)
+
+        # cleaner queries in logs (Postgres)
+        group_str = group_str.gsub(/ (\-|\+) INTERVAL '0 second'/, "")
+
+        group = relation.group(group_str)
         relation =
           if time_range.is_a?(Range)
             # doesn't matter whether we include the end of a ... range - it will be excluded later
