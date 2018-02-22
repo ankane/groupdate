@@ -437,8 +437,7 @@ module TestDatabase
     # hack for Redshift adapter, which doesn't return id on creation...
     user = User.last if user.id.nil?
 
-    # hack for MySQL & Redshift adapters
-    user.update_attributes(created_at: nil, created_on: nil) if created_at.nil? && is_redshift?
+    user.update_columns(created_at: nil, created_on: nil) if created_at.nil?
 
     user
   end
