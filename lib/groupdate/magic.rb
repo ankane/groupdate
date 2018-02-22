@@ -251,8 +251,7 @@ module Groupdate
           case adapter_name
           when "MySQL", "Mysql2", "Mysql2Spatial", 'Mysql2Rgeo'
             case period
-            when :day_of_week # Sunday = 0, Monday = 1, etc
-              # use CONCAT for consistent return type (String)
+            when :day_of_week
               ["DAYOFWEEK(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)) - 1", time_zone]
             when :hour_of_day
               ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) + 24 - #{day_start / 3600}) % 24", time_zone]
@@ -342,7 +341,7 @@ module Groupdate
             end
           when "Redshift"
             case period
-            when :day_of_week # Sunday = 0, Monday = 1, etc.
+            when :day_of_week
               ["EXTRACT(DOW from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
             when :hour_of_day
               ["EXTRACT(HOUR from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
