@@ -2,7 +2,7 @@ module Enumerable
   Groupdate::PERIODS.each do |period|
     define_method :"group_by_#{period}" do |*args, &block|
       if block
-        Groupdate::Magic.new(period, args[0] || {}).group_by(self, &block)
+        Groupdate::Magic::Enumerable.new(period, args[0] || {}).group_by(self, &block)
       elsif respond_to?(:scoping)
         scoping { @klass.send(:"group_by_#{period}", *args, &block) }
       else

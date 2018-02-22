@@ -7,7 +7,7 @@ module Groupdate
         options[:time_zone] ||= args[0] unless args[0].nil?
         options[:range] ||= args[1] unless args[1].nil?
 
-        Groupdate::Magic.new(period, options).relation(field, self)
+        Groupdate::Magic::Relation.new(period, options).relation(field, self)
       end
     end
 
