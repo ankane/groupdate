@@ -428,12 +428,8 @@ module Groupdate
         ActiveRecord::VERSION::STRING.starts_with?("4.2.")
       end
 
-      def self.generate_relation(relation, period, field, *args)
-        args = args.dup
-        options = (args[-1].is_a?(Hash) ? args.pop : {}).dup
-        options[:time_zone] ||= args[0] unless args[0].nil?
-        options[:range] ||= args[1] unless args[1].nil?
-        Groupdate::Magic::Relation.new(period: period, **options).relation(field, relation)
+      def self.generate_relation(relation, field:, **options)
+        Groupdate::Magic::Relation.new(**options).relation(field, relation)
       end
 
       def self.unwind(relation, method, *args, &block)
