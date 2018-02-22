@@ -198,6 +198,7 @@ module Groupdate
 
         series(result, (options.key?(:default_value) ? options[:default_value] : 0), multiple_groups, reverse)
       else
+        # for ActiveRecord::Calculations methods that don't call calculate, like pluck
         result
       end
     end
