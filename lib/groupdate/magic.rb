@@ -370,8 +370,14 @@ module Groupdate
 
         group_str = relation.send(:sanitize_sql_array, query)
 
-        # cleaner queries in logs (Postgres)
+        # cleaner queries in logs
+        # Postgres
         group_str = group_str.gsub(/ (\-|\+) INTERVAL '0 second'/, "")
+        # MySQL
+        group_str = group_str.gsub("DATE_SUB(#{column}, INTERVAL 0 second)", "#{column}")
+        if group_str.start_with?("DATE_ADD(") && group_str.end_with?(", INTERVAL 0 second)")
+          group_str = group_str[9..-21]
+        end
 
         group = relation.group(group_str)
         relation =
