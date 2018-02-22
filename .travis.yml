@@ -8,7 +8,7 @@ gemfile:
   - test/gemfiles/activerecord50.gemfile
   - test/gemfiles/activerecord42.gemfile
 sudo: false
-script: RUBYOPT=W0 bundle exec rake test
+script: bundle exec rake test
 before_install:
   - gem install bundler
   - mysql -e 'create database groupdate_test;'
