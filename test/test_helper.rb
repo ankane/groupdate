@@ -90,16 +90,6 @@ module TestDatabase
     assert_equal 23, User.group_by_hour_of_day(:created_at).order("hour_of_day DESC").count.keys.first
   end
 
-  def test_order_hour_of_day_reverse
-    skip if ActiveRecord::VERSION::MAJOR == 5
-    assert_equal 23, User.group_by_hour_of_day(:created_at).reverse_order.count.keys.first
-  end
-
-  def test_order_hour_of_day_order_reverse
-    skip if ActiveRecord::VERSION::MAJOR == 5
-    assert_equal 0, User.group_by_hour_of_day(:created_at).order("hour_of_day desc").reverse_order.count.keys.first
-  end
-
   def test_table_name
     # This test is to ensure there's not an error when using the table
     # name as part of the column name.
