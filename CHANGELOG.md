@@ -1,6 +1,9 @@
-## 3.3.0 [unreleased]
+## 4.0.0 [unreleased]
 
 - Fixed issue with custom calculation methods returning `Groupdate::Series`
+
+## 3.2.1
+
 - Added `minute_of_hour`
 - Added support for `unscoped`
 
