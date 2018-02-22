@@ -383,24 +383,6 @@ module Groupdate
         relation
       end
 
-      def before_perform(relation)
-        # undo reverse since we do not want this to appear in the query
-        reverse = relation.send(:reverse_order_value)
-        relation = relation.except(:reverse_order) if reverse
-        order = relation.order_values.first
-        if order.is_a?(String)
-          parts = order.split(" ")
-          reverse_order = (parts.size == 2 && (parts[0].to_sym == period || (activerecord42? && parts[0] == "#{relation.quoted_table_name}.#{relation.quoted_primary_key}")) && parts[1].to_s.downcase == "desc")
-          if reverse_order
-            reverse = !reverse
-            relation = relation.reorder(relation.order_values[1..-1])
-          end
-        end
-        @reverse = reverse
-
-        relation
-      end
-
       def perform(relation, result)
         multiple_groups = relation.group_values.size > 1
 
@@ -424,10 +406,6 @@ module Groupdate
         series(result, (options.key?(:default_value) ? options[:default_value] : 0), multiple_groups, @reverse)
       end
 
-      def activerecord42?
-        ActiveRecord::VERSION::STRING.starts_with?("4.2.")
-      end
-
       def self.generate_relation(relation, field:, **options)
         magic = Groupdate::Magic::Relation.new(**options)
 
@@ -440,15 +418,8 @@ module Groupdate
         relation
       end
 
-      def self.unwind_relation(relation, method, *args, &block)
-        relation = relation.dup
-        groupdate_values = relation.groupdate_values
-        groupdate_values.each do |gv|
-          relation = gv.before_perform(relation)
-        end
-        relation.groupdate_values = nil
-        result = relation.send(method, *args, &block)
-        groupdate_values.reverse.each do |gv|
+      def self.unwind_relation(relation, result)
+        relation.groupdate_values.reverse.each do |gv|
           result = gv.perform(relation, result)
         end
         result

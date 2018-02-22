@@ -82,14 +82,6 @@ module TestDatabase
     assert_equal expected, User.where("id = 0").group_by_day(:created_at, range: Date.parse("2013-05-01")..Date.parse("2013-05-01 23:59:59 UTC")).count
   end
 
-  def test_order_hour_of_day
-    assert_equal 23, User.group_by_hour_of_day(:created_at).order("hour_of_day desc").count.keys.first
-  end
-
-  def test_order_hour_of_day_case
-    assert_equal 23, User.group_by_hour_of_day(:created_at).order("hour_of_day DESC").count.keys.first
-  end
-
   def test_table_name
     # This test is to ensure there's not an error when using the table
     # name as part of the column name.
