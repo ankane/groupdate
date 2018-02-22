@@ -381,7 +381,6 @@ module Groupdate
         # TODO do not change object state
         @group_index = group.group_values.size - 1
 
-        (relation.groupdate_values ||= []) << self
         relation
       end
 
@@ -429,10 +428,18 @@ module Groupdate
       end
 
       def self.generate_relation(relation, field:, **options)
-        Groupdate::Magic::Relation.new(**options).relation(field, relation)
+        magic = Groupdate::Magic::Relation.new(**options)
+
+        # generate ActiveRecord relation
+        relation = magic.relation(field, relation)
+
+        # add Groupdate info
+        (relation.groupdate_values ||= []) << magic
+
+        relation
       end
 
-      def self.unwind(relation, method, *args, &block)
+      def self.unwind_relation(relation, method, *args, &block)
         relation = relation.dup
         groupdate_values = relation.groupdate_values
         groupdate_values.each do |gv|

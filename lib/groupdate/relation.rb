@@ -10,7 +10,7 @@ module Groupdate
 
     def calculate(*args, &block)
       if groupdate_values
-        Groupdate::Magic::Relation.unwind(self, :calculate, *args, &block)
+        Groupdate::Magic::Relation.unwind_relation(self, :calculate, *args, &block)
       else
         super
       end
