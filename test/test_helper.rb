@@ -781,6 +781,24 @@ module TestGroupdate
     assert_result :day_of_week, 3, "2013-01-02 10:00:00", true, day_start: 2
   end
 
+  # day of week week start monday
+
+  def test_day_of_week_end_of_day_week_start_mon
+    assert_result :day_of_week, 1, "2013-01-01 23:59:59", false, week_start: :mon
+  end
+
+  def test_day_of_week_start_of_day_week_start_mon
+    assert_result :day_of_week, 2, "2013-01-02 00:00:00", false, week_start: :mon
+  end
+
+  def test_day_of_week_end_of_week_with_time_zone_week_start_mon
+    assert_result :day_of_week, 1, "2013-01-02 07:59:59", true, week_start: :mon
+  end
+
+  def test_day_of_week_start_of_week_with_time_zone_week_start_mon
+    assert_result :day_of_week, 2, "2013-01-02 08:00:00", true, week_start: :mon
+  end
+
   # day of month
 
   def test_day_of_month_end_of_day
@@ -1081,6 +1099,10 @@ module TestGroupdate
   def test_format_day_of_week_week_start
     create_user "2014-03-01"
     assert_format :day_of_week, "Sat", "%a", week_start: :mon
+  end
+
+  def test_format_day_of_week_week_start
+    assert_equal "Mon", call_method(:day_of_week, :created_at, week_start: :mon, format: "%a", series: true).keys.first
   end
 
   def test_format_day_of_month

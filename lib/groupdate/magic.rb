@@ -155,7 +155,7 @@ module Groupdate
               when :minute_of_hour
                 key = sunday + key.minutes + day_start.seconds
               when :day_of_week
-                key = sunday + key.days
+                key = sunday + key.days + (week_start + 1).days
               when :day_of_month
                 key = Date.new(2014, 1, key).to_time
               when :month_of_year
@@ -210,7 +210,7 @@ module Groupdate
         when :minute_of_hour
           time.min
         when :day_of_week
-          time.wday
+          (time.wday - 1 - week_start) % 7
         when :day_of_month
           time.day
         when :month_of_year
@@ -407,7 +407,9 @@ module Groupdate
 
         cast_method =
           case period
-          when :day_of_week, :hour_of_day, :day_of_month, :month_of_year, :minute_of_hour
+          when :day_of_week
+            lambda { |k| (k.to_i - 1 - week_start) % 7 }
+          when :hour_of_day, :day_of_month, :month_of_year, :minute_of_hour
             lambda { |k| k.to_i }
           else
             utc = ActiveSupport::TimeZone["UTC"]
