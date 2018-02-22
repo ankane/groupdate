@@ -400,6 +400,12 @@ module TestDatabase
     assert_equal [0], User.group_by_hour_of_day(:created_at).pluck(0)
   end
 
+  # test relation
+
+  def test_relation
+    assert User.group_by_day(:created_at).is_a?(ActiveRecord::Relation)
+  end
+
   private
 
   def call_method(method, field, options)
