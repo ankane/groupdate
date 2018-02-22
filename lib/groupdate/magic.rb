@@ -4,7 +4,7 @@ module Groupdate
   class Magic
     attr_accessor :period, :options
 
-    def initialize(period, **options)
+    def initialize(period:, **options)
       @period = period
       @options = options
 
@@ -227,11 +227,15 @@ module Groupdate
         group = enum.group_by { |v| v = yield(v); v ? round_time(v) : nil }
         series(group, [], false, false, false)
       end
+
+      def self.group_by(enum, period, options, &block)
+        Groupdate::Magic::Enumerable.new(period: period, **options).group_by(enum, &block)
+      end
     end
 
     class Relation < Magic
-      def initialize(period, **options)
-        super(period, options.reject { |k, _| [:default_value, :carry_forward, :last, :current].include?(k) })
+      def initialize(**options)
+        super(**options.reject { |k, _| [:default_value, :carry_forward, :last, :current].include?(k) })
         @options = options
       end
 
@@ -422,6 +426,14 @@ module Groupdate
 
       def activerecord42?
         ActiveRecord::VERSION::STRING.starts_with?("4.2.")
+      end
+
+      def self.generate_relation(relation, period, field, *args)
+        args = args.dup
+        options = (args[-1].is_a?(Hash) ? args.pop : {}).dup
+        options[:time_zone] ||= args[0] unless args[0].nil?
+        options[:range] ||= args[1] unless args[1].nil?
+        Groupdate::Magic::Relation.new(period: period, **options).relation(field, relation)
       end
 
       def self.unwind(relation, method, *args, &block)

@@ -2,12 +2,7 @@ module Groupdate
   module Scopes
     Groupdate::PERIODS.each do |period|
       define_method :"group_by_#{period}" do |field, *args|
-        args = args.dup
-        options = args[-1].is_a?(Hash) ? args.pop : {}
-        options[:time_zone] ||= args[0] unless args[0].nil?
-        options[:range] ||= args[1] unless args[1].nil?
-
-        Groupdate::Magic::Relation.new(period, options).relation(field, self)
+        Groupdate::Magic::Relation.generate_relation(self, period, field, *args)
       end
     end
 
