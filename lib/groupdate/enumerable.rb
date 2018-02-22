@@ -16,7 +16,7 @@ module Enumerable
       period = args[0]
       options = args[1] || {}
 
-      optinos = options.dup
+      options = options.dup
       # to_sym is unsafe on user input, so convert to strings
       permitted_periods = ((options.delete(:permit) || Groupdate::PERIODS).map(&:to_sym) & Groupdate::PERIODS).map(&:to_s)
       if permitted_periods.include?(period.to_s)
