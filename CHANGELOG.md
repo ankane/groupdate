@@ -1,6 +1,14 @@
 ## 4.0.0 [unreleased]
 
-- Fixed issue with custom calculation methods returning `Groupdate::Series`
+- Custom calculation methods are supported by default - `groupdate_calculation_methods` is no longer needed
+
+Breaking changes
+
+- Dropped support for Rails < 4.2
+- Invalid options now throw an `ArgumentError`
+- `group_by` methods return an `ActiveRecord::Relation` instead of a `Groupdate::Series`
+- `week_start` now affects `day_of_week`
+- Removed support for `reverse_order` (was never supported in Rails 5)
 
 ## 3.2.1
 
