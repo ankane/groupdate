@@ -10,7 +10,7 @@ Minitest::Test = Minitest::Unit::TestCase unless defined?(Minitest::Test)
 ENV["TZ"] = "UTC"
 
 # for debugging
-# ActiveRecord::Base.logger = Logger.new(STDOUT)
+ActiveRecord::Base.logger = ActiveSupport::Logger.new(STDOUT) if ENV["VERBOSE"]
 
 # rails does this in activerecord/lib/active_record/railtie.rb
 ActiveRecord::Base.default_timezone = :utc
@@ -20,10 +20,6 @@ class User < ActiveRecord::Base
   has_many :posts
 
   def self.custom_count
-    count
-  end
-
-  def self.unlisted_calculation
     count
   end
 end
