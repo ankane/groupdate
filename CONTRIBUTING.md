@@ -60,6 +60,9 @@ git clone https://github.com/ankane/groupdate.git
 cd groupdate
 bundle install
 bundle exec rake test
+
+# run a single test file
+ruby test/postgresql_test.rb
 ```
 
 ---
