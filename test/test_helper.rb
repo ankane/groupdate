@@ -419,6 +419,13 @@ module TestDatabase
     assert_equal User.all, User.group_by_day(:created_at).unscoped.all
   end
 
+  # pluck
+
+  def test_pluck
+    create_user "2014-05-01"
+    assert_equal [0], User.group_by_hour_of_day(:created_at).pluck(0)
+  end
+
   private
 
   def call_method(method, field, options)

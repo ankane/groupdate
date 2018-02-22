@@ -189,13 +189,17 @@ module Groupdate
         end
 
       result = relation.send(method, *args, &block)
-      missing_time_zone_support = multiple_groups ? (result.keys.first && result.keys.first[@group_index].nil?) : result.key?(nil)
-      if missing_time_zone_support
-        raise Groupdate::Error, "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
-      end
-      result = Hash[result.map { |k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] }]
+      if result.is_a?(Hash)
+        missing_time_zone_support = multiple_groups ? (result.keys.first && result.keys.first[@group_index].nil?) : result.key?(nil)
+        if missing_time_zone_support
+          raise Groupdate::Error, "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
+        end
+        result = Hash[result.map { |k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] }]
 
-      series(result, (options.key?(:default_value) ? options[:default_value] : 0), multiple_groups, reverse)
+        series(result, (options.key?(:default_value) ? options[:default_value] : 0), multiple_groups, reverse)
+      else
+        result
+      end
     end
 
     protected
