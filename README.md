@@ -254,11 +254,10 @@ Groupdate.time_zone = false
 
 Groupdate 4.0 brings a number of improvements.  Here are a few to be aware of:
 
-- Custom calculation methods are supported by default - `groupdate_calculation_methods` is no longer needed
-- Invalid options now throw an `ArgumentError`
-- Rails < 4.2 is no longer supported
 - `group_by` methods return an `ActiveRecord::Relation` instead of a `Groupdate::Series`
+- Invalid options now throw an `ArgumentError`
 - `week_start` now affects `day_of_week`
+- Custom calculation methods are supported by default
 
 ### 3.0
 
