@@ -5,9 +5,12 @@ require "groupdate/calculations"
 require "groupdate/series"
 
 ActiveRecord::Base.send(:extend, Groupdate::Scopes)
+ActiveRecord::Calculations.prepend(Groupdate::Calculations)
 
 module ActiveRecord
   class Relation
+    attr_accessor :groupdate_values
+
     if ActiveRecord::VERSION::MAJOR == 3 && ActiveRecord::VERSION::MINOR < 2
 
       def method_missing_with_hack(method, *args, &block)

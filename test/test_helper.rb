@@ -19,10 +19,6 @@ ActiveRecord::Base.time_zone_aware_attributes = true
 class User < ActiveRecord::Base
   has_many :posts
 
-  def self.groupdate_calculation_methods
-    [:custom_count, :undefined_calculation]
-  end
-
   def self.custom_count
     count
   end
@@ -401,10 +397,6 @@ module TestDatabase
     }
 
     assert_equal expected, User.group_by_day(:created_at).custom_count
-  end
-
-  def test_using_unlisted_calculation_method_returns_new_series_instance
-    assert_instance_of Groupdate::Series, User.group_by_day(:created_at).unlisted_calculation
   end
 
   def test_using_listed_but_undefined_custom_calculation_method_raises_error

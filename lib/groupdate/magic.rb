@@ -4,6 +4,20 @@ module Groupdate
   class Magic
     attr_accessor :period, :options
 
+    def self.unwind(relation, method, *args, &block)
+      relation = relation.dup
+      groupdate_values = relation.groupdate_values
+      groupdate_values.each do |gv|
+        relation = gv.before_perform(relation)
+      end
+      relation.groupdate_values = nil
+      result = relation.send(method, *args, &block)
+      groupdate_values.reverse.each do |gv|
+        result = gv.perform(relation, result)
+      end
+      result
+    end
+
     def initialize(period, options)
       @period = period
       @options = options
@@ -160,10 +174,11 @@ module Groupdate
       # TODO do not change object state
       @group_index = group.group_values.size - 1
 
+      (relation.groupdate_values ||= []) << self
       Groupdate::Series.new(self, relation)
     end
 
-    def perform(relation, method, *args, &block)
+    def before_perform(relation)
       # undo reverse since we do not want this to appear in the query
       reverse = relation.send(:reverse_order_value)
       relation = relation.except(:reverse_order) if reverse
@@ -176,7 +191,12 @@ module Groupdate
           relation = relation.reorder(relation.order_values[1..-1])
         end
       end
+      @reverse = reverse
 
+      relation
+    end
+
+    def perform(relation, result)
       multiple_groups = relation.group_values.size > 1
 
       cast_method =
@@ -188,19 +208,13 @@ module Groupdate
           lambda { |k| (k.is_a?(String) || !k.respond_to?(:to_time) ? utc.parse(k.to_s) : k.to_time).in_time_zone(time_zone) }
         end
 
-      result = relation.send(method, *args, &block)
-      if result.is_a?(Hash)
-        missing_time_zone_support = multiple_groups ? (result.keys.first && result.keys.first[@group_index].nil?) : result.key?(nil)
-        if missing_time_zone_support
-          raise Groupdate::Error, "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
-        end
-        result = Hash[result.map { |k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] }]
-
-        series(result, (options.key?(:default_value) ? options[:default_value] : 0), multiple_groups, reverse)
-      else
-        # for ActiveRecord::Calculations methods that don't call calculate, like pluck
-        result
+      missing_time_zone_support = multiple_groups ? (result.keys.first && result.keys.first[@group_index].nil?) : result.key?(nil)
+      if missing_time_zone_support
+        raise Groupdate::Error, "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
       end
+      result = Hash[result.map { |k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] }]
+
+      series(result, (options.key?(:default_value) ? options[:default_value] : 0), multiple_groups, @reverse)
     end
 
     protected
