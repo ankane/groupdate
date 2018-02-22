@@ -1,4 +1,4 @@
-## 3.2.1 [unreleased]
+## 3.2.1
 
 - Added `minute_of_hour`
 - Added support for `unscoped`
