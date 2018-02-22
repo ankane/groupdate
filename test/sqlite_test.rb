@@ -17,11 +17,6 @@ class TestSqlite < Minitest::Test
     skip
   end
 
-  def test_zeros_datetime
-    skip if ENV["TRAVIS"]
-    super
-  end
-
   def call_method(method, field, options)
     if method == :quarter || options[:time_zone] || options[:day_start] || options[:week_start] || Groupdate.week_start != :sun || (Time.zone && options[:time_zone] != false)
       error = assert_raises(Groupdate::Error) { super }
