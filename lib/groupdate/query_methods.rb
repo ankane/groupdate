@@ -1,5 +1,5 @@
 module Groupdate
-  module Scopes
+  module QueryMethods
     Groupdate::PERIODS.each do |period|
       define_method :"group_by_#{period}" do |field, time_zone = nil, range = nil, **options|
         Groupdate::Magic::Relation.generate_relation(self,

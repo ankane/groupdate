@@ -1,6 +1,6 @@
 require "active_record"
-require "groupdate/scopes"
+require "groupdate/query_methods"
 require "groupdate/relation"
 
-ActiveRecord::Base.extend(Groupdate::Scopes)
+ActiveRecord::Base.extend(Groupdate::QueryMethods)
 ActiveRecord::Relation.include(Groupdate::Relation)
