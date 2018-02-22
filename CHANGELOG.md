@@ -1,4 +1,4 @@
-## 4.0.0 [unreleased]
+## 4.0.0
 
 - Custom calculation methods are supported by default - `groupdate_calculation_methods` is no longer needed
 
