@@ -418,7 +418,7 @@ module Groupdate
         relation
       end
 
-      def self.unwind_relation(relation, result)
+      def self.process_result(relation, result)
         relation.groupdate_values.reverse.each do |gv|
           result = gv.perform(relation, result)
         end
