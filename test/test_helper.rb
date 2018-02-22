@@ -769,6 +769,10 @@ module TestGroupdate
     assert_result :day_of_week, 2, "2013-01-01 23:59:59"
   end
 
+  def test_day_of_week_end_of_day_week_start_mon
+    assert_result :day_of_week, 1, "2013-01-01 23:59:59", false, week_start: :mon
+  end
+
   def test_day_of_week_start_of_day
     assert_result :day_of_week, 3, "2013-01-02 00:00:00"
   end
