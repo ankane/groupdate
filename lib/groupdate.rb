@@ -2,6 +2,7 @@ require "active_support/core_ext/module/attribute_accessors"
 require "active_support/time"
 require "groupdate/version"
 require "groupdate/relation_builder"
+require "groupdate/series_builder"
 require "groupdate/magic"
 
 module Groupdate
