@@ -2,7 +2,7 @@ require "i18n"
 
 module Groupdate
   class Magic
-    attr_accessor :period, :options
+    attr_accessor :period, :options, :group_index
 
     def initialize(period:, **options)
       @period = period
@@ -14,8 +14,6 @@ module Groupdate
       raise Groupdate::Error, "Unrecognized time zone" unless time_zone
       raise Groupdate::Error, "Unrecognized :week_start option" if period == :week && !week_start
     end
-
-    protected
 
     def time_zone
       @time_zone ||= begin
@@ -70,6 +68,8 @@ module Groupdate
       end
     end
 
+    private
+
     def series(count, default_value, multiple_groups = false, reverse = false, series_default = true)
       reverse = !reverse if options[:reverse]
 
@@ -94,7 +94,7 @@ module Groupdate
               # use first and last values
               sorted_keys =
                 if multiple_groups
-                  count.keys.map { |k| k[@group_index] }.sort
+                  count.keys.map { |k| k[group_index] }.sort
                 else
                   count.keys.sort
                 end
@@ -128,10 +128,10 @@ module Groupdate
 
       series =
         if multiple_groups
-          keys = count.keys.map { |k| k[0...@group_index] + k[(@group_index + 1)..-1] }.uniq
+          keys = count.keys.map { |k| k[0...group_index] + k[(group_index + 1)..-1] }.uniq
           series = series.to_a.reverse if reverse
           keys.flat_map do |k|
-            series.map { |s| k[0...@group_index] + [s] + k[@group_index..-1] }
+            series.map { |s| k[0...group_index] + [s] + k[group_index..-1] }
           end
         else
           series
@@ -178,7 +178,7 @@ module Groupdate
       value = 0
       Hash[series.map do |k|
         value = count[k] || (@options[:carry_forward] && value) || default_value
-        [multiple_groups ? k[0...@group_index] + [key_format.call(k[@group_index])] + k[(@group_index + 1)..-1] : key_format.call(k), value]
+        [multiple_groups ? k[0...group_index] + [key_format.call(k[group_index])] + k[(group_index + 1)..-1] : key_format.call(k), value]
       end]
     end
 
@@ -239,161 +239,6 @@ module Groupdate
         @options = options
       end
 
-      def relation(column, relation)
-        if relation.default_timezone == :local
-          raise Groupdate::Error, "ActiveRecord::Base.default_timezone must be :utc to use Groupdate"
-        end
-
-        time_zone = self.time_zone.tzinfo.name
-
-        adapter_name = relation.connection.adapter_name
-        query =
-          case adapter_name
-          when "MySQL", "Mysql2", "Mysql2Spatial", 'Mysql2Rgeo'
-            case period
-            when :day_of_week
-              ["DAYOFWEEK(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)) - 1", time_zone]
-            when :hour_of_day
-              ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) + 24 - #{day_start / 3600}) % 24", time_zone]
-            when :minute_of_hour
-              ["(EXTRACT(MINUTE from CONVERT_TZ(#{column}, '+00:00', ?)))", time_zone]
-            when :day_of_month
-              ["DAYOFMONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?))", time_zone]
-            when :month_of_year
-              ["MONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?))", time_zone]
-            when :week
-              ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL ((#{7 - week_start} + WEEKDAY(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} second)) % 7) DAY) - INTERVAL #{day_start} second, '+00:00', ?), '%Y-%m-%d 00:00:00') + INTERVAL #{day_start} second, ?, '+00:00')", time_zone, time_zone, time_zone]
-            when :quarter
-              ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(EXTRACT(YEAR FROM CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S'), ?, '+00:00'), INTERVAL #{day_start} second)", time_zone, time_zone, time_zone]
-            else
-              format =
-                case period
-                when :second
-                  "%Y-%m-%d %H:%i:%S"
-                when :minute
-                  "%Y-%m-%d %H:%i:00"
-                when :hour
-                  "%Y-%m-%d %H:00:00"
-                when :day
-                  "%Y-%m-%d 00:00:00"
-                when :month
-                  "%Y-%m-01 00:00:00"
-                else # year
-                  "%Y-01-01 00:00:00"
-                end
-
-              ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?), '#{format}'), ?, '+00:00'), INTERVAL #{day_start} second)", time_zone, time_zone]
-            end
-          when "PostgreSQL", "PostGIS"
-            case period
-            when :day_of_week
-              ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
-            when :hour_of_day
-              ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
-            when :minute_of_hour
-              ["EXTRACT(MINUTE from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
-            when :day_of_month
-              ["EXTRACT(DAY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
-            when :month_of_year
-              ["EXTRACT(MONTH from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
-            when :week # start on Sunday, not PostgreSQL default Monday
-              ["(DATE_TRUNC('#{period}', (#{column}::timestamptz - INTERVAL '#{week_start} day' - INTERVAL '#{day_start} second') AT TIME ZONE ?) + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second') AT TIME ZONE ?", time_zone, time_zone]
-            else
-              ["(DATE_TRUNC('#{period}', (#{column}::timestamptz - INTERVAL '#{day_start} second') AT TIME ZONE ?) + INTERVAL '#{day_start} second') AT TIME ZONE ?", time_zone, time_zone]
-            end
-          when "SQLite"
-            raise Groupdate::Error, "Time zones not supported for SQLite" unless self.time_zone.utc_offset.zero?
-            raise Groupdate::Error, "day_start not supported for SQLite" unless day_start.zero?
-            raise Groupdate::Error, "week_start not supported for SQLite" unless week_start == 6
-
-            if period == :week
-              ["strftime('%%Y-%%m-%%d 00:00:00 UTC', #{column}, '-6 days', 'weekday 0')"]
-            else
-              format =
-                case period
-                when :hour_of_day
-                  "%H"
-                when :minute_of_hour
-                  "%M"
-                when :day_of_week
-                  "%w"
-                when :day_of_month
-                  "%d"
-                when :month_of_year
-                  "%m"
-                when :second
-                  "%Y-%m-%d %H:%M:%S UTC"
-                when :minute
-                  "%Y-%m-%d %H:%M:00 UTC"
-                when :hour
-                  "%Y-%m-%d %H:00:00 UTC"
-                when :day
-                  "%Y-%m-%d 00:00:00 UTC"
-                when :month
-                  "%Y-%m-01 00:00:00 UTC"
-                when :quarter
-                  raise Groupdate::Error, "Quarter not supported for SQLite"
-                else # year
-                  "%Y-01-01 00:00:00 UTC"
-                end
-
-              ["strftime('#{format.gsub(/%/, '%%')}', #{column})"]
-            end
-          when "Redshift"
-            case period
-            when :day_of_week
-              ["EXTRACT(DOW from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
-            when :hour_of_day
-              ["EXTRACT(HOUR from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
-            when :minute_of_hour
-              ["EXTRACT(MINUTE from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
-            when :day_of_month
-              ["EXTRACT(DAY from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
-            when :month_of_year
-              ["EXTRACT(MONTH from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL '#{day_start} second')::integer", time_zone]
-            when :week # start on Sunday, not Redshift default Monday
-              # Redshift does not return timezone information; it
-              # always says it is in UTC time, so we must convert
-              # back to UTC to play properly with the rest of Groupdate.
-              #
-              ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, CONVERT_TIMEZONE(?, #{column}) - INTERVAL '#{week_start} day' - INTERVAL '#{day_start} second'))::timestamp + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second'", time_zone, period, time_zone]
-            else
-              ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, CONVERT_TIMEZONE(?, #{column}) - INTERVAL '#{day_start} second'))::timestamp + INTERVAL '#{day_start} second'", time_zone, period, time_zone]
-            end
-          else
-            raise Groupdate::Error, "Connection adapter not supported: #{adapter_name}"
-          end
-
-        if adapter_name == "MySQL" && period == :week
-          query[0] = "CAST(#{query[0]} AS DATETIME)"
-        end
-
-        group_str = relation.send(:sanitize_sql_array, query)
-
-        # cleaner queries in logs
-        # Postgres
-        group_str = group_str.gsub(/ (\-|\+) INTERVAL '0 second'/, "")
-        # MySQL
-        group_str = group_str.gsub("DATE_SUB(#{column}, INTERVAL 0 second)", "#{column}")
-        if group_str.start_with?("DATE_ADD(") && group_str.end_with?(", INTERVAL 0 second)")
-          group_str = group_str[9..-21]
-        end
-
-        group = relation.group(group_str)
-        relation =
-          if time_range.is_a?(Range)
-            # doesn't matter whether we include the end of a ... range - it will be excluded later
-            group.where("#{column} >= ? AND #{column} <= ?", time_range.first, time_range.last)
-          else
-            group.where("#{column} IS NOT NULL")
-          end
-
-        # TODO do not change object state
-        @group_index = group.group_values.size - 1
-
-        relation
-      end
-
       def perform(relation, result)
         multiple_groups = relation.group_values.size > 1
 
@@ -408,22 +253,32 @@ module Groupdate
             lambda { |k| (k.is_a?(String) || !k.respond_to?(:to_time) ? utc.parse(k.to_s) : k.to_time).in_time_zone(time_zone) }
           end
 
-        missing_time_zone_support = multiple_groups ? (result.keys.first && result.keys.first[@group_index].nil?) : result.key?(nil)
+        missing_time_zone_support = multiple_groups ? (result.keys.first && result.keys.first[group_index].nil?) : result.key?(nil)
         if missing_time_zone_support
           raise Groupdate::Error, "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
         end
-        result = Hash[result.map { |k, v| [multiple_groups ? k[0...@group_index] + [cast_method.call(k[@group_index])] + k[(@group_index + 1)..-1] : cast_method.call(k), v] }]
+        result = Hash[result.map { |k, v| [multiple_groups ? k[0...group_index] + [cast_method.call(k[group_index])] + k[(group_index + 1)..-1] : cast_method.call(k), v] }]
 
-        series(result, (options.key?(:default_value) ? options[:default_value] : 0), multiple_groups, @reverse)
+        series(result, (options.key?(:default_value) ? options[:default_value] : 0), multiple_groups)
       end
 
       def self.generate_relation(relation, field:, **options)
         magic = Groupdate::Magic::Relation.new(**options)
 
         # generate ActiveRecord relation
-        relation = magic.relation(field, relation)
+        relation =
+          RelationBuilder.new(
+            relation,
+            column: field,
+            period: magic.period,
+            time_zone: magic.time_zone,
+            time_range: magic.time_range,
+            week_start: magic.week_start,
+            day_start: magic.day_start
+          ).generate
 
         # add Groupdate info
+        magic.group_index = relation.group_values.size - 1
         (relation.groupdate_values ||= []) << magic
 
         relation
