@@ -70,65 +70,68 @@ module Groupdate
 
     private
 
-    def series(count, default_value, multiple_groups = false, reverse = false, series_default = true)
+    def generate_series(data, multiple_groups)
+      case period
+      when :day_of_week
+        0..6
+      when :hour_of_day
+        0..23
+      when :minute_of_hour
+        0..59
+      when :day_of_month
+        1..31
+      when :month_of_year
+        1..12
+      else
+        time_range = self.time_range
+        time_range =
+          if time_range.is_a?(Range)
+            time_range
+          else
+            # use first and last values
+            sorted_keys =
+              if multiple_groups
+                data.keys.map { |k| k[group_index] }.sort
+              else
+                data.keys.sort
+              end
+            sorted_keys.first..sorted_keys.last
+          end
+
+        if time_range.first
+          series = [round_time(time_range.first)]
+
+          if period == :quarter
+            step = 3.months
+          else
+            step = 1.send(period)
+          end
+
+          last_step = series.last
+          while (next_step = round_time(last_step + step)) && time_range.cover?(next_step)
+            if next_step == last_step
+              last_step += step
+              next
+            end
+            series << next_step
+            last_step = next_step
+          end
+
+          series
+        else
+          []
+        end
+      end
+    end
+
+    def series(data, default_value: nil, multiple_groups: false, series_default: true)
       reverse = !reverse if options[:reverse]
 
-      series =
-        case period
-        when :day_of_week
-          0..6
-        when :hour_of_day
-          0..23
-        when :minute_of_hour
-          0..59
-        when :day_of_month
-          1..31
-        when :month_of_year
-          1..12
-        else
-          time_range = self.time_range
-          time_range =
-            if time_range.is_a?(Range)
-              time_range
-            else
-              # use first and last values
-              sorted_keys =
-                if multiple_groups
-                  count.keys.map { |k| k[group_index] }.sort
-                else
-                  count.keys.sort
-                end
-              sorted_keys.first..sorted_keys.last
-            end
-
-          if time_range.first
-            series = [round_time(time_range.first)]
-
-            if period == :quarter
-              step = 3.months
-            else
-              step = 1.send(period)
-            end
-
-            last_step = series.last
-            while (next_step = round_time(last_step + step)) && time_range.cover?(next_step)
-              if next_step == last_step
-                last_step += step
-                next
-              end
-              series << next_step
-              last_step = next_step
-            end
-
-            series
-          else
-            []
-          end
-        end
+      series = generate_series(data, multiple_groups)
 
       series =
         if multiple_groups
-          keys = count.keys.map { |k| k[0...group_index] + k[(group_index + 1)..-1] }.uniq
+          keys = data.keys.map { |k| k[0...group_index] + k[(group_index + 1)..-1] }.uniq
           series = series.to_a.reverse if reverse
           keys.flat_map do |k|
             series.map { |s| k[0...group_index] + [s] + k[group_index..-1] }
@@ -172,12 +175,12 @@ module Groupdate
 
       use_series = options.key?(:series) ? options[:series] : series_default
       if use_series == false
-        series = series.select { |k| count[k] }
+        series = series.select { |k| data[k] }
       end
 
       value = 0
       Hash[series.map do |k|
-        value = count[k] || (@options[:carry_forward] && value) || default_value
+        value = data[k] || (@options[:carry_forward] && value) || default_value
         [multiple_groups ? k[0...group_index] + [key_format.call(k[group_index])] + k[(group_index + 1)..-1] : key_format.call(k), value]
       end]
     end
@@ -225,7 +228,7 @@ module Groupdate
     class Enumerable < Magic
       def group_by(enum, &_block)
         group = enum.group_by { |v| v = yield(v); v ? round_time(v) : nil }
-        series(group, [], false, false, false)
+        series(group, default_value: [], series_default: false)
       end
 
       def self.group_by(enum, period, options, &block)
@@ -259,7 +262,7 @@ module Groupdate
         end
         result = Hash[result.map { |k, v| [multiple_groups ? k[0...group_index] + [cast_method.call(k[group_index])] + k[(group_index + 1)..-1] : cast_method.call(k), v] }]
 
-        series(result, (options.key?(:default_value) ? options[:default_value] : 0), multiple_groups)
+        series(result, default_value: (options.key?(:default_value) ? options[:default_value] : 0), multiple_groups: multiple_groups)
       end
 
       def self.generate_relation(relation, field:, **options)
