@@ -156,7 +156,9 @@ module Groupdate
       end
     end
 
-    def handle_multiple(data, series, multiple_groups, reverse)
+    def handle_multiple(data, series, multiple_groups)
+      reverse = options[:reverse]
+
       if multiple_groups
         keys = data.keys.map { |k| k[0...group_index] + k[(group_index + 1)..-1] }.uniq
         series = series.to_a.reverse if reverse
@@ -170,21 +172,29 @@ module Groupdate
       end
     end
 
+    def entire_series?(series_default)
+      options.key?(:series) ? options[:series] : series_default
+    end
+
     def series(data, default_value: nil, multiple_groups: false, series_default: true)
-      reverse = !reverse if options[:reverse]
-
       series = generate_series(data, multiple_groups)
-      series = handle_multiple(data, series, multiple_groups, reverse)
+      series = handle_multiple(data, series, multiple_groups)
 
-      use_series = options.key?(:series) ? options[:series] : series_default
-      if use_series == false
+      unless entire_series?(series_default)
         series = series.select { |k| data[k] }
       end
 
       value = 0
       Hash[series.map do |k|
         value = data[k] || (@options[:carry_forward] && value) || default_value
-        [multiple_groups ? k[0...group_index] + [key_format.call(k[group_index])] + k[(group_index + 1)..-1] : key_format.call(k), value]
+        key =
+          if multiple_groups
+            k[0...group_index] + [key_format.call(k[group_index])] + k[(group_index + 1)..-1]
+          else
+            key_format.call(k)
+          end
+
+        [key, value]
       end]
     end
 
