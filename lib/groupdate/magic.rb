@@ -66,22 +66,8 @@ module Groupdate
       def perform(relation, result)
         multiple_groups = relation.group_values.size > 1
 
-        cast_method =
-          case period
-          when :day_of_week
-            lambda { |k| (k.to_i - 1 - week_start) % 7 }
-          when :hour_of_day, :day_of_month, :month_of_year, :minute_of_hour
-            lambda { |k| k.to_i }
-          else
-            utc = ActiveSupport::TimeZone["UTC"]
-            lambda { |k| (k.is_a?(String) || !k.respond_to?(:to_time) ? utc.parse(k.to_s) : k.to_time).in_time_zone(time_zone) }
-          end
-
-        missing_time_zone_support = multiple_groups ? (result.keys.first && result.keys.first[group_index].nil?) : result.key?(nil)
-        if missing_time_zone_support
-          raise Groupdate::Error, "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
-        end
-        result = Hash[result.map { |k, v| [multiple_groups ? k[0...group_index] + [cast_method.call(k[group_index])] + k[(group_index + 1)..-1] : cast_method.call(k), v] }]
+        check_time_zone_support(result, multiple_groups)
+        result = cast_result(result, multiple_groups)
 
         series_builder.generate(
           result,
@@ -89,6 +75,29 @@ module Groupdate
           multiple_groups: multiple_groups,
           group_index: group_index
         )
+      end
+
+      def cast_method
+        case period
+        when :day_of_week
+          lambda { |k| (k.to_i - 1 - week_start) % 7 }
+        when :hour_of_day, :day_of_month, :month_of_year, :minute_of_hour
+          lambda { |k| k.to_i }
+        else
+          utc = ActiveSupport::TimeZone["UTC"]
+          lambda { |k| (k.is_a?(String) || !k.respond_to?(:to_time) ? utc.parse(k.to_s) : k.to_time).in_time_zone(time_zone) }
+        end
+      end
+
+      def cast_result(result, multiple_groups)
+        Hash[result.map { |k, v| [multiple_groups ? k[0...group_index] + [cast_method.call(k[group_index])] + k[(group_index + 1)..-1] : cast_method.call(k), v] }]
+      end
+
+      def check_time_zone_support(result, multiple_groups)
+        missing_time_zone_support = multiple_groups ? (result.keys.first && result.keys.first[group_index].nil?) : result.key?(nil)
+        if missing_time_zone_support
+          raise Groupdate::Error, "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
+        end
       end
 
       def self.generate_relation(relation, field:, **options)
