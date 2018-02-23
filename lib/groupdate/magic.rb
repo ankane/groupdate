@@ -124,54 +124,57 @@ module Groupdate
       end
     end
 
+    def key_format
+      locale = options[:locale] || I18n.locale
+      use_dates = options.key?(:dates) ? options[:dates] : Groupdate.dates
+
+      if options[:format]
+        if options[:format].respond_to?(:call)
+          options[:format]
+        else
+          sunday = time_zone.parse("2014-03-02 00:00:00")
+          lambda do |key|
+            case period
+            when :hour_of_day
+              key = sunday + key.hours + day_start.seconds
+            when :minute_of_hour
+              key = sunday + key.minutes + day_start.seconds
+            when :day_of_week
+              key = sunday + key.days + (week_start + 1).days
+            when :day_of_month
+              key = Date.new(2014, 1, key).to_time
+            when :month_of_year
+              key = Date.new(2014, key, 1).to_time
+            end
+            I18n.localize(key, format: options[:format], locale: locale)
+          end
+        end
+      elsif [:day, :week, :month, :quarter, :year].include?(period) && use_dates
+        lambda { |k| k.to_date }
+      else
+        lambda { |k| k }
+      end
+    end
+
+    def handle_multiple(data, series, multiple_groups, reverse)
+      if multiple_groups
+        keys = data.keys.map { |k| k[0...group_index] + k[(group_index + 1)..-1] }.uniq
+        series = series.to_a.reverse if reverse
+        keys.flat_map do |k|
+          series.map { |s| k[0...group_index] + [s] + k[group_index..-1] }
+        end
+      elsif reverse
+        series.to_a.reverse
+      else
+        series
+      end
+    end
+
     def series(data, default_value: nil, multiple_groups: false, series_default: true)
       reverse = !reverse if options[:reverse]
 
       series = generate_series(data, multiple_groups)
-
-      series =
-        if multiple_groups
-          keys = data.keys.map { |k| k[0...group_index] + k[(group_index + 1)..-1] }.uniq
-          series = series.to_a.reverse if reverse
-          keys.flat_map do |k|
-            series.map { |s| k[0...group_index] + [s] + k[group_index..-1] }
-          end
-        else
-          series
-        end
-
-      # reversed above if multiple groups
-      series = series.to_a.reverse if !multiple_groups && reverse
-
-      locale = options[:locale] || I18n.locale
-      use_dates = options.key?(:dates) ? options[:dates] : Groupdate.dates
-      key_format =
-        if options[:format]
-          if options[:format].respond_to?(:call)
-            options[:format]
-          else
-            sunday = time_zone.parse("2014-03-02 00:00:00")
-            lambda do |key|
-              case period
-              when :hour_of_day
-                key = sunday + key.hours + day_start.seconds
-              when :minute_of_hour
-                key = sunday + key.minutes + day_start.seconds
-              when :day_of_week
-                key = sunday + key.days + (week_start + 1).days
-              when :day_of_month
-                key = Date.new(2014, 1, key).to_time
-              when :month_of_year
-                key = Date.new(2014, key, 1).to_time
-              end
-              I18n.localize(key, format: options[:format], locale: locale)
-            end
-          end
-        elsif [:day, :week, :month, :quarter, :year].include?(period) && use_dates
-          lambda { |k| k.to_date }
-        else
-          lambda { |k| k }
-        end
+      series = handle_multiple(data, series, multiple_groups, reverse)
 
       use_series = options.key?(:series) ? options[:series] : series_default
       if use_series == false
