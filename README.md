@@ -218,7 +218,7 @@ gem 'groupdate'
 
 #### For MySQL
 
-[Time zone support](http://dev.mysql.com/doc/refman/5.6/en/time-zone-support.html) must be installed on the server.
+[Time zone support](https://dev.mysql.com/doc/refman/5.7/en/time-zone-support.html) must be installed on the server.
 
 ```sh
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
@@ -278,7 +278,7 @@ Groupdate 2.0 brings a number of improvements.  Here are two things to be aware 
 
 View the [changelog](https://github.com/ankane/groupdate/blob/master/CHANGELOG.md)
 
-Groupdate follows [Semantic Versioning](http://semver.org/)
+Groupdate follows [Semantic Versioning](https://semver.org/)
 
 ## Contributing
 
