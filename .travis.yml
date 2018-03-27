@@ -22,8 +22,6 @@ notifications:
     on_failure: change
 matrix:
   allow_failures:
-    - rvm: 2.4.3
-      gemfile: test/gemfiles/activerecord52.gemfile
     - rvm: jruby-9.1.16.0
       gemfile: test/gemfiles/activerecord52.gemfile
     - rvm: jruby-9.1.16.0
