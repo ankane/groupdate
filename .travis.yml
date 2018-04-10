@@ -4,7 +4,7 @@ rvm:
   - jruby-9.1.5.0
 gemfile:
   - Gemfile
-  - test/gemfiles/activerecord52.gemfile
+  - test/gemfiles/activerecord51.gemfile
   - test/gemfiles/activerecord50.gemfile
   - test/gemfiles/activerecord42.gemfile
 sudo: false
@@ -20,8 +20,6 @@ notifications:
     on_failure: change
 matrix:
   allow_failures:
-    - rvm: 2.4.2
-      gemfile: test/gemfiles/activerecord52.gemfile
     - rvm: jruby-9.1.5.0
       gemfile: test/gemfiles/activerecord52.gemfile
     - rvm: jruby-9.1.5.0
