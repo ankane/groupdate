@@ -4,3 +4,9 @@ source 'https://rubygems.org'
 gemspec path: "../../"
 
 gem "activerecord", "~> 5.1.0"
+
+if defined?(JRUBY_VERSION)
+  gem "activerecord-jdbcpostgresql-adapter" # no 51.0 yet
+  gem "activerecord-jdbcmysql-adapter", "~> 51.0"
+  gem "activerecord-jdbcsqlite3-adapter", "~> 51.0"
+end
