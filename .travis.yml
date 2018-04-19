@@ -1,7 +1,7 @@
 language: ruby
 rvm:
   - 2.4.2
-  - jruby-9.1.5.0
+  - jruby-9.1.9.0
 gemfile:
   - Gemfile
   - test/gemfiles/activerecord51.gemfile
@@ -20,9 +20,9 @@ notifications:
     on_failure: change
 matrix:
   allow_failures:
-    - rvm: jruby-9.1.5.0
+    - rvm: jruby-9.1.9.0
       gemfile: Gemfile
-    - rvm: jruby-9.1.5.0
+    - rvm: jruby-9.1.9.0
       gemfile: test/gemfiles/activerecord50.gemfile
-    - rvm: jruby-9.1.5.0
+    - rvm: jruby-9.1.9.0
       gemfile: test/gemfiles/activerecord42.gemfile
