@@ -1,3 +1,7 @@
+## 4.0.1 [unreleased]
+
+- Fixed incorrect range with `last` option near time change
+
 ## 4.0.0
 
 - Custom calculation methods are supported by default - `groupdate_calculation_methods` is no longer needed

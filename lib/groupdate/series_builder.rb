@@ -90,7 +90,7 @@ module Groupdate
             raise ArgumentError, "Cannot use last option with #{period}"
           end
           if step
-            now = Time.now
+            now = time_zone.now
             # loop instead of multiply to change start_at - see #151
             start_at = now
             (options[:last].to_i - 1).times do
