@@ -1,4 +1,4 @@
-## 4.0.1 [unreleased]
+## 4.0.1
 
 - Fixed incorrect range with `last` option near time change
 
