@@ -229,6 +229,16 @@ module TestDatabase
     assert_equal expected, User.group_by_year(:created_at, last: 2, current: false).count
   end
 
+  def test_current_no_last
+    create_user "#{this_year - 2}-01-01"
+    create_user "#{this_year}-01-01"
+    expected = {
+      Date.parse("#{this_year - 2}-01-01") => 1,
+      Date.parse("#{this_year - 1}-01-01") => 0
+    }
+    assert_equal expected, User.group_by_year(:created_at, current: false).count
+  end
+
   def test_quarter_and_last
     today = Date.today
     create_user today.to_s

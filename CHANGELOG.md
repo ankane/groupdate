@@ -1,3 +1,7 @@
+## 4.0.2 [unreleased]
+
+- Make `current` option work without `last`
+
 ## 4.0.1
 
 - Fixed incorrect range with `last` option near time change

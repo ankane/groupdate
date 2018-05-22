@@ -90,7 +90,6 @@ module Groupdate
             raise ArgumentError, "Cannot use last option with #{period}"
           end
           if step
-            now = time_zone.now
             # loop instead of multiply to change start_at - see #151
             start_at = now
             (options[:last].to_i - 1).times do
@@ -110,6 +109,10 @@ module Groupdate
     end
 
     private
+
+    def now
+      @now ||= time_zone.now
+    end
 
     def generate_series(data, multiple_groups, group_index)
       case period
@@ -136,7 +139,12 @@ module Groupdate
               else
                 data.keys.sort
               end
-            sorted_keys.first..sorted_keys.last
+
+            tr = sorted_keys.first..sorted_keys.last
+            if options[:current] == false && round_time(now) >= tr.last
+              tr = tr.first...round_time(now)
+            end
+            tr
           end
 
         if time_range.first
