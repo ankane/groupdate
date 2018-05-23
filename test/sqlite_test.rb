@@ -13,6 +13,10 @@ class TestSqlite < Minitest::Test
     end
   end
 
+  def test_zeros_datetime
+    skip # flaky
+  end
+
   def test_where_after
     skip
   end
