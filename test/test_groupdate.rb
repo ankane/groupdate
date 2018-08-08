@@ -655,7 +655,7 @@ module TestGroupdate
     assert_format :day_of_week, "Sat", "%a", week_start: :mon
   end
 
-  def test_format_day_of_week_week_start
+  def test_format_day_of_week_week_start_first_key
     assert_equal "Mon", call_method(:day_of_week, :created_at, week_start: :mon, format: "%a", series: true).keys.first
   end
 
