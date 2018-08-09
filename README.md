@@ -252,7 +252,7 @@ Groupdate.time_zone = false
 
 ### 4.0
 
-Groupdate 4.0 brings a number of improvements.  Here are a few to be aware of:
+Groupdate 4.0 brings a number of improvements. Here are a few to be aware of:
 
 - `group_by` methods return an `ActiveRecord::Relation` instead of a `Groupdate::Series`
 - Invalid options now throw an `ArgumentError`
@@ -261,7 +261,7 @@ Groupdate 4.0 brings a number of improvements.  Here are a few to be aware of:
 
 ### 3.0
 
-Groupdate 3.0 brings a number of improvements.  Here are a few to be aware of:
+Groupdate 3.0 brings a number of improvements. Here are a few to be aware of:
 
 - `Date` objects are now returned for day, week, month, quarter, and year by default. Use `dates: false` for the previous behavior, or change this globally with `Groupdate.dates = false`.
 - Array and hash methods no longer return the entire series by default. Use `series: true` for the previous behavior.
@@ -269,7 +269,7 @@ Groupdate 3.0 brings a number of improvements.  Here are a few to be aware of:
 
 ### 2.0
 
-Groupdate 2.0 brings a number of improvements.  Here are two things to be aware of:
+Groupdate 2.0 brings a number of improvements. Here are two things to be aware of:
 
 - the entire series is returned by default
 - `ActiveSupport::TimeWithZone` keys are now returned for every database adapter - adapters previously returned `Time` or `String` keys
