@@ -1,6 +1,7 @@
 ## 4.0.2 [unreleased]
 
 - Make `current` option work without `last`
+- Fixed default value for `maximum`, `minimum`, and `average`
 
 ## 4.0.1
 

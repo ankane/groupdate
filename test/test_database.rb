@@ -246,10 +246,9 @@ module TestDatabase
   def test_default_value_defaults
     assert_equal 0, User.group_by_year(:created_at, last: 1).count.values.first
     assert_equal 0, User.group_by_year(:created_at, last: 1).sum(:id).values.first
-    # fix in next major version
-    # assert_nil User.group_by_year(:created_at, last: 1).average(:id).values.first
-    # assert_nil User.group_by_year(:created_at, last: 1).maximum(:id).values.first
-    # assert_nil User.group_by_year(:created_at, last: 1).minimum(:id).values.first
+    assert_nil User.group_by_year(:created_at, last: 1).average(:id).values.first
+    assert_nil User.group_by_year(:created_at, last: 1).maximum(:id).values.first
+    assert_nil User.group_by_year(:created_at, last: 1).minimum(:id).values.first
   end
 
   # associations
