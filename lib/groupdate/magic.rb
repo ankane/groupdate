@@ -63,7 +63,7 @@ module Groupdate
         @options = options
       end
 
-      def perform(relation, result)
+      def perform(relation, result, default_value:)
         multiple_groups = relation.group_values.size > 1
 
         check_time_zone_support(result, multiple_groups)
@@ -71,7 +71,7 @@ module Groupdate
 
         series_builder.generate(
           result,
-          default_value: options.key?(:default_value) ? options[:default_value] : 0,
+          default_value: options.key?(:default_value) ? options[:default_value] : default_value,
           multiple_groups: multiple_groups,
           group_index: group_index
         )
@@ -122,9 +122,9 @@ module Groupdate
         relation
       end
 
-      def self.process_result(relation, result)
+      def self.process_result(relation, result, default_value: 0)
         relation.groupdate_values.reverse.each do |gv|
-          result = gv.perform(relation, result)
+          result = gv.perform(relation, result, default_value: default_value)
         end
         result
       end

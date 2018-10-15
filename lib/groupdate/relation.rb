@@ -10,7 +10,9 @@ module Groupdate
 
     def calculate(*args, &block)
       if groupdate_values
-        Groupdate::Magic::Relation.process_result(self, super)
+        # TODO in next major version
+        # pass default based on operation
+        Groupdate::Magic::Relation.process_result(self, super, default_value: 0)
       else
         super
       end
