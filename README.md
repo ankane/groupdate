@@ -192,7 +192,7 @@ User.group_by_week(:created_on, time_zone: false).count
 
 ### User Input
 
-If passing user input as the column, be sure to sanitize it first [like you must with](https://rails-sqli.org/) `group`.
+If passing user input as the column, be sure to sanitize it first [like you must](https://rails-sqli.org/) with `group`.
 
 ```ruby
 column = params[:column]
