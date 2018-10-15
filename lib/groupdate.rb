@@ -15,6 +15,14 @@ module Groupdate
   self.week_start = :sun
   self.day_start = 0
   self.dates = true
+
+  # api for gems like ActiveMedian
+  def self.process_result(relation, result, **options)
+    if relation.groupdate_values
+      result = Groupdate::Magic::Relation.process_result(relation, result, **options)
+    end
+    result
+  end
 end
 
 require "groupdate/enumerable"

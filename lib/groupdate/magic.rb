@@ -122,9 +122,10 @@ module Groupdate
         relation
       end
 
-      def self.process_result(relation, result, default_value: 0)
+      # allow any options to keep flexible for future
+      def self.process_result(relation, result, **options)
         relation.groupdate_values.reverse.each do |gv|
-          result = gv.perform(relation, result, default_value: default_value)
+          result = gv.perform(relation, result, default_value: options[:default_value])
         end
         result
       end
