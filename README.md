@@ -48,7 +48,7 @@ and
 - day_of_month
 - month_of_year
 
-Use it anywhere you can use `group`.
+Use it anywhere you can use `group`. Works with `count`, `sum`, `minimum`, `maximum`, `average`, and [`median`](https://github.com/ankane/active_median).
 
 ### Time Zones
 
