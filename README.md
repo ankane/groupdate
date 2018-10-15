@@ -190,6 +190,19 @@ If grouping on date columns which don’t need time zone conversion, use:
 User.group_by_week(:created_on, time_zone: false).count
 ```
 
+### User Input
+
+If passing user input as the column, be sure to sanitize it first like you must with `group`.
+
+```ruby
+column = params[:column]
+
+# check against permitted columns
+raise "Unpermitted column" unless ["column_a", "column_b"].include?(column)
+
+User.group_by_day(column).count
+```
+
 ## Arrays and Hashes
 
 ```ruby
