@@ -197,6 +197,15 @@ class DatabaseTest < Minitest::Test
     assert_equal User.all, User.group_by_day(:created_at).unscoped.all
   end
 
+  # currently loses groupdate_values
+  # def test_except_where
+  #   create_user "2014-05-01"
+  #   expected = {
+  #     Date.parse("2017-01-01") => 0
+  #   }
+  #   assert_equal expected, User.group_by_year(:created_at, range: Date.parse("2017-01-01")...Date.parse("2018-01-01")).except(:where).count
+  # end
+
   # pluck
 
   def test_pluck
