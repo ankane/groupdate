@@ -184,24 +184,6 @@ class DatabaseTest < Minitest::Test
     assert_equal expected, call_method(:quarter, :created_at, last: 2)
   end
 
-  def test_format_locale
-    create_user "2014-10-01"
-    assert_equal ({"Okt" => 1}), User.group_by_day(:created_at, format: "%b", locale: :de).count
-  end
-
-  def test_format_locale_by_symbol
-    create_user "2014-10-01"
-    assert_equal ({"Okt  1, 2014" => 1}), User.group_by_day(:created_at, format: :special, locale: :de).count
-  end
-
-  def test_format_locale_global
-    create_user "2014-10-01"
-    I18n.locale = :de
-    assert_equal ({"Okt" => 1}), User.group_by_day(:created_at, format: "%b").count
-  ensure
-    I18n.locale = :en
-  end
-
   def test_format_multiple_groups
     create_user "2014-03-01"
     assert_equal ({["Sun", 1] => 1}), User.group_by_week(:created_at, format: "%a").group(:score).count

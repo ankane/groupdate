@@ -69,4 +69,22 @@ class FormatTest < Minitest::Test
     create_user "2014-01-01"
     assert_format :month_of_year, "Jan", "%b"
   end
+
+  def test_format_locale
+    create_user "2014-10-01"
+    assert_equal ({"Okt" => 1}), call_method(:day, :created_at, format: "%b", locale: :de)
+  end
+
+  def test_format_locale_by_symbol
+    create_user "2014-10-01"
+    assert_equal ({"Okt  1, 2014" => 1}), call_method(:day, :created_at, format: :special, locale: :de)
+  end
+
+  def test_format_locale_global
+    create_user "2014-10-01"
+    I18n.locale = :de
+    assert_equal ({"Okt" => 1}), call_method(:day, :created_at, format: "%b")
+  ensure
+    I18n.locale = :en
+  end
 end
