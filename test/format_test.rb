@@ -87,4 +87,8 @@ class FormatTest < Minitest::Test
   ensure
     I18n.locale = :en
   end
+
+  def assert_format(method, expected, format, options = {})
+    assert_equal({expected => 1}, call_method(method, :created_at, options.merge(format: format, series: false)))
+  end
 end

@@ -60,10 +60,6 @@ class Minitest::Test
     user
   end
 
-  def utc
-    ActiveSupport::TimeZone["UTC"]
-  end
-
   def call_method(method, field, options)
     if ENV["ADAPTER"] == "enumerable"
       Hash[@users.group_by_period(method, options) { |u| u.send(field) }.map { |k, v| [k, v.size] }]
@@ -74,10 +70,6 @@ class Minitest::Test
     else
       User.group_by_period(method, field, options).count
     end
-  end
-
-  def assert_format(method, expected, format, options = {})
-    assert_equal({expected => 1}, call_method(method, :created_at, options.merge(format: format, series: false)))
   end
 
   def assert_result_time(method, expected, time_str, time_zone = false, options = {})
@@ -101,6 +93,10 @@ class Minitest::Test
   def result(method, time_str, time_zone = false, options = {})
     create_user time_str
     call_method(method, :created_at, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
+  end
+
+  def utc
+    ActiveSupport::TimeZone["UTC"]
   end
 
   def pt
