@@ -44,6 +44,7 @@ module Groupdate
       @round_time[time] ||= begin
         time = time.to_time.in_time_zone(time_zone)
 
+        # only if day_start != 0 for performance
         time =- day_start.seconds if day_start != 0
 
         time =
@@ -80,6 +81,7 @@ module Groupdate
             raise Groupdate::Error, "Invalid period"
           end
 
+        # only if day_start != 0 for performance
         time += day_start.seconds if day_start != 0 && time.is_a?(Time)
 
         time
