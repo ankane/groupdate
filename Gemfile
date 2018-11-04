@@ -10,3 +10,5 @@ if defined?(JRUBY_VERSION)
   gem "activerecord-jdbcmysql-adapter", git: "https://github.com/jruby/activerecord-jdbc-adapter.git"
   gem "activerecord-jdbcsqlite3-adapter", git: "https://github.com/jruby/activerecord-jdbc-adapter.git"
 end
+
+gem "ruby-prof", require: false

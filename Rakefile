@@ -26,3 +26,32 @@ task :test do
 end
 
 task default: :test
+
+desc "Profile call"
+task :profile do
+  require "active_record"
+  require "sqlite3"
+  require "groupdate"
+  require "ruby-prof"
+
+  ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
+
+  ActiveRecord::Migration.create_table :users, force: true do |t|
+    t.timestamp :created_at
+  end
+
+  class User < ActiveRecord::Base
+  end
+
+  now = Time.now
+  10000.times do |n|
+    User.create!(created_at: now - n.days)
+  end
+
+  result = RubyProf.profile do
+    User.group_by_day(:created_at).count
+  end
+
+  printer = RubyProf::GraphPrinter.new(result)
+  printer.print(STDOUT, {})
+end
