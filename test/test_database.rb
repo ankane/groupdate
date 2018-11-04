@@ -349,6 +349,20 @@ module TestDatabase
     assert User.group_by_day(:created_at).is_a?(ActiveRecord::Relation)
   end
 
+  # null
+
+  def test_null
+    create_user nil
+    assert_equal 0, call_method(:hour_of_day, :created_at, range: true, series: true)[0]
+  end
+
+  # bad column
+
+  def test_bad_column
+    create_user "2018-01-01"
+    assert_raises { User.group_by_day(:name).count }
+  end
+
   private
 
   def call_method(method, field, options)
@@ -370,10 +384,6 @@ module TestDatabase
     user.update_columns(created_at: nil, created_on: nil) if created_at.nil?
 
     user
-  end
-
-  def is_redshift?
-    ActiveRecord::Base.connection.adapter_name == "Redshift"
   end
 
   def teardown

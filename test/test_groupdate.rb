@@ -560,11 +560,6 @@ module TestGroupdate
     assert_equal expected, call_method(:day, :created_at, range: DateTime.parse("2013-05-01")..DateTime.parse("2013-05-01"), series: true)
   end
 
-  def test_zeros_null_value
-    create_user nil
-    assert_equal 0, call_method(:hour_of_day, :created_at, range: true, series: true)[0]
-  end
-
   def test_zeroes_range_true
     create_user "2013-05-01"
     create_user "2013-05-03"
