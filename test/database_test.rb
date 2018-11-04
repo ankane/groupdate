@@ -191,12 +191,6 @@ class DatabaseTest < Minitest::Test
     assert_equal expected, User.group_by_day(:created_at).custom_count
   end
 
-  def test_using_listed_but_undefined_custom_calculation_method_raises_error
-    assert_raises(NoMethodError) do
-      User.group_by_day(:created_at).undefined_calculation
-    end
-  end
-
   # unscope
 
   def test_unscope
