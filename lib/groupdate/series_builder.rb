@@ -45,7 +45,7 @@ module Groupdate
         time = time.to_time.in_time_zone(time_zone)
 
         # only if day_start != 0 for performance
-        time =- day_start.seconds if day_start != 0
+        time -= day_start.seconds if day_start != 0
 
         time =
           case period
