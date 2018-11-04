@@ -1,4 +1,6 @@
-module TestDatabase
+require_relative "test_helper"
+
+class DatabaseTest < Minitest::Test
   def test_zeros_previous_scope
     create_user "2013-05-01"
     expected = {
@@ -19,6 +21,8 @@ module TestDatabase
   end
 
   def test_where_after
+    skip if ENV["ADAPTER"] == "sqlite"
+
     create_user "2013-05-01"
     create_user "2013-05-02"
     expected = {Date.parse("2013-05-02") => 1}
@@ -283,7 +287,7 @@ module TestDatabase
   # Brasilia Summer Time
 
   def test_brasilia_summer_time
-    # must parse and convert to UTC for ActiveRecord 3.1
+    brasilia = ActiveSupport::TimeZone["Brasilia"]
     create_user(brasilia.parse("2014-10-19 02:00:00").utc.to_s)
     create_user(brasilia.parse("2014-10-20 02:00:00").utc.to_s)
     expected = {
@@ -363,34 +367,11 @@ module TestDatabase
     assert_raises { User.group_by_day(:name).count }
   end
 
-  private
-
-  def call_method(method, field, options)
-    User.group_by_period(method, field, options).count
+  def this_year
+    Time.now.year
   end
 
-  def create_user(created_at, score = 1)
-    user =
-      User.create!(
-        name: "Andrew",
-        score: score,
-        created_at: created_at ? utc.parse(created_at) : nil,
-        created_on: created_at ? Date.parse(created_at) : nil
-      )
-
-    # hack for Redshift adapter, which doesn't return id on creation...
-    user = User.last if user.id.nil?
-
-    user.update_columns(created_at: nil, created_on: nil) if created_at.nil?
-
-    user
-  end
-
-  def teardown
-    User.delete_all
-  end
-
-  def enumerable_test?
-    false
+  def this_month
+    Time.now.month
   end
 end

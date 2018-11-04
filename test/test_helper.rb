@@ -4,32 +4,15 @@ require "minitest/autorun"
 require "minitest/pride"
 require "logger"
 require "active_record"
-
-# support
-require_relative "test_database"
-require_relative "test_groupdate"
-
-Minitest::Test = Minitest::Unit::TestCase unless defined?(Minitest::Test)
+require "ostruct"
 
 ENV["TZ"] = "UTC"
 
-# for debugging
-ActiveRecord::Base.logger = ActiveSupport::Logger.new(STDOUT) if ENV["VERBOSE"]
+adapter = ENV["ADAPTER"]
+puts "Using #{adapter}"
+require_relative "adapters/#{adapter}"
 
-# rails does this in activerecord/lib/active_record/railtie.rb
-ActiveRecord::Base.default_timezone = :utc
-ActiveRecord::Base.time_zone_aware_attributes = true
-
-class User < ActiveRecord::Base
-  has_many :posts
-
-  def self.custom_count
-    count
-  end
-end
-
-class Post < ActiveRecord::Base
-end
+require_relative "support/activerecord" unless adapter == "enumerable"
 
 # i18n
 I18n.enforce_available_locales = true
@@ -40,35 +23,87 @@ time: {
   formats: {special: "%b %e, %Y"}
 }
 
-# migrations
-def create_tables
-  ActiveRecord::Migration.verbose = false
-
-  ActiveRecord::Migration.create_table :users, force: true do |t|
-    t.string :name
-    t.integer :score
-    t.timestamp :created_at
-    t.date :created_on
+class Minitest::Test
+  def setup
+    if ENV["ADAPTER"] == "enumerable"
+      @users = []
+    else
+      User.delete_all
+    end
   end
 
-  ActiveRecord::Migration.create_table :posts, force: true do |t|
-    t.references :user
-    t.timestamp :created_at
+  def create_user(created_at, score = 1)
+    if ENV["ADAPTER"] == "enumerable"
+      user =
+        OpenStruct.new(
+          name: "Andrew",
+          score: score,
+          created_at: created_at ? utc.parse(created_at) : nil,
+          created_on: created_at ? Date.parse(created_at) : nil
+        )
+      @users << user
+    else
+      user =
+        User.create!(
+          name: "Andrew",
+          score: score,
+          created_at: created_at ? utc.parse(created_at) : nil,
+          created_on: created_at ? Date.parse(created_at) : nil
+        )
+
+      # hack for Redshift adapter, which doesn't return id on creation...
+      user = User.last if user.id.nil?
+
+      user.update_columns(created_at: nil, created_on: nil) if created_at.nil?
+    end
+
+    user
   end
-end
 
-def create_redshift_tables
-  ActiveRecord::Migration.verbose = false
-
-  if ActiveRecord::Migration.table_exists?(:users)
-    ActiveRecord::Migration.drop_table(:users, force: :cascade)
+  def utc
+    ActiveSupport::TimeZone["UTC"]
   end
 
-  if ActiveRecord::Migration.table_exists?(:posts)
-    ActiveRecord::Migration.drop_table(:posts, force: :cascade)
+  def call_method(method, field, options)
+    if ENV["ADAPTER"] == "enumerable"
+      Hash[@users.group_by_period(method, options) { |u| u.send(field) }.map { |k, v| [k, v.size] }]
+    elsif ENV["ADAPTER"] == "sqlite" && (method == :quarter || options[:time_zone] || options[:day_start] || options[:week_start] || Groupdate.week_start != :sun || (Time.zone && options[:time_zone] != false))
+      error = assert_raises(Groupdate::Error) { User.group_by_period(method, field, options).count }
+      assert_includes error.message, "not supported for SQLite"
+      skip
+    else
+      User.group_by_period(method, field, options).count
+    end
   end
 
-  ActiveRecord::Migration.execute "CREATE TABLE users (id INT IDENTITY(1,1) PRIMARY KEY, name VARCHAR(255), score INT, created_at DATETIME, created_on DATE);"
+  def assert_format(method, expected, format, options = {})
+    assert_equal({expected => 1}, call_method(method, :created_at, options.merge(format: format, series: false)))
+  end
 
-  ActiveRecord::Migration.execute "CREATE TABLE posts (id INT IDENTITY(1,1) PRIMARY KEY, user_id INT REFERENCES users, created_at DATETIME);"
+  def assert_result_time(method, expected, time_str, time_zone = false, options = {})
+    expected = {utc.parse(expected).in_time_zone(time_zone ? "Pacific Time (US & Canada)" : utc) => 1}
+    assert_equal expected, result(method, time_str, time_zone, options)
+  end
+
+  def assert_result_date(method, expected_str, time_str, time_zone = false, options = {})
+    create_user time_str
+    expected = {Date.parse(expected_str) => 1}
+    assert_equal expected, call_method(method, :created_at, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
+    expected = {(time_zone ? pt : utc).parse(expected_str) + options[:day_start].to_f.hours => 1}
+    assert_equal expected, call_method(method, :created_at, options.merge(dates: false, time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
+    # assert_equal expected, call_method(method, :created_on, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
+  end
+
+  def assert_result(method, expected, time_str, time_zone = false, options = {})
+    assert_equal 1, result(method, time_str, time_zone, options)[expected]
+  end
+
+  def result(method, time_str, time_zone = false, options = {})
+    create_user time_str
+    call_method(method, :created_at, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
+  end
+
+  def pt
+    ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
+  end
 end
