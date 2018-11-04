@@ -287,4 +287,12 @@ class BasicTest < Minitest::Test
     }
     assert_equal expected, call_method(:day, :created_at, time_zone: "Brasilia")
   end
+
+  def test_brasilia_summer_time_2018
+    create_user("2018-11-01 00:00:00")
+    expected = {
+      Date.parse("2018-10-28") => 1
+    }
+    assert_equal expected, call_method(:week, :created_at, time_zone: "Brasilia")
+  end
 end
