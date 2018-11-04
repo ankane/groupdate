@@ -1,5 +1,6 @@
-## 4.0.3 [unreleased]
+## 4.1.0 [unreleased]
 
+- Added check for consistent time zone info
 - Fixed error message for invalid queries with MySQL and SQLite
 - Fixed issue with enumerable methods ignoring nils
 

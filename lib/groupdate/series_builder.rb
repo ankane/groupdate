@@ -2,6 +2,8 @@ module Groupdate
   class SeriesBuilder
     attr_reader :period, :time_zone, :day_start, :week_start, :options
 
+    CHECK_PERIODS = [:day, :week, :month, :quarter, :year]
+
     def initialize(period:, time_zone:, day_start:, week_start:, **options)
       @period = period
       @time_zone = time_zone
@@ -11,6 +13,9 @@ module Groupdate
     end
 
     def generate(data, default_value:, series_default: true, multiple_groups: false, group_index: nil)
+      # only for database
+      check_consistent_time_zone_info(data, multiple_groups, group_index) if series_default && CHECK_PERIODS.include?(period)
+
       series = generate_series(data, multiple_groups, group_index)
       series = handle_multiple(data, series, multiple_groups, group_index)
 
@@ -218,6 +223,21 @@ module Groupdate
         series.to_a.reverse
       else
         series
+      end
+    end
+
+    def check_consistent_time_zone_info(data, multiple_groups, group_index)
+      keys = data.keys
+      if multiple_groups
+        keys.map! { |k| k[group_index] }
+        keys.uniq!
+      end
+
+      keys.each do |key|
+        if key != round_time(key)
+          # only need to show what database returned since it will cast in Ruby time zone
+          raise Groupdate::Error, "Database and Ruby have inconsistent time zone info. Database returned #{key}"
+        end
       end
     end
 
