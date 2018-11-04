@@ -96,7 +96,16 @@ module Groupdate
       end
 
       def cast_result(result, multiple_groups)
-        Hash[result.map { |k, v| [multiple_groups ? k[0...group_index] + [cast_method.call(k[group_index])] + k[(group_index + 1)..-1] : cast_method.call(k), v] }]
+        new_result = {}
+        result.each do |k, v|
+          if multiple_groups
+            k[group_index] = cast_method.call(k[group_index])
+          else
+            k = cast_method.call(k)
+          end
+          new_result[k] = v
+        end
+        new_result
       end
 
       def time_zone_support?(relation)
