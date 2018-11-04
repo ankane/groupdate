@@ -274,4 +274,17 @@ class BasicTest < Minitest::Test
   ensure
     ENV["TZ"] = "UTC"
   end
+
+  # Brasilia Summer Time
+
+  def test_brasilia_summer_time
+    brasilia = ActiveSupport::TimeZone["Brasilia"]
+    create_user(brasilia.parse("2014-10-19 02:00:00").utc.to_s)
+    create_user(brasilia.parse("2014-10-20 02:00:00").utc.to_s)
+    expected = {
+      Date.parse("2014-10-19") => 1,
+      Date.parse("2014-10-20") => 1
+    }
+    assert_equal expected, call_method(:day, :created_at, time_zone: "Brasilia")
+  end
 end
