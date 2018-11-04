@@ -48,7 +48,11 @@ module Groupdate
 
     class Enumerable < Magic
       def group_by(enum, &_block)
-        group = enum.group_by { |v| v = yield(v); v ? series_builder.round_time(v) : nil }
+        group = enum.group_by do |v|
+          v = yield(v)
+          raise ArgumentError, "Not a time" unless v.respond_to?(:to_time)
+          series_builder.round_time(v)
+        end
         series_builder.generate(group, default_value: [], series_default: false)
       end
 

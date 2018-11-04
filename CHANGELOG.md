@@ -1,3 +1,7 @@
+## 4.0.3 [unreleased]
+
+- Fixed issue with enumerable methods ignoring nils
+
 ## 4.0.2
 
 - Make `current` option work without `last`

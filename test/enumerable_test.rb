@@ -29,6 +29,11 @@ class EnumerableTest < Minitest::Test
     assert_raises(ArgumentError) { [].group_by_day(:created_at) }
   end
 
+  def test_null
+    user = create_user("2014-01-21")
+    assert_raises(ArgumentError) { [user].group_by_day { nil } }
+  end
+
   def call_method(method, field, options)
     Hash[@users.group_by_period(method, options) { |u| u.send(field) }.map { |k, v| [k, v.size] }]
   end
