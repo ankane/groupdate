@@ -14,16 +14,16 @@ module Groupdate
     end
 
     def generate(data, default_value:, series_default: true, multiple_groups: false, group_index: nil)
-      # only check for database
-      if series_default && CHECK_PERIODS.include?(period)
-        check_consistent_time_zone_info(data, multiple_groups, group_index)
-      end
-
       series = generate_series(data, multiple_groups, group_index)
       series = handle_multiple(data, series, multiple_groups, group_index)
 
       unless entire_series?(series_default)
         series = series.select { |k| data[k] }
+      end
+
+      # only check for database
+      if series_default && CHECK_PERIODS.include?(period)
+        check_consistent_time_zone_info(data, multiple_groups, group_index)
       end
 
       value = 0
