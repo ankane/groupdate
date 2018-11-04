@@ -8,6 +8,7 @@ ADAPTERS.each do |adapter|
     task("env:#{adapter}") { ENV["ADAPTER"] = adapter }
 
     Rake::TestTask.new(adapter => "env:#{adapter}") do |t|
+      t.description = "Run tests for #{adapter}"
       t.libs << "test"
       test_files = FileList["test/**/*_test.rb"]
       if adapter == "enumerable"
