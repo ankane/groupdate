@@ -70,7 +70,7 @@ module Groupdate
       def perform(relation, result, default_value:)
         multiple_groups = relation.group_values.size > 1
 
-        check_time_zone_support(result, multiple_groups)
+        check_nils(result, multiple_groups, relation)
         result = cast_result(result, multiple_groups)
 
         series_builder.generate(
@@ -97,10 +97,22 @@ module Groupdate
         Hash[result.map { |k, v| [multiple_groups ? k[0...group_index] + [cast_method.call(k[group_index])] + k[(group_index + 1)..-1] : cast_method.call(k), v] }]
       end
 
-      def check_time_zone_support(result, multiple_groups)
-        missing_time_zone_support = multiple_groups ? (result.keys.first && result.keys.first[group_index].nil?) : result.key?(nil)
-        if missing_time_zone_support
-          raise Groupdate::Error, "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
+      def time_zone_support?(relation)
+        if relation.connection.adapter_name =~ /mysql/i
+          !relation.connection.select_all("SELECT CONVERT_TZ(NOW(), '+00:00', 'Etc/UTC')").first.values.first.nil?
+        else
+          true
+        end
+      end
+
+      def check_nils(result, multiple_groups, relation)
+        has_nils = multiple_groups ? (result.keys.first && result.keys.first[group_index].nil?) : result.key?(nil)
+        if has_nils
+          if time_zone_support?(relation)
+            raise Groupdate::Error, "Invalid query"
+          else
+            raise Groupdate::Error, "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
+          end
         end
       end
 

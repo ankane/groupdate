@@ -1,5 +1,6 @@
 ## 4.0.3 [unreleased]
 
+- Fixed error message for invalid queries with MySQL and SQLite
 - Fixed issue with enumerable methods ignoring nils
 
 ## 4.0.2
