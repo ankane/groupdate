@@ -82,14 +82,16 @@ module Groupdate
       end
 
       def cast_method
-        case period
-        when :day_of_week
-          lambda { |k| (k.to_i - 1 - week_start) % 7 }
-        when :hour_of_day, :day_of_month, :month_of_year, :minute_of_hour
-          lambda { |k| k.to_i }
-        else
-          utc = ActiveSupport::TimeZone["UTC"]
-          lambda { |k| (k.is_a?(String) || !k.respond_to?(:to_time) ? utc.parse(k.to_s) : k.to_time).in_time_zone(time_zone) }
+        @cast_method ||= begin
+          case period
+          when :day_of_week
+            lambda { |k| (k.to_i - 1 - week_start) % 7 }
+          when :hour_of_day, :day_of_month, :month_of_year, :minute_of_hour
+            lambda { |k| k.to_i }
+          else
+            utc = ActiveSupport::TimeZone["UTC"]
+            lambda { |k| (k.is_a?(String) || !k.respond_to?(:to_time) ? utc.parse(k.to_s) : k.to_time).in_time_zone(time_zone) }
+          end
         end
       end
 
