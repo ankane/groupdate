@@ -173,7 +173,11 @@ module Groupdate
           end
 
           last_step = series.last
-          while (next_step = round_time(last_step + step)) && time_range.cover?(next_step)
+          loop do
+            next_step = last_step + step
+            next_step = round_time(next_step) if next_step.hour != 0 # add condition to speed up
+            break unless time_range.cover?(next_step)
+
             if next_step == last_step
               last_step += step
               next

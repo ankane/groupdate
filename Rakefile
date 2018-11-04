@@ -34,7 +34,7 @@ task :profile do
   require "groupdate"
   require "ruby-prof"
 
-  RubyProf.measure_mode = RubyProf::ALLOCATIONS
+  # RubyProf.measure_mode = RubyProf::ALLOCATIONS
 
   ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
 
