@@ -110,7 +110,7 @@ module Groupdate
         has_nils = multiple_groups ? (result.keys.first && result.keys.first[group_index].nil?) : result.key?(nil)
         if has_nils
           if time_zone_support?(relation)
-            raise Groupdate::Error, "Invalid query"
+            raise Groupdate::Error, "Invalid query - be sure to use a date or time column"
           else
             raise Groupdate::Error, "Database missing time zone support for #{time_zone.tzinfo.name} - see https://github.com/ankane/groupdate#for-mysql"
           end
