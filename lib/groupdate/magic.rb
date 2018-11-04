@@ -99,7 +99,8 @@ module Groupdate
 
       def time_zone_support?(relation)
         if relation.connection.adapter_name =~ /mysql/i
-          !relation.connection.select_all("SELECT CONVERT_TZ(NOW(), '+00:00', 'Etc/UTC')").first.values.first.nil?
+          sql = relation.send(:sanitize_sql_array, ["SELECT CONVERT_TZ(NOW(), '+00:00', ?)", time_zone.tzinfo.name])
+          !relation.connection.select_all(sql).first.values.first.nil?
         else
           true
         end
@@ -111,7 +112,7 @@ module Groupdate
           if time_zone_support?(relation)
             raise Groupdate::Error, "Invalid query"
           else
-            raise Groupdate::Error, "Be sure to install time zone support - https://github.com/ankane/groupdate#for-mysql"
+            raise Groupdate::Error, "Database missing time zone support for #{time_zone.tzinfo.name} - see https://github.com/ankane/groupdate#for-mysql"
           end
         end
       end

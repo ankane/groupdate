@@ -242,7 +242,7 @@ or copy and paste [these statements](https://gist.githubusercontent.com/ankane/1
 You can confirm it worked with:
 
 ```sql
-SELECT CONVERT_TZ(NOW(), '+00:00', 'Etc/UTC');
+SELECT CONVERT_TZ(NOW(), '+00:00', 'Pacific/Honolulu');
 ```
 
 It should return the time instead of `NULL`.
