@@ -10,11 +10,14 @@ module Groupdate
       @week_start = week_start
       @day_start = day_start
       @options = options
+      @round_time = {}
     end
 
     def generate(data, default_value:, series_default: true, multiple_groups: false, group_index: nil)
-      # only for database
-      check_consistent_time_zone_info(data, multiple_groups, group_index) if series_default && CHECK_PERIODS.include?(period)
+      # only check for database
+      if series_default && CHECK_PERIODS.include?(period)
+        check_consistent_time_zone_info(data, multiple_groups, group_index)
+      end
 
       series = generate_series(data, multiple_groups, group_index)
       series = handle_multiple(data, series, multiple_groups, group_index)
@@ -38,43 +41,45 @@ module Groupdate
     end
 
     def round_time(time)
-      time = time.to_time.in_time_zone(time_zone) - day_start.seconds
+      @round_time[time] ||= begin
+        time = time.to_time.in_time_zone(time_zone) - day_start.seconds
 
-      time =
-        case period
-        when :second
-          time.change(usec: 0)
-        when :minute
-          time.change(sec: 0)
-        when :hour
-          time.change(min: 0)
-        when :day
-          time.beginning_of_day
-        when :week
-          # same logic as MySQL group
-          weekday = (time.wday - 1) % 7
-          (time - ((7 - week_start + weekday) % 7).days).midnight
-        when :month
-          time.beginning_of_month
-        when :quarter
-          time.beginning_of_quarter
-        when :year
-          time.beginning_of_year
-        when :hour_of_day
-          time.hour
-        when :minute_of_hour
-          time.min
-        when :day_of_week
-          (time.wday - 1 - week_start) % 7
-        when :day_of_month
-          time.day
-        when :month_of_year
-          time.month
-        else
-          raise Groupdate::Error, "Invalid period"
-        end
+        time =
+          case period
+          when :second
+            time.change(usec: 0)
+          when :minute
+            time.change(sec: 0)
+          when :hour
+            time.change(min: 0)
+          when :day
+            time.beginning_of_day
+          when :week
+            # same logic as MySQL group
+            weekday = (time.wday - 1) % 7
+            (time - ((7 - week_start + weekday) % 7).days).midnight
+          when :month
+            time.beginning_of_month
+          when :quarter
+            time.beginning_of_quarter
+          when :year
+            time.beginning_of_year
+          when :hour_of_day
+            time.hour
+          when :minute_of_hour
+            time.min
+          when :day_of_week
+            (time.wday - 1 - week_start) % 7
+          when :day_of_month
+            time.day
+          when :month_of_year
+            time.month
+          else
+            raise Groupdate::Error, "Invalid period"
+          end
 
-      time.is_a?(Time) ? time + day_start.seconds : time
+        time.is_a?(Time) ? time + day_start.seconds : time
+      end
     end
 
     def time_range
