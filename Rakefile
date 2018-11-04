@@ -11,7 +11,7 @@ ADAPTERS.each do |adapter|
       t.description = "Run tests for #{adapter}"
       t.libs << "test"
       # TODO permit works for enumerable, just need to make tests work
-      exclude = adapter == "enumerable" ? /database|permit/ : /enumerable/
+      exclude = adapter == "enumerable" ? /database|multiple_group|permit/ : /enumerable/
       t.test_files = FileList["test/**/*_test.rb"].exclude(exclude)
     end
   end
