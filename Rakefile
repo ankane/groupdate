@@ -17,7 +17,7 @@ ADAPTERS.each do |adapter|
   end
 end
 
-desc "Run all adapter tests besides Redshift"
+desc "Run all adapter tests besides redshift"
 task :test do
   ADAPTERS.each do |adapter|
     next if adapter == "redshift"
