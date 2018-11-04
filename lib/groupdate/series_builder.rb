@@ -42,7 +42,9 @@ module Groupdate
 
     def round_time(time)
       @round_time[time] ||= begin
-        time = time.to_time.in_time_zone(time_zone) - day_start.seconds
+        time = time.to_time.in_time_zone(time_zone)
+
+        time =- day_start.seconds if day_start != 0
 
         time =
           case period
@@ -78,7 +80,9 @@ module Groupdate
             raise Groupdate::Error, "Invalid period"
           end
 
-        time.is_a?(Time) ? time + day_start.seconds : time
+        time += day_start.seconds if day_start != 0 && time.is_a?(Time)
+
+        time
       end
     end
 
