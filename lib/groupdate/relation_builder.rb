@@ -167,8 +167,8 @@ module Groupdate
 
     def where_clause
       if @time_range.is_a?(Range)
-        # doesn't matter whether we include the end of a ... range - it will be excluded later
-        ["#{column} >= ? AND #{column} <= ?", @time_range.first, @time_range.last]
+        op = @time_range.exclude_end? ? "<" : "<="
+        ["#{column} >= ? AND #{column} #{op} ?", @time_range.first, @time_range.last]
       else
         ["#{column} IS NOT NULL"]
       end
