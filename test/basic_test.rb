@@ -4,11 +4,7 @@ class BasicTest < Minitest::Test
   # second
 
   def test_second_end_of_second
-    if %w(mysql enumerable).include?(ENV["ADAPTER"])
-      skip # no millisecond precision
-    else
-      assert_result_time :second, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:00.999"
-    end
+    assert_result_time :second, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:00.999"
   end
 
   def test_second_start_of_second
