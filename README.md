@@ -13,7 +13,7 @@ The simplest way to group by:
 
 Supports PostgreSQL, MySQL, and Redshift, plus arrays and hashes (and limited support for [SQLite](#for-sqlite))
 
-:cupid: Goes hand in hand with [Chartkick](https://www.chartkick.com) and [calculate-all](https://github.com/codesnik/calculate-all)
+:cupid: Goes hand in hand with [Chartkick](https://www.chartkick.com)
 
 [![Build Status](https://travis-ci.org/ankane/groupdate.svg?branch=master)](https://travis-ci.org/ankane/groupdate)
 
@@ -48,7 +48,7 @@ and
 - day_of_month
 - month_of_year
 
-Use it anywhere you can use `group`. Works with `count`, `sum`, `minimum`, `maximum`, `average`, and [`median`](https://github.com/ankane/active_median).
+Use it anywhere you can use `group`. Works with `count`, `sum`, `minimum`, `maximum`, `average`, and [`median`](https://github.com/ankane/active_median). For multiple aggregate functions at once, check out [calculate-all](https://github.com/codesnik/calculate-all).
 
 ### Time Zones
 
