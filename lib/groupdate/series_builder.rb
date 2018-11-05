@@ -21,14 +21,9 @@ module Groupdate
         series = series.select { |k| data[k] }
       end
 
-      # only check for database
-      if series_default && CHECK_PERIODS.include?(period)
-        check_consistent_time_zone_info(data, multiple_groups, group_index)
-      end
-
       value = 0
-      Hash[series.map do |k|
-        value = data[k] || (@options[:carry_forward] && value) || default_value
+      result = Hash[series.map do |k|
+        value = data.delete(k) || (@options[:carry_forward] && value) || default_value
         key =
           if multiple_groups
             k[0...group_index] + [key_format.call(k[group_index])] + k[(group_index + 1)..-1]
@@ -38,54 +33,60 @@ module Groupdate
 
         [key, value]
       end]
+
+      # only check for database
+      # only checks remaining keys to avoid expensive calls to round_time
+      if series_default && CHECK_PERIODS.include?(period)
+        check_consistent_time_zone_info(data, multiple_groups, group_index)
+      end
+
+      result
     end
 
     def round_time(time)
-      @round_time[time] ||= begin
-        time = time.to_time.in_time_zone(time_zone)
+      time = time.to_time.in_time_zone(time_zone)
 
-        # only if day_start != 0 for performance
-        time -= day_start.seconds if day_start != 0
+      # only if day_start != 0 for performance
+      time -= day_start.seconds if day_start != 0
 
-        time =
-          case period
-          when :second
-            time.change(usec: 0)
-          when :minute
-            time.change(sec: 0)
-          when :hour
-            time.change(min: 0)
-          when :day
-            time.beginning_of_day
-          when :week
-            # same logic as MySQL group
-            weekday = (time.wday - 1) % 7
-            (time - ((7 - week_start + weekday) % 7).days).midnight
-          when :month
-            time.beginning_of_month
-          when :quarter
-            time.beginning_of_quarter
-          when :year
-            time.beginning_of_year
-          when :hour_of_day
-            time.hour
-          when :minute_of_hour
-            time.min
-          when :day_of_week
-            (time.wday - 1 - week_start) % 7
-          when :day_of_month
-            time.day
-          when :month_of_year
-            time.month
-          else
-            raise Groupdate::Error, "Invalid period"
-          end
+      time =
+        case period
+        when :second
+          time.change(usec: 0)
+        when :minute
+          time.change(sec: 0)
+        when :hour
+          time.change(min: 0)
+        when :day
+          time.beginning_of_day
+        when :week
+          # same logic as MySQL group
+          weekday = (time.wday - 1) % 7
+          (time - ((7 - week_start + weekday) % 7).days).midnight
+        when :month
+          time.beginning_of_month
+        when :quarter
+          time.beginning_of_quarter
+        when :year
+          time.beginning_of_year
+        when :hour_of_day
+          time.hour
+        when :minute_of_hour
+          time.min
+        when :day_of_week
+          (time.wday - 1 - week_start) % 7
+        when :day_of_month
+          time.day
+        when :month_of_year
+          time.month
+        else
+          raise Groupdate::Error, "Invalid period"
+        end
 
-        # only if day_start != 0 for performance
-        time += day_start.seconds if day_start != 0 && time.is_a?(Time)
+      # only if day_start != 0 for performance
+      time += day_start.seconds if day_start != 0 && time.is_a?(Time)
 
-        time
-      end
+      time
     end
 
     def time_range
