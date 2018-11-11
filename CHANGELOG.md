@@ -8,7 +8,7 @@
 ## 4.0.2
 
 - Make `current` option work without `last`
-- Fixed default value for `maximum`, `minimum`, and `average` (periods with no results will now return `nil` instead of `0`, to return `0` pass `default_value: 0` in your grouping function)
+- Fixed default value for `maximum`, `minimum`, and `average` (periods with no results now return `nil` instead of `0`, pass `default_value: 0` for previous behavior)
 
 ## 4.0.1
 
