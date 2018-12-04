@@ -11,7 +11,6 @@ services:
   - mysql
 script: bundle exec rake test
 before_install:
-  - gem install bundler
   - mysql -e 'CREATE DATABASE groupdate_test;'
   - mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
   - psql -c 'CREATE DATABASE groupdate_test;' -U postgres
