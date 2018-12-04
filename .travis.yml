@@ -1,6 +1,5 @@
 dist: xenial
 language: ruby
-cache: bundler
 rvm: 2.5.3
 gemfile:
   - Gemfile
