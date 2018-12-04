@@ -1,22 +1,20 @@
 dist: xenial
 language: ruby
-rvm:
-  - 2.5.3
+rvm: 2.5.3
 gemfile:
   - Gemfile
   - test/gemfiles/activerecord51.gemfile
   - test/gemfiles/activerecord50.gemfile
   - test/gemfiles/activerecord42.gemfile
-sudo: false
 services:
   - postgresql
   - mysql
 script: bundle exec rake test
 before_install:
   - gem install bundler
-  - mysql -e 'create database groupdate_test;'
+  - mysql -e 'CREATE DATABASE groupdate_test;'
   - mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
-  - psql -c 'create database groupdate_test;' -U postgres
+  - psql -c 'CREATE DATABASE groupdate_test;' -U postgres
 notifications:
   email:
     on_success: never
