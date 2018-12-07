@@ -1,3 +1,8 @@
+## 4.1.1 [unreleased]
+
+- Made column resolution consistent with `group`
+- Added support for `alias_attribute`
+
 ## 4.1.0
 
 - Many performance improvements

@@ -4,7 +4,7 @@ module Groupdate
 
     def initialize(relation, column:, period:, time_zone:, time_range:, week_start:, day_start:)
       @relation = relation
-      @column = column
+      @column = resolve_column(relation, column)
       @period = period
       @time_zone = time_zone
       @time_range = time_range
@@ -172,6 +172,15 @@ module Groupdate
       else
         ["#{column} IS NOT NULL"]
       end
+    end
+
+    # resolves eagerly
+    # need to convert both where_clause (easy)
+    # and group_clause (not easy) if want to avoid this
+    def resolve_column(relation, column)
+      node = relation.send(:relation).send(:arel_columns, [column]).first
+      node = Arel::Nodes::SqlLiteral.new(node) if node.is_a?(String)
+      relation.connection.visitor.accept(node, Arel::Collectors::SQLString.new).value
     end
   end
 end

@@ -9,12 +9,6 @@ class DatabaseTest < Minitest::Test
     assert_equal expected, User.where("id = 0").group_by_day(:created_at, range: Date.parse("2013-05-01")..Date.parse("2013-05-01 23:59:59 UTC")).count
   end
 
-  def test_table_name
-    # This test is to ensure there's not an error when using the table
-    # name as part of the column name.
-    assert_empty User.group_by_day("users.created_at").count
-  end
-
   def test_previous_scopes
     create_user "2013-05-01"
     assert_empty User.where("id = 0").group_by_day(:created_at).count
@@ -129,6 +123,59 @@ class DatabaseTest < Minitest::Test
     assert_nil User.group_by_year(:created_at, last: 1).average(:id).values.first
     assert_nil User.group_by_year(:created_at, last: 1).maximum(:id).values.first
     assert_nil User.group_by_year(:created_at, last: 1).minimum(:id).values.first
+  end
+
+  # column values
+
+  def test_string
+    assert_empty User.group("created_at").count
+    assert_empty User.group_by_day("created_at").count
+  end
+
+  def test_table_name
+    assert_empty User.group("users.created_at").count
+    assert_empty User.group_by_day("users.created_at").count
+  end
+
+  def test_string_with_join
+    assert_empty User.joins(:posts).group("created_at").count
+    assert_empty User.joins(:posts).group_by_day("created_at").count
+  end
+
+  def test_symbol_with_join
+    assert_empty User.joins(:posts).group(:created_at).count
+    assert_empty User.joins(:posts).group_by_day(:created_at).count
+  end
+
+  def test_symbol_undefined_attribute
+    create_user "2018-01-01"
+
+    # for sqlite, double-quoted string literals are accepted
+    # https://www.sqlite.org/quirks.html
+    if ENV["ADAPTER"] == "sqlite"
+      assert_equal ({"created_at2" => 1}), User.group(:created_at2).count
+
+      error = assert_raises(Groupdate::Error) do
+        User.group_by_day(:created_at2).count
+      end
+      assert_equal "Invalid query - be sure to use a date or time column", error.message
+    else
+      assert_raises(ActiveRecord::StatementInvalid) do
+        User.group(:created_at2).count
+      end
+      assert_raises(ActiveRecord::StatementInvalid) do
+        User.group_by_day(:created_at2).count
+      end
+    end
+  end
+
+  def test_alias_attribute
+    # ActiveRecord group does not support alias_attribute
+    # in group clauses before 5, so neither does Groupdate
+    skip if ActiveRecord::VERSION::MAJOR < 5
+
+    assert_empty User.group(:signed_up_at).count
+    assert_empty User.group_by_day(:signed_up_at).count
   end
 
   # associations

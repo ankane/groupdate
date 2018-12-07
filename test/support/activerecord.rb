@@ -12,6 +12,8 @@ ActiveRecord::Base.time_zone_aware_attributes = true
 class User < ActiveRecord::Base
   has_many :posts
 
+  alias_attribute :signed_up_at, :created_at
+
   def self.custom_count
     count
   end
