@@ -1,4 +1,4 @@
-## 4.1.1 [unreleased]
+## 4.1.1
 
 - Made column resolution consistent with `group`
 - Added support for `alias_attribute`
