@@ -1,0 +1,6 @@
+daysUntilLock: 60
+skipCreatedBefore: false
+exemptLabels: []
+lockLabel: false
+lockComment: false
+setLockReason: true
