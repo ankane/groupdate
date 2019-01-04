@@ -25,37 +25,7 @@ Add this line to your application’s Gemfile:
 gem 'groupdate'
 ```
 
-#### For MySQL
-
-[Time zone support](https://dev.mysql.com/doc/refman/5.7/en/time-zone-support.html) must be installed on the server.
-
-```sh
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
-```
-
-or copy and paste [these statements](https://gist.githubusercontent.com/ankane/1d6b0022173186accbf0/raw/time_zone_support.sql) into a SQL console.
-
-You can confirm it worked with:
-
-```sql
-SELECT CONVERT_TZ(NOW(), '+00:00', 'Pacific/Honolulu');
-```
-
-It should return the time instead of `NULL`.
-
-#### For SQLite
-
-Groupdate has limited support for SQLite.
-
-- No time zone support
-- No `day_start` or `week_start` options
-- No `group_by_quarter` method
-
-If your application’s time zone is set to something other than `Etc/UTC` (the default), create an initializer with:
-
-```ruby
-Groupdate.time_zone = false
-```
+For MySQL and SQLite, also follow [these instructions](#additional-instructions).
 
 ## Getting Started
 
@@ -259,6 +229,40 @@ Count
 
 ```ruby
 Hash[ users.group_by_day { |u| u.created_at }.map { |k, v| [k, v.size] } ]
+```
+
+## Additional Instructions
+
+#### For MySQL
+
+[Time zone support](https://dev.mysql.com/doc/refman/5.7/en/time-zone-support.html) must be installed on the server.
+
+```sh
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
+```
+
+or copy and paste [these statements](https://gist.githubusercontent.com/ankane/1d6b0022173186accbf0/raw/time_zone_support.sql) into a SQL console.
+
+You can confirm it worked with:
+
+```sql
+SELECT CONVERT_TZ(NOW(), '+00:00', 'Pacific/Honolulu');
+```
+
+It should return the time instead of `NULL`.
+
+#### For SQLite
+
+Groupdate has limited support for SQLite.
+
+- No time zone support
+- No `day_start` or `week_start` options
+- No `group_by_quarter` method
+
+If your application’s time zone is set to something other than `Etc/UTC` (the default), create an initializer with:
+
+```ruby
+Groupdate.time_zone = false
 ```
 
 ## Upgrading
