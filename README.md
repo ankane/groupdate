@@ -233,7 +233,7 @@ Hash[ users.group_by_day { |u| u.created_at }.map { |k, v| [k, v.size] } ]
 
 ## Additional Instructions
 
-#### For MySQL
+### For MySQL
 
 [Time zone support](https://dev.mysql.com/doc/refman/5.7/en/time-zone-support.html) must be installed on the server.
 
@@ -251,7 +251,7 @@ SELECT CONVERT_TZ(NOW(), '+00:00', 'Pacific/Honolulu');
 
 It should return the time instead of `NULL`.
 
-#### For SQLite
+### For SQLite
 
 Groupdate has limited support for SQLite.
 
