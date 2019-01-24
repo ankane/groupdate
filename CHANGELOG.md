@@ -1,4 +1,4 @@
-## 4.1.2
+## 4.1.2 [unreleased]
 
 - Fixed error with empty data and `current: false`
 
