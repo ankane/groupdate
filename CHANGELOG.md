@@ -1,3 +1,7 @@
+## 4.1.2
+
+- Fixed error with empty data and `current: false`
+
 ## 4.1.1
 
 - Made column resolution consistent with `group`

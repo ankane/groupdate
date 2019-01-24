@@ -94,6 +94,11 @@ class DatabaseTest < Minitest::Test
     assert_equal expected, User.group_by_year(:created_at, current: false).count
   end
 
+  def test_current_no_last_empty_data
+    expected = {}
+    assert_equal expected, User.group_by_year(:created_at, current: false).count
+  end
+
   def test_quarter_and_last
     today = Date.today
     create_user today.to_s
