@@ -110,7 +110,8 @@ module Groupdate
 
       def time_zone_support?(relation)
         if relation.connection.adapter_name =~ /mysql/i
-          sql = relation.send(:sanitize_sql_array, ["SELECT CONVERT_TZ(NOW(), '+00:00', ?)", time_zone.tzinfo.name])
+          # need to call klass for Rails < 5.2
+          sql = relation.klass.send(:sanitize_sql_array, ["SELECT CONVERT_TZ(NOW(), '+00:00', ?)", time_zone.tzinfo.name])
           !relation.connection.select_all(sql).first.values.first.nil?
         else
           true
