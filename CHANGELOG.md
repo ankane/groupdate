@@ -1,6 +1,7 @@
 ## 4.1.2 [unreleased]
 
 - Fixed error with empty data and `current: false`
+- Fixed error in time zone check for Rails < 5.1
 
 ## 4.1.1
 
