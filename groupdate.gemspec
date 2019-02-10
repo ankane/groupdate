@@ -32,6 +32,6 @@ Gem::Specification.new do |spec|
   else
     spec.add_development_dependency "pg", "< 1"
     spec.add_development_dependency "mysql2", "< 0.5"
-    spec.add_development_dependency "sqlite3"
+    spec.add_development_dependency "sqlite3", "~> 1.3.0"
   end
 end
