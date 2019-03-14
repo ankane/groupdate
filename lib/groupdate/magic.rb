@@ -13,7 +13,7 @@ module Groupdate
 
       raise Groupdate::Error, "Unrecognized time zone" unless time_zone
       raise Groupdate::Error, "Unrecognized :week_start option" if period == :week && !week_start
-      raise Groupdate::Error, "Cannot use infinite range for :range option" if options[:range].is_a?(Range) && !options[:range].end
+      raise Groupdate::Error, "Cannot use endless range for :range option" if options[:range].is_a?(Range) && !options[:range].end
     end
 
     def time_zone

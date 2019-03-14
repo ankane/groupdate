@@ -246,9 +246,9 @@ class BasicTest < Minitest::Test
     Time.zone = nil
   end
 
-  # infinite range
+  # endless range
 
-  def test_infinite_range
+  def test_endless_range
     skip if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("2.6.0")
 
     assert_raises Groupdate::Error do
