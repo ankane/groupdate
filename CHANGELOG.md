@@ -2,6 +2,7 @@
 
 - Fixed error with empty data and `current: false`
 - Fixed error in time zone check for Rails < 5.2
+- Prevent infinite loop with infinite ranges
 
 ## 4.1.1
 

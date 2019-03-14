@@ -246,6 +246,16 @@ class BasicTest < Minitest::Test
     Time.zone = nil
   end
 
+  # infinite range
+
+  def test_infinite_range
+    skip if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("2.6.0")
+
+    assert_raises Groupdate::Error do
+      call_method(:day, :created_at, series: true, range: eval('Date.parse("2013-05-01")..'))
+    end
+  end
+
   # date range
 
   def test_date_range
