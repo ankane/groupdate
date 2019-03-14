@@ -158,7 +158,7 @@ module Groupdate
               end
 
             tr = sorted_keys.first..sorted_keys.last
-            if options[:current] == false && tr.last && round_time(now) >= tr.last
+            if options[:current] == false && sorted_keys.any? && round_time(now) >= tr.last
               tr = tr.first...round_time(now)
             end
             tr
