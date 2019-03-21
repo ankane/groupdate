@@ -285,6 +285,8 @@ class DatabaseTest < Minitest::Test
     assert_raises { User.group_by_day(:name).count }
   end
 
+  private
+
   def this_year
     Time.now.year
   end
