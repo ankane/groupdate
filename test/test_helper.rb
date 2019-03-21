@@ -44,12 +44,18 @@ class Minitest::Test
       @users << user
     else
       user =
-        User.create!(
+        User.new(
           name: "Andrew",
           score: score,
           created_at: created_at ? utc.parse(created_at) : nil,
           created_on: created_at ? Date.parse(created_at) : nil
         )
+
+      if ENV["ADAPTER"] == "postgresql"
+        user.deleted_at = user.created_at
+      end
+
+      user.save!
 
       # hack for Redshift adapter, which doesn't return id on creation...
       user = User.last if user.id.nil?
@@ -74,7 +80,12 @@ class Minitest::Test
 
   def assert_result_time(method, expected, time_str, time_zone = false, options = {})
     expected = {utc.parse(expected).in_time_zone(time_zone ? "Pacific Time (US & Canada)" : utc) => 1}
-    assert_equal expected, result(method, time_str, time_zone, options)
+    assert_equal expected, result(method, time_str, time_zone, :created_at, options)
+
+    if ENV["ADAPTER"] == "postgresql"
+      # test timestamptz
+      assert_equal expected, result(method, time_str, time_zone, :deleted_at, options)
+    end
   end
 
   def assert_result_date(method, expected_str, time_str, time_zone = false, options = {})
@@ -87,12 +98,12 @@ class Minitest::Test
   end
 
   def assert_result(method, expected, time_str, time_zone = false, options = {})
-    assert_equal 1, result(method, time_str, time_zone, options)[expected]
+    assert_equal 1, result(method, time_str, time_zone, :created_at, options)[expected]
   end
 
-  def result(method, time_str, time_zone = false, options = {})
-    create_user time_str
-    call_method(method, :created_at, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
+  def result(method, time_str, time_zone = false, attribute = :created_at, options = {})
+    create_user time_str unless attribute == :deleted_at
+    call_method(method, attribute, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
   end
 
   def utc

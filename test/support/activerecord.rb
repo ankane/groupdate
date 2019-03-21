@@ -40,6 +40,7 @@ else
     t.string :name
     t.integer :score
     t.timestamp :created_at
+    t.column :deleted_at, :timestamptz if ENV["ADAPTER"] == "postgresql"
     t.date :created_on
   end
 

@@ -225,14 +225,14 @@ class BasicTest < Minitest::Test
     expected = {
       Date.parse("2013-05-03") => 1
     }
-    assert_equal expected, result(:day, "2013-05-03", false)
+    assert_equal expected, result(:day, "2013-05-03", false, :created_on)
   end
 
   def test_date_column_with_time_zone
     expected = {
       Date.parse("2013-05-02") => 1
     }
-    assert_equal expected, result(:day, "2013-05-03", true)
+    assert_equal expected, result(:day, "2013-05-03", true, :created_on)
   end
 
   def test_date_column_with_time_zone_false
