@@ -1,3 +1,7 @@
+## 4.2.0 [unreleased]
+
+- Dropped support for Rails 4.2
+
 ## 4.1.2
 
 - Fixed error with empty data and `current: false`

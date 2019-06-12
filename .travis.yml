@@ -1,11 +1,11 @@
 dist: xenial
 language: ruby
-rvm: 2.6.2
+rvm: 2.6.3
 gemfile:
   - Gemfile
+  - test/gemfiles/activerecord52.gemfile
   - test/gemfiles/activerecord51.gemfile
   - test/gemfiles/activerecord50.gemfile
-  - test/gemfiles/activerecord42.gemfile
 services:
   - postgresql
   - mysql
