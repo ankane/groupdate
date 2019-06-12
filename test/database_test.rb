@@ -175,10 +175,6 @@ class DatabaseTest < Minitest::Test
   end
 
   def test_alias_attribute
-    # ActiveRecord group does not support alias_attribute
-    # in group clauses before 5, so neither does Groupdate
-    skip if ActiveRecord::VERSION::MAJOR < 5
-
     assert_empty User.group(:signed_up_at).count
     assert_empty User.group_by_day(:signed_up_at).count
   end
