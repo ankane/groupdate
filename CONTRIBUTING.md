@@ -57,7 +57,7 @@ brew services start mysql
 
 # create databases
 createdb groupdate_test
-mysql -u root -e "create database groupdate_test"
+mysqladmin create groupdate_test
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 
 # clone the repo and run the tests
