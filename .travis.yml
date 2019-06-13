@@ -11,9 +11,9 @@ services:
   - mysql
 script: bundle exec rake test
 before_install:
-  - mysql -e 'CREATE DATABASE groupdate_test;'
+  - mysqladmin create groupdate_test
   - mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
-  - psql -c 'CREATE DATABASE groupdate_test;' -U postgres
+  - createdb groupdate_test
 notifications:
   email:
     on_success: never
