@@ -3,7 +3,7 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in groupdate.gemspec
 gemspec
 
-gem "activerecord", "~> 6.0.0.rc1"
+gem "activerecord", "~> 6.0.0"
 
 if defined?(JRUBY_VERSION)
   gem "activerecord-jdbcpostgresql-adapter", git: "https://github.com/jruby/activerecord-jdbc-adapter.git", platforms: :jruby
