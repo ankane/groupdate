@@ -231,6 +231,12 @@ Count
 Hash[ users.group_by_day { |u| u.created_at }.map { |k, v| [k, v.size] } ]
 ```
 
+Get the entire series with
+
+```ruby
+users.group_by_day(series: true) { |u| u.created_at }
+```
+
 ## Additional Instructions
 
 ### For MySQL
