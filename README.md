@@ -58,7 +58,7 @@ and
 - day_of_month
 - month_of_year
 
-Use it anywhere you can use `group`. Works with `count`, `sum`, `minimum`, `maximum`, and `average`. For `median`, check out [ActiveMedian](https://github.com/ankane/active_median). For other aggregate functions, including multiple together, check out [CalculateAll](https://github.com/codesnik/calculate-all).
+Use it anywhere you can use `group`. Works with `count`, `sum`, `minimum`, `maximum`, and `average`. For `median`, check out [ActiveMedian](https://github.com/ankane/active_median).
 
 ### Time Zones
 
