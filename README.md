@@ -228,7 +228,7 @@ users.group_by_day(time_zone: time_zone) { |u| u.created_at }
 Count
 
 ```ruby
-Hash[ users.group_by_day { |u| u.created_at }.map { |k, v| [k, v.size] } ]
+users.group_by_day { |u| u.created_at }.map { |k, v| [k, v.size] }.to_h
 ```
 
 Get the entire series with:
