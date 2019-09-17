@@ -56,6 +56,7 @@ and
 - hour_of_day
 - day_of_week (Sunday = 0, Monday = 1, etc)
 - day_of_month
+- day_of_year [master]
 - month_of_year
 
 Use it anywhere you can use `group`. Works with `count`, `sum`, `minimum`, `maximum`, and `average`. For `median`, check out [ActiveMedian](https://github.com/ankane/active_median).

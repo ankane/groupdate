@@ -31,6 +31,8 @@ module Groupdate
           case period
           when :day_of_week
             ["DAYOFWEEK(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)) - 1", time_zone]
+          when :day_of_year
+            ["DAYOFYEAR(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?))", time_zone]
           when :hour_of_day
             ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) + 24 - #{day_start / 3600}) % 24", time_zone]
           when :minute_of_hour
@@ -66,6 +68,8 @@ module Groupdate
           case period
           when :day_of_week
             ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
+          when :day_of_year
+            ["EXTRACT(DOY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
           when :hour_of_day
             ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
           when :minute_of_hour
@@ -99,6 +103,8 @@ module Groupdate
                 "%d"
               when :month_of_year
                 "%m"
+              when :day_of_year
+                "%j"
               when :second
                 "%Y-%m-%d %H:%M:%S UTC"
               when :minute

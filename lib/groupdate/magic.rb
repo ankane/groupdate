@@ -87,7 +87,7 @@ module Groupdate
           case period
           when :day_of_week
             lambda { |k| (k.to_i - 1 - week_start) % 7 }
-          when :hour_of_day, :day_of_month, :month_of_year, :minute_of_hour
+          when :hour_of_day, :day_of_month, :day_of_year, :month_of_year, :minute_of_hour
             lambda { |k| k.to_i }
           else
             utc = ActiveSupport::TimeZone["UTC"]

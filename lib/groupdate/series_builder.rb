@@ -79,6 +79,8 @@ module Groupdate
           time.day
         when :month_of_year
           time.month
+        when :day_of_year
+          time.yday
         else
           raise Groupdate::Error, "Invalid period"
         end
@@ -141,6 +143,8 @@ module Groupdate
         0..59
       when :day_of_month
         1..31
+      when :day_of_year
+        1..366
       when :month_of_year
         1..12
       else
