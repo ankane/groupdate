@@ -1,4 +1,4 @@
-## 4.2.0 [unreleased]
+## 4.2.0
 
 - Added `day_of_year`
 - Dropped support for Rails 4.2
