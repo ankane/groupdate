@@ -242,7 +242,7 @@ users.group_by_day(series: true) { |u| u.created_at }
 
 ### For MySQL
 
-[Time zone support](https://dev.mysql.com/doc/refman/5.7/en/time-zone-support.html) must be installed on the server.
+[Time zone support](https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html) must be installed on the server.
 
 ```sh
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
