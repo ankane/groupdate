@@ -64,7 +64,7 @@ class DatabaseTest < Minitest::Test
       last_month.to_date => 0,
       this_month.to_date => 1
     }
-    assert_equal expected, call_method(:month, :created_on, last: 2)
+    assert_equal expected, call_method(:month, :created_on, last: 2, time_zone: false)
   ensure
     Time.zone = nil
   end
