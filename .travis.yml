@@ -1,6 +1,6 @@
-dist: xenial
+dist: bionic
 language: ruby
-rvm: 2.6.3
+rvm: 2.6
 gemfile:
   - Gemfile
   - test/gemfiles/activerecord52.gemfile
@@ -9,6 +9,8 @@ gemfile:
 services:
   - postgresql
   - mysql
+addons:
+  postgresql: 10
 script: bundle exec rake test
 before_install:
   - mysqladmin create groupdate_test
