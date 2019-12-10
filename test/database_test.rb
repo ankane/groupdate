@@ -284,12 +284,12 @@ class DatabaseTest < Minitest::Test
   # duration
 
   def test_duration
-    create_user("2014-01-21 00:01:23")
-    create_user("2014-01-22 00:04:56")
+    create_user("2014-01-21 00:12:34")
+    create_user("2014-01-22 00:56:12")
     result = User.group_by_duration(10.minutes, :created_at).count
-    assert_equal 145, result.size
-    assert_equal 1, result[utc.parse("2014-01-21")]
-    assert_equal 1, result[utc.parse("2014-01-22")]
+    assert_equal 149, result.size
+    assert_equal 1, result[utc.parse("2014-01-21 00:10:00")]
+    assert_equal 1, result[utc.parse("2014-01-22 00:50:00")]
   end
 
   def test_duration_period
