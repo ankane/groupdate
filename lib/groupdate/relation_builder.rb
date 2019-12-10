@@ -83,7 +83,7 @@ module Groupdate
           when :week # start on Sunday, not PostgreSQL default Monday
             ["(DATE_TRUNC('#{period}', (#{column}::timestamptz - INTERVAL '#{week_start} day' - INTERVAL '#{day_start} second') AT TIME ZONE ?) + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second') AT TIME ZONE ?", time_zone, time_zone]
           when Integer
-            "TO_TIMESTAMP((EXTRACT(EPOCH FROM #{column}::timestamptz) / #{period}) * #{period})"
+            "TO_TIMESTAMP((EXTRACT(EPOCH FROM #{column}::timestamptz)::int / #{period}) * #{period})"
           else
             ["(DATE_TRUNC('#{period}', (#{column}::timestamptz - INTERVAL '#{day_start} second') AT TIME ZONE ?) + INTERVAL '#{day_start} second') AT TIME ZONE ?", time_zone, time_zone]
           end

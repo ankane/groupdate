@@ -45,7 +45,7 @@ module Groupdate
 
     def round_time(time)
       if period.is_a?(Integer)
-        return time_zone.at((time.to_i / period) * period)
+        return time_zone.at((time.to_time.to_i / period) * period)
       end
 
       time = time.to_time.in_time_zone(time_zone)

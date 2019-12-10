@@ -32,8 +32,8 @@ class EnumerableTest < Minitest::Test
   end
 
   def test_duration
-    user_a = create_user("2014-01-21")
-    user_b = create_user("2014-01-22")
+    user_a = create_user("2014-01-21 00:01:23")
+    user_b = create_user("2014-01-22 00:04:56")
     assert_equal 145, [user_a, user_b].group_by_duration(10.minutes, series: true, &:created_at).size
   end
 
