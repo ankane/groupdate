@@ -30,10 +30,12 @@ module Enumerable
   end
 
   def group_by_duration(duration, **options, &block)
-    if block || !respond_to?(:scoping)
+    if block
       Groupdate::Magic::Enumerable.group_by(self, duration.to_i, options, &block)
-    else
+    elsif respond_to?(:scoping)
       scoping { @klass.send(:group_by_duration, duration, options, &block) }
+    else
+      raise ArgumentError, "no block given"
     end
   end
 end
