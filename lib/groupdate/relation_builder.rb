@@ -46,7 +46,7 @@ module Groupdate
           when :quarter
             ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(EXTRACT(YEAR FROM CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S'), ?, '+00:00'), INTERVAL #{day_start} second)", time_zone, time_zone, time_zone]
           when Integer
-            ["FROM_UNIXTIME((UNIX_TIMESTAMP(#{column}) / #{period}) * #{period})"]
+            ["FROM_UNIXTIME((UNIX_TIMESTAMP(#{column}) DIV #{period}) * #{period})"]
           else
             format =
               case period
@@ -83,7 +83,7 @@ module Groupdate
           when :week # start on Sunday, not PostgreSQL default Monday
             ["(DATE_TRUNC('#{period}', (#{column}::timestamptz - INTERVAL '#{week_start} day' - INTERVAL '#{day_start} second') AT TIME ZONE ?) + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second') AT TIME ZONE ?", time_zone, time_zone]
           when Integer
-            "TO_TIMESTAMP((EXTRACT(EPOCH FROM #{column}::timestamptz)::int / #{period}) * #{period})"
+            "TO_TIMESTAMP((EXTRACT(EPOCH FROM #{column}::timestamptz)::bigint / #{period}) * #{period})"
           else
             ["(DATE_TRUNC('#{period}', (#{column}::timestamptz - INTERVAL '#{day_start} second') AT TIME ZONE ?) + INTERVAL '#{day_start} second') AT TIME ZONE ?", time_zone, time_zone]
           end
