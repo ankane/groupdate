@@ -8,7 +8,10 @@ module Groupdate
       @period = period
       @options = options
 
-      unknown_keywords = options.keys - [:day_start, :time_zone, :dates, :series, :week_start, :format, :locale, :range, :reverse]
+      known_keywords = [:time_zone, :series, :format, :locale, :range, :reverse]
+      known_keywords += [:day_start, :dates, :week_start] unless @period.is_a?(Integer)
+
+      unknown_keywords = options.keys - known_keywords
       raise ArgumentError, "unknown keywords: #{unknown_keywords.join(", ")}" if unknown_keywords.any?
 
       raise Groupdate::Error, "Unrecognized time zone" unless time_zone

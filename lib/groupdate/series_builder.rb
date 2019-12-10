@@ -44,6 +44,10 @@ module Groupdate
     end
 
     def round_time(time)
+      if period.is_a?(Integer)
+        return time_zone.at((time.to_i / period) * period)
+      end
+
       time = time.to_time.in_time_zone(time_zone)
 
       # only if day_start != 0 for performance
@@ -173,6 +177,8 @@ module Groupdate
 
           if period == :quarter
             step = 3.months
+          elsif period.is_a?(Integer)
+            step = period
           else
             step = 1.send(period)
           end

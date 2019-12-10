@@ -281,6 +281,21 @@ class DatabaseTest < Minitest::Test
     assert_raises { User.group_by_day(:name).count }
   end
 
+  # duration
+
+  def test_duration
+    create_user("2014-01-21")
+    create_user("2014-01-22")
+    assert_equal 145, User.group_by_duration(10.minutes, :created_at).count.size
+  end
+
+  def test_duration_period
+    error = assert_raises ArgumentError do
+      User.group_by_period(10.minutes, :created_at).count
+    end
+    assert_equal "Unpermitted period", error.message
+  end
+
   private
 
   def this_year

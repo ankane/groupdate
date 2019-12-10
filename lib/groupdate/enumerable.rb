@@ -28,4 +28,12 @@ module Enumerable
       scoping { @klass.send(:group_by_period, *args, &block) }
     end
   end
+
+  def group_by_duration(duration, **options, &block)
+    if block || !respond_to?(:scoping)
+      Groupdate::Magic::Enumerable.group_by(self, duration.to_i, options, &block)
+    else
+      scoping { @klass.send(:group_by_duration, duration, options, &block) }
+    end
+  end
 end

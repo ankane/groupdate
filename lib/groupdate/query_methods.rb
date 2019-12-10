@@ -21,5 +21,13 @@ module Groupdate
         raise ArgumentError, "Unpermitted period"
       end
     end
+
+    def group_by_duration(duration, field, **options)
+      Groupdate::Magic::Relation.generate_relation(self,
+        period: duration.to_i,
+        field: field,
+        **options
+      )
+    end
   end
 end
