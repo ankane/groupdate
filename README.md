@@ -235,7 +235,7 @@ users.group_by_day(series: true) { |u| u.created_at }
 Count
 
 ```ruby
-users.group_by_day { |u| u.created_at }.map { |k, v| [k, v.size] }.to_h
+users.group_by_day { |u| u.created_at }.map { |k, v| [k, v.count] }.to_h
 ```
 
 ## Additional Instructions
