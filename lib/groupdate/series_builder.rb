@@ -168,8 +168,8 @@ module Groupdate
             tr
           end
 
-        if time_range.first
-          series = [round_time(time_range.first)]
+        if time_range.begin
+          series = [round_time(time_range.begin)]
 
           if period == :quarter
             step = 3.months

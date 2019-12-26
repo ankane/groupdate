@@ -1,3 +1,7 @@
+## 4.2.1 (unreleased)
+
+- Fixed error with empty results in Ruby 2.7
+
 ## 4.2.0 (2019-10-28)
 
 - Added `day_of_year`
