@@ -2,6 +2,7 @@
 
 - Fixed error with empty results in Ruby 2.7
 - Fixed deprecation warnings in Ruby 2.7
+- Deprecated positional arguments for time zone and range
 
 ## 4.2.0 (2019-10-28)
 

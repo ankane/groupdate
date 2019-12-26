@@ -2,6 +2,8 @@ module Groupdate
   module QueryMethods
     Groupdate::PERIODS.each do |period|
       define_method :"group_by_#{period}" do |field, time_zone = nil, range = nil, **options|
+        warn "[groupdate] positional arguments are deprecated" if time_zone || range
+
         Groupdate::Magic::Relation.generate_relation(self,
           period: period,
           field: field,
