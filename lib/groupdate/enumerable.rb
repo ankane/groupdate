@@ -11,11 +11,9 @@ module Enumerable
     end
   end
 
-  def group_by_period(*args, &block)
+  def group_by_period(period, *args, &block)
     if block || !respond_to?(:scoping)
-      period = args[0]
-      options = args[1] || {}
-
+      options = args[0] || {}
       options = options.dup
       # to_sym is unsafe on user input, so convert to strings
       permitted_periods = ((options.delete(:permit) || Groupdate::PERIODS).map(&:to_sym) & Groupdate::PERIODS).map(&:to_s)
@@ -25,7 +23,7 @@ module Enumerable
         raise ArgumentError, "Unpermitted period"
       end
     else
-      scoping { @klass.send(:group_by_period, *args, &block) }
+      scoping { @klass.send(:group_by_period, period, *args, &block) }
     end
   end
 end
