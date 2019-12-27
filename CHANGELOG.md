@@ -1,4 +1,4 @@
-## 4.2.1 (unreleased)
+## 4.3.0 (2019-12-26)
 
 - Fixed error with empty results in Ruby 2.7
 - Fixed deprecation warnings in Ruby 2.7
