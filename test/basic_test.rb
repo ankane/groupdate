@@ -319,4 +319,20 @@ class BasicTest < Minitest::Test
     }
     assert_equal expected, call_method(:week, :created_at, time_zone: "Brasilia")
   end
+
+
+
+
+  # Daylight Saving Time - issues around transition day
+
+  def test_daylight_saving_time
+    paris = ActiveSupport::TimeZone["Paris"]
+    create_user(paris.parse("2015-03-30 00:15:00").utc.to_s)
+    expected = {Date.parse("2015-03-29") => 1}
+    assert_equal expected, call_method(:week, :created_at, {time_zone: "Paris"})
+  end
+
+
+
+
 end
