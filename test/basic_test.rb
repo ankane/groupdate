@@ -325,7 +325,13 @@ class BasicTest < Minitest::Test
 
   # Daylight Saving Time - issues around transition day
 
+
   def test_daylight_saving_time
+    assert_result_date(:week, "2015-03-08", "2015-03-09 07:15:00", true)
+  end
+
+
+  def test_daylight_saving_time_paris
     paris = ActiveSupport::TimeZone["Paris"]
     create_user(paris.parse("2015-03-30 00:15:00").utc.to_s)
     expected = {Date.parse("2015-03-29") => 1}
