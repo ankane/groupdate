@@ -27,7 +27,7 @@ module Groupdate
       adapter_name = @relation.connection.adapter_name
       query =
         case adapter_name
-        when "MySQL", "Mysql2", "Mysql2Spatial", 'Mysql2Rgeo'
+        when "MySQL", "Mysql2", "Mysql2Spatial", "Mysql2Rgeo"
           case period
           when :day_of_week
             ["DAYOFWEEK(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} second) - 1", time_zone]
