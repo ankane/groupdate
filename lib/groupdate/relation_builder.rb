@@ -16,8 +16,29 @@ module Groupdate
       end
     end
 
+
+    def render_aliasable_with_ugly_hack value
+      value.define_singleton_method(:relation) do
+        nothing = ''
+        nothing.define_singleton_method(:name) do
+          "groupdate_special_#{Time.now.to_i}"
+        end
+        return nothing
+      end
+
+      value.define_singleton_method(:name) do
+        "alias"
+      end
+
+      return value
+    end
+
+
+
     def generate
-      @relation.group(group_clause).where(*where_clause)
+      group_clause_evaluated = group_clause()
+      render_aliasable_with_ugly_hack(group_clause_evaluated)
+      @relation.group(group_clause_evaluated).where(*where_clause)
     end
 
     private
