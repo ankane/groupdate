@@ -30,21 +30,21 @@ module Groupdate
         when "MySQL", "Mysql2", "Mysql2Spatial", 'Mysql2Rgeo'
           case period
           when :day_of_week
-            ["DAYOFWEEK(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)) - 1", time_zone]
+            ["DAYOFWEEK(CONVERT_TZ(#{column} - INTERVAL #{day_start} second, '+00:00', ?)) - 1", time_zone]
           when :day_of_year
-            ["DAYOFYEAR(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?))", time_zone]
+            ["DAYOFYEAR(CONVERT_TZ(#{column} - INTERVAL #{day_start} second, '+00:00', ?))", time_zone]
           when :hour_of_day
             ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) + 24 - #{day_start / 3600}) % 24", time_zone]
           when :minute_of_hour
             ["(EXTRACT(MINUTE from CONVERT_TZ(#{column}, '+00:00', ?)))", time_zone]
           when :day_of_month
-            ["DAYOFMONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?))", time_zone]
+            ["DAYOFMONTH(CONVERT_TZ(#{column} - INTERVAL #{day_start} second, '+00:00', ?))", time_zone]
           when :month_of_year
-            ["MONTH(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?))", time_zone]
+            ["MONTH(CONVERT_TZ(#{column} - INTERVAL #{day_start} second, '+00:00', ?))", time_zone]
           when :week
             ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL ((#{7 - week_start} + WEEKDAY(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} second)) % 7) DAY) - INTERVAL #{day_start} second, '+00:00', ?), '%Y-%m-%d 00:00:00') + INTERVAL #{day_start} second, ?, '+00:00')", time_zone, time_zone, time_zone]
           when :quarter
-            ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(EXTRACT(YEAR FROM CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S'), ?, '+00:00'), INTERVAL #{day_start} second)", time_zone, time_zone, time_zone]
+            ["CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(EXTRACT(YEAR FROM CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?)), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(#{column}- INTERVAL #{day_start} second, '+00:00', ?)) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S'), ?, '+00:00') + INTERVAL #{day_start} second", time_zone, time_zone, time_zone]
           else
             format =
               case period
@@ -62,7 +62,7 @@ module Groupdate
                 "%Y-01-01 00:00:00"
               end
 
-            ["DATE_ADD(CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(DATE_SUB(#{column}, INTERVAL #{day_start} second), '+00:00', ?), '#{format}'), ?, '+00:00'), INTERVAL #{day_start} second)", time_zone, time_zone]
+            ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column} - INTERVAL #{day_start} second, '+00:00', ?), '#{format}'), ?, '+00:00') + INTERVAL #{day_start} second", time_zone, time_zone]
           end
         when "PostgreSQL", "PostGIS"
           case period
@@ -166,11 +166,7 @@ module Groupdate
     end
 
     def clean_group_clause_mysql(clause)
-      clause = clause.gsub("DATE_SUB(#{column}, INTERVAL 0 second)", "#{column}")
-      if clause.start_with?("DATE_ADD(") && clause.end_with?(", INTERVAL 0 second)")
-        clause = clause[9..-21]
-      end
-      clause
+      clause.gsub(/ (\-|\+) INTERVAL 0 second/, "")
     end
 
     def where_clause
