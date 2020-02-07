@@ -67,6 +67,12 @@ class BasicTest < Minitest::Test
     assert_result_date :week, "2013-03-17", "2013-03-17 07:00:00", true
   end
 
+  # extra test for week
+  def test_week_middle_of_week_with_time_zone
+    skip "until #227 is merged"
+    assert_result_date :week, "2013-03-10", "2013-03-11 07:15:00", true
+  end
+
   # month
 
   def test_month_end_of_month
