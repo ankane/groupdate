@@ -97,8 +97,10 @@ module Groupdate
         if time_range.is_a?(Range) && time_range.first.is_a?(Date)
           # convert range of dates to range of times
           # use parsing instead of in_time_zone due to Rails < 4
-          last = time_zone.parse(time_range.last.to_s)
-          last += 1.day unless time_range.exclude_end?
+          if time_range.end
+            last = time_zone.parse(time_range.last.to_s)
+            last += 1.day unless time_range.exclude_end?
+          end
           time_range = Range.new(time_zone.parse(time_range.first.to_s), last, true)
         elsif !time_range && options[:last]
           if period == :quarter
@@ -150,7 +152,7 @@ module Groupdate
       else
         time_range = self.time_range
         time_range =
-          if time_range.is_a?(Range)
+          if time_range.is_a?(Range) && time_range.end
             time_range
           else
             # use first and last values
@@ -161,11 +163,15 @@ module Groupdate
                 data.keys.sort
               end
 
-            tr = sorted_keys.first..sorted_keys.last
-            if options[:current] == false && sorted_keys.any? && round_time(now) >= tr.last
-              tr = tr.first...round_time(now)
+            if time_range.is_a?(Range)
+              time_range.begin..(sorted_keys.last || time_range.begin)
+            else
+              tr = sorted_keys.first..sorted_keys.last
+              if options[:current] == false && sorted_keys.any? && round_time(now) >= tr.last
+                tr = tr.first...round_time(now)
+              end
+              tr
             end
-            tr
           end
 
         if time_range.begin
