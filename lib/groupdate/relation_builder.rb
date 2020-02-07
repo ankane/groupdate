@@ -81,7 +81,7 @@ module Groupdate
           when :week # start on Sunday, not PostgreSQL default Monday
             ["(DATE_TRUNC('week', (#{column}::timestamptz - INTERVAL '#{week_start} day' - INTERVAL '#{day_start} second') AT TIME ZONE ?) + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second') AT TIME ZONE ?", time_zone, time_zone]
           else
-            ["(DATE_TRUNC(?, (#{column}::timestamptz - INTERVAL '#{day_start} second') AT TIME ZONE ?) + INTERVAL '#{day_start} second') AT TIME ZONE ?", period, time_zone, time_zone]
+            ["DATE_TRUNC(?, #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second') AT TIME ZONE ? + INTERVAL '#{day_start} second'", period, time_zone, time_zone]
           end
         when "SQLite"
           raise Groupdate::Error, "Time zones not supported for SQLite" unless @time_zone.utc_offset.zero?
