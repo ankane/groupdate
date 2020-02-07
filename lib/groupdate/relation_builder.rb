@@ -36,7 +36,7 @@ module Groupdate
           when :hour_of_day
             ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) + 24 - #{day_start / 3600}) % 24", time_zone]
           when :minute_of_hour
-            ["(EXTRACT(MINUTE from CONVERT_TZ(#{column}, '+00:00', ?)))", time_zone]
+            ["EXTRACT(MINUTE from CONVERT_TZ(#{column}, '+00:00', ?))", time_zone]
           when :day_of_month
             ["DAYOFMONTH(CONVERT_TZ(#{column} - INTERVAL #{day_start} second, '+00:00', ?))", time_zone]
           when :month_of_year
