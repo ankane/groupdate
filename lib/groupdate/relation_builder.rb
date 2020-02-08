@@ -42,7 +42,7 @@ module Groupdate
           when :month_of_year
             ["MONTH(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
           when :week
-            ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column} - INTERVAL ((#{7 - week_start} + WEEKDAY(CONVERT_TZ(#{column} - INTERVAL #{day_start} second, '+00:00', ?))) % 7) DAY - INTERVAL #{day_start} second, '+00:00', ?), '%Y-%m-%d 00:00:00') + INTERVAL #{day_start} second, ?, '+00:00')", time_zone, time_zone, time_zone]
+            ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second - INTERVAL ((? + WEEKDAY(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)) % 7) DAY, '%Y-%m-%d 00:00:00'), ?, '+00:00') + INTERVAL ? second", time_zone, day_start, 7 - week_start, time_zone, day_start, time_zone, day_start]
           when :quarter
             ["CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(EXTRACT(YEAR FROM CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S'), ?, '+00:00') + INTERVAL ? second", time_zone, day_start, time_zone, day_start, time_zone, day_start]
           else
