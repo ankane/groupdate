@@ -65,24 +65,27 @@ module Groupdate
             ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} second, ?), ?, '+00:00') + INTERVAL #{day_start} second", time_zone, format, time_zone]
           end
         when "PostgreSQL", "PostGIS"
+          day_start_interval = "#{day_start} second"
+
           case period
           when :day_of_week
-            ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
+            ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :day_of_year
-            ["EXTRACT(DOY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
+            ["EXTRACT(DOY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :hour_of_day
-            ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
+            ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :minute_of_hour
-            ["EXTRACT(MINUTE from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
+            ["EXTRACT(MINUTE from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :day_of_month
-            ["EXTRACT(DAY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
+            ["EXTRACT(DAY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :month_of_year
-            ["EXTRACT(MONTH from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
+            ["EXTRACT(MONTH from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :week # start on Sunday, not PostgreSQL default Monday
             # TODO just subtract number of days from day of week like MySQL?
-            ["DATE_TRUNC('week', #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second' - INTERVAL '#{week_start} day') AT TIME ZONE ? + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second'", time_zone, time_zone]
+            week_start_interval = "#{week_start} day"
+            ["DATE_TRUNC('week', #{column}::timestamptz AT TIME ZONE ? - INTERVAL ? - INTERVAL ?) AT TIME ZONE ? + INTERVAL ? + INTERVAL ?", time_zone, day_start_interval, week_start_interval, time_zone, week_start_interval, day_start_interval]
           else
-            ["DATE_TRUNC(?, #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second') AT TIME ZONE ? + INTERVAL '#{day_start} second'", period, time_zone, time_zone]
+            ["DATE_TRUNC(?, #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?) AT TIME ZONE ? + INTERVAL ?", period, time_zone, day_start_interval, time_zone, day_start_interval]
           end
         when "SQLite"
           raise Groupdate::Error, "Time zones not supported for SQLite" unless @time_zone.utc_offset.zero?
