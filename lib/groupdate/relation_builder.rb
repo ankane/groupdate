@@ -125,7 +125,7 @@ module Groupdate
                 "%Y-01-01 00:00:00 UTC"
               end
 
-            ["strftime('#{format.gsub(/%/, '%%')}', #{column})"]
+            ["strftime(?, #{column})", format]
           end
         when "Redshift"
           case period
