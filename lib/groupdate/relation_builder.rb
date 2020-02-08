@@ -30,7 +30,7 @@ module Groupdate
         when "MySQL", "Mysql2", "Mysql2Spatial", "Mysql2Rgeo"
           case period
           when :minute_of_hour
-            ["EXTRACT(MINUTE from CONVERT_TZ(#{column}, '+00:00', ?))", time_zone]
+            ["EXTRACT(MINUTE from CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
           when :hour_of_day
             ["EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
           when :day_of_week
@@ -62,14 +62,14 @@ module Groupdate
                 "%Y-01-01 00:00:00"
               end
 
-            ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} second, ?), ?, '+00:00') + INTERVAL #{day_start} second", time_zone, format, time_zone]
+            ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second, ?), ?, '+00:00') + INTERVAL ? second", time_zone, day_start, format, time_zone, day_start]
           end
         when "PostgreSQL", "PostGIS"
           day_start_interval = "#{day_start} second"
 
           case period
           when :minute_of_hour
-            ["EXTRACT(MINUTE from #{column}::timestamptz AT TIME ZONE ?)::integer", time_zone]
+            ["EXTRACT(MINUTE from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :hour_of_day
             ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :day_of_week
@@ -132,7 +132,7 @@ module Groupdate
 
           case period
           when :minute_of_hour
-            ["EXTRACT(MINUTE from CONVERT_TIMEZONE(?, #{column}::timestamp))::integer", time_zone]
+            ["EXTRACT(MINUTE from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :hour_of_day
             ["EXTRACT(HOUR from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :day_of_week

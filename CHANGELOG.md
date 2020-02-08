@@ -2,9 +2,8 @@
 
 - Fixed error around DST for `group_by_week` with MySQL
 - Fixed error around DST for `group_by_week` and `day_start` with PostgreSQL
-- Fixed bug where `day_start` applied to `minute_of_hour` with PostgreSQL and Redshift
+- Fixed bug where `day_start` not applied to `minute_of_hour` with MySQL
 - Fixed bug with non-integer `day_start` and `hour_of_day` with MySQL
-- Added warning for `hour_of_day` with non-integer `day_start` with MySQL
 
 ## 4.3.0 (2019-12-26)
 
