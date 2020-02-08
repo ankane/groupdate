@@ -174,7 +174,7 @@ class DayStartTest < Minitest::Test
   end
 
   def test_decimal_hour_of_day
-    skip if sqlite? || ENV["ADAPTER"] == "mysql"
+    skip if sqlite?
     assert_result :hour_of_day, 23, "2013-05-04 02:29:59", false, day_start: 2.5
   end
 
@@ -188,5 +188,20 @@ class DayStartTest < Minitest::Test
   def test_too_large
     # TODO raise error
     call_method(:day, :created_at, day_start: 24)
+  end
+
+  # dst behavior
+
+  def test_dst_hour_of_day_spring
+    # TODO make consistent
+    expected = ENV["ADAPTER"] == "enumerable" ? 0 : 1
+
+    time = pt.parse("2013-03-10 06:00:00")
+    assert_result :hour_of_day, expected, time.utc.to_s, true, day_start: 5
+  end
+
+  def test_dst_hour_of_day_fall
+    time = pt.parse("2013-11-03 06:00:00")
+    assert_result :hour_of_day, 1, time.utc.to_s, true, day_start: 5
   end
 end

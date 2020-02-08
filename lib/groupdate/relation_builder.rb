@@ -32,16 +32,7 @@ module Groupdate
           when :minute_of_hour
             ["EXTRACT(MINUTE from CONVERT_TZ(#{column}, '+00:00', ?))", time_zone]
           when :hour_of_day
-            # TODO make consistent with other queries and Postgres
-            # or make Postgres consistent with this
-            # ["EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
-
-            if day_start / 3600 != day_start / 3600.0
-              # TODO raise error
-              warn "[groupdate] hour_of_day returns incorrect results for non-integer day_start with MySQL"
-            end
-
-            ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) - ? + 24) % 24", time_zone, day_start / 3600]
+            ["EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
           when :day_of_week
             ["DAYOFWEEK(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second) - 1", time_zone, day_start]
           when :day_of_month
