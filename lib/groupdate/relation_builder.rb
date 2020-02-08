@@ -36,6 +36,7 @@ module Groupdate
             # or make Postgres consistent with this
             # ["EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
 
+            # doesn't handle fractional day_start
             ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) - ? + 24) % 24", time_zone, day_start / 3600]
           when :day_of_week
             ["DAYOFWEEK(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second) - 1", time_zone, day_start]
