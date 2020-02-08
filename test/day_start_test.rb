@@ -173,6 +173,11 @@ class DayStartTest < Minitest::Test
     assert_result_date :day, "2013-05-03", "2013-05-03 02:30:00", false, day_start: 2.5
   end
 
+  def test_decimal_hour_of_day
+    skip if sqlite? || ENV["ADAPTER"] == "mysql"
+    assert_result :hour_of_day, 23, "2013-05-04 02:29:59", false, day_start: 2.5
+  end
+
   # invalid
 
   def test_too_small
