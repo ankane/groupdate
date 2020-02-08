@@ -46,8 +46,11 @@ module Groupdate
     def round_time(time)
       time = time.to_time.in_time_zone(time_zone)
 
-      # only if day_start != 0 for performance
-      time -= day_start.seconds if day_start != 0
+      if day_start != 0
+        # TODO apply day_start to a time object that's not affected by DST
+        # time = time.change(zone: utc)
+        time -= day_start.seconds
+      end
 
       time =
         case period
@@ -85,8 +88,11 @@ module Groupdate
           raise Groupdate::Error, "Invalid period"
         end
 
-      # only if day_start != 0 for performance
-      time += day_start.seconds if day_start != 0 && time.is_a?(Time)
+      if day_start != 0 && time.is_a?(Time)
+        time += day_start.seconds
+        # TODO convert back
+        # time = time.change(zone: time_zone)
+      end
 
       time
     end
@@ -263,6 +269,10 @@ module Groupdate
 
     def entire_series?(series_default)
       options.key?(:series) ? options[:series] : series_default
+    end
+
+    def utc
+      @utc ||= ActiveSupport::TimeZone["Etc/UTC"]
     end
   end
 end
