@@ -192,12 +192,20 @@ class DayStartTest < Minitest::Test
 
   # dst behavior
 
+  def test_dst_day_spring
+    # TODO make consistent
+    expected = ENV["ADAPTER"] == "enumerable" ? "2013-03-09" : "2013-03-10"
+
+    time = pt.parse("2013-03-10 03:00:00")
+    assert_result_date :day, expected, time, true, day_start: 3
+  end
+
   def test_dst_hour_of_day_spring
     # TODO make consistent
-    expected = ENV["ADAPTER"] == "enumerable" ? 0 : 1
+    expected = ENV["ADAPTER"] == "enumerable" ? 23 : 0
 
-    time = pt.parse("2013-03-10 06:00:00")
-    assert_result :hour_of_day, expected, time, true, day_start: 5
+    time = pt.parse("2013-03-10 03:00:00")
+    assert_result :hour_of_day, expected, time, true, day_start: 3
   end
 
   def test_dst_hour_of_day_fall
