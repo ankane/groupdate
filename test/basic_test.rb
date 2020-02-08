@@ -79,19 +79,25 @@ class BasicTest < Minitest::Test
     # before and after DST weeks
     weeks = ["2013-03-03", "2013-03-10", "2013-03-17", "2013-10-27", "2013-11-03", "2013-11-10"]
     weekdays = [:sun, :mon, :tue, :wed, :thu, :fri, :sat]
+    hours = [0, 1, 2, 3, 21, 22]
 
-    weekdays.each_with_index do |week_start, i|
-      weeks.each do |week|
-        start_at = pt.parse(week) + i.days
-        time = start_at.dup
-        end_at = time + 1.week
-        while time < end_at
-          # prevent mysql error
-          if time.utc.to_s != "2013-03-10 02:00:00 UTC"
-            assert_result_date :week, start_at.strftime("%Y-%m-%d"), time.utc.to_s, true, week_start: week_start
-            User.delete_all
+    hours.each do |hour|
+      puts hour
+      weekdays.each_with_index do |week_start, i|
+        puts week_start
+        weeks.each do |week|
+          puts week
+          start_at = (pt.parse(week) + i.days).change(hour: hour)
+          time = start_at.dup
+          end_at = (time + 1.week).change(hour: hour)
+          while time < end_at
+            # prevent mysql error
+            if time.utc.to_s != "2013-03-10 02:00:00 UTC"
+              assert_result_date :week, start_at.strftime("%Y-%m-%d"), time.utc.to_s, true, week_start: week_start, day_start: hour
+              User.delete_all
+            end
+            time += 1.hour
           end
-          time += 1.hour
         end
       end
     end

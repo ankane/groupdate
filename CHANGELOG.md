@@ -1,3 +1,7 @@
+## 4.3.1 (unreleased)
+
+- Fixed error around DST for `group_by_week` and `day_start` with PostgreSQL
+
 ## 4.3.0 (2019-12-26)
 
 - Fixed error with empty results in Ruby 2.7

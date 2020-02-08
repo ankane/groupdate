@@ -79,11 +79,8 @@ module Groupdate
           when :month_of_year
             ["EXTRACT(MONTH from #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second')::integer", time_zone]
           when :week # start on Sunday, not PostgreSQL default Monday
-
-            # TODO apply time zone conversions before day subtraction?
-            # ["DATE_TRUNC('week', #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{week_start} day' - INTERVAL '#{day_start} second') AT TIME ZONE ? + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second'", time_zone, time_zone]
-
-            ["(DATE_TRUNC('week', (#{column}::timestamptz - INTERVAL '#{week_start} day' - INTERVAL '#{day_start} second') AT TIME ZONE ?) + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second') AT TIME ZONE ?", time_zone, time_zone]
+            # TODO just subtract number of days from day of week like MySQL?
+            ["DATE_TRUNC('week', #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second' - INTERVAL '#{week_start} day') AT TIME ZONE ? + INTERVAL '#{week_start} day' + INTERVAL '#{day_start} second'", time_zone, time_zone]
           else
             ["DATE_TRUNC(?, #{column}::timestamptz AT TIME ZONE ? - INTERVAL '#{day_start} second') AT TIME ZONE ? + INTERVAL '#{day_start} second'", period, time_zone, time_zone]
           end
