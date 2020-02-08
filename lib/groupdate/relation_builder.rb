@@ -29,16 +29,16 @@ module Groupdate
         case adapter_name
         when "MySQL", "Mysql2", "Mysql2Spatial", "Mysql2Rgeo"
           case period
-          when :day_of_week
-            ["DAYOFWEEK(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second) - 1", time_zone, day_start]
-          when :day_of_year
-            ["DAYOFYEAR(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
-          when :hour_of_day
-            ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) + 24 - ?) % 24", time_zone, day_start / 3600]
           when :minute_of_hour
             ["EXTRACT(MINUTE from CONVERT_TZ(#{column}, '+00:00', ?))", time_zone]
+          when :hour_of_day
+            ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) + 24 - ?) % 24", time_zone, day_start / 3600]
+          when :day_of_week
+            ["DAYOFWEEK(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second) - 1", time_zone, day_start]
           when :day_of_month
             ["DAYOFMONTH(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
+          when :day_of_year
+            ["DAYOFYEAR(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
           when :month_of_year
             ["MONTH(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
           when :week
@@ -68,16 +68,16 @@ module Groupdate
           day_start_interval = "#{day_start} second"
 
           case period
-          when :day_of_week
-            ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
-          when :day_of_year
-            ["EXTRACT(DOY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
-          when :hour_of_day
-            ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :minute_of_hour
             ["EXTRACT(MINUTE from #{column}::timestamptz AT TIME ZONE ?)::integer", time_zone]
+          when :hour_of_day
+            ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+          when :day_of_week
+            ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :day_of_month
             ["EXTRACT(DAY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+          when :day_of_year
+            ["EXTRACT(DOY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :month_of_year
             ["EXTRACT(MONTH from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :week # start on Sunday, not PostgreSQL default Monday
@@ -97,18 +97,18 @@ module Groupdate
           else
             format =
               case period
-              when :hour_of_day
-                "%H"
               when :minute_of_hour
                 "%M"
+              when :hour_of_day
+                "%H"
               when :day_of_week
                 "%w"
               when :day_of_month
                 "%d"
-              when :month_of_year
-                "%m"
               when :day_of_year
                 "%j"
+              when :month_of_year
+                "%m"
               when :second
                 "%Y-%m-%d %H:%M:%S UTC"
               when :minute
@@ -131,12 +131,12 @@ module Groupdate
           day_start_interval = "#{day_start} second"
 
           case period
-          when :day_of_week
-            ["EXTRACT(DOW from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?)::integer", time_zone, day_start_interval]
-          when :hour_of_day
-            ["EXTRACT(HOUR from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :minute_of_hour
             ["EXTRACT(MINUTE from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?)::integer", time_zone, day_start_interval]
+          when :hour_of_day
+            ["EXTRACT(HOUR from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?)::integer", time_zone, day_start_interval]
+          when :day_of_week
+            ["EXTRACT(DOW from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :day_of_month
             ["EXTRACT(DAY from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :day_of_year
