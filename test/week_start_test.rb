@@ -57,14 +57,14 @@ class WeekStartTest < Minitest::Test
 
   # global
 
-  def test_week_start
+  def test_global
     Groupdate.week_start = :mon
     assert_result_date :week, "2013-03-18", "2013-03-24 23:59:59"
   ensure
     Groupdate.week_start = :sun
   end
 
-  def test_week_start_and_start_option
+  def test_global_and_option
     Groupdate.week_start = :mon
     assert_result_date :week, "2013-03-16", "2013-03-22 23:59:59", false, week_start: :sat
   ensure

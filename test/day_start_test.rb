@@ -165,11 +165,11 @@ class DayStartTest < Minitest::Test
 
   # decimal
 
-  def test_day_start_decimal_end_of_day
+  def test_decimal_end_of_day
     assert_result_date :day, "2013-05-03", "2013-05-04 02:29:59", false, day_start: 2.5
   end
 
-  def test_day_start_decimal_start_of_day
+  def test_decimal_start_of_day
     assert_result_date :day, "2013-05-03", "2013-05-03 02:30:00", false, day_start: 2.5
   end
 
