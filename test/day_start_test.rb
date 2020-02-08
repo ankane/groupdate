@@ -200,6 +200,14 @@ class DayStartTest < Minitest::Test
     assert_result_date :day, expected, time, true, day_start: 3
   end
 
+  def test_dst_week_spring
+    # TODO make consistent
+    expected = ENV["ADAPTER"] == "enumerable" ? "2013-03-03" : "2013-03-10"
+
+    time = pt.parse("2013-03-10 03:00:00")
+    assert_result_date :week, expected, time, true, day_start: 3
+  end
+
   def test_dst_hour_of_day_spring
     # TODO make consistent
     expected = ENV["ADAPTER"] == "enumerable" ? 23 : 0
