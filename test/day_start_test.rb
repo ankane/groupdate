@@ -172,4 +172,16 @@ class DayStartTest < Minitest::Test
   def test_day_start_decimal_start_of_day
     assert_result_date :day, "2013-05-03", "2013-05-03 02:30:00", false, day_start: 2.5
   end
+
+  # invalid
+
+  def test_too_small
+    # TODO raise error
+    call_method(:day, :created_at, day_start: -1)
+  end
+
+  def test_too_large
+    # TODO raise error
+    call_method(:day, :created_at, day_start: 24)
+  end
 end

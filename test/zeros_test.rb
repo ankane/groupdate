@@ -124,7 +124,7 @@ class ZerosTest < Minitest::Test
 
   def test_zeros_datetime
     # flaky
-    skip if ENV["ADAPTER"] == "sqlite"
+    skip if sqlite?
 
     create_user "2013-05-01"
     expected = {

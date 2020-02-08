@@ -70,4 +70,24 @@ class WeekStartTest < Minitest::Test
   ensure
     Groupdate.week_start = :sun
   end
+
+  # invalid
+
+  def test_invalid_week
+    skip "call_method expects different error message" if sqlite?
+
+    error = assert_raises(Groupdate::Error) do
+      call_method(:week, :created_at, week_start: "bad")
+    end
+    assert_equal "Unrecognized :week_start option", error.message
+  end
+
+  def test_invalid_day_of_week
+    skip "call_method expects different error message" if sqlite?
+
+    error = assert_raises(Groupdate::Error) do
+      call_method(:day_of_week, :created_at, week_start: "bad")
+    end
+    assert_equal "Unrecognized :week_start option", error.message
+  end
 end

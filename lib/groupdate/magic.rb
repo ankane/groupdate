@@ -11,9 +11,14 @@ module Groupdate
       unknown_keywords = options.keys - [:day_start, :time_zone, :dates, :series, :week_start, :format, :locale, :range, :reverse]
       raise ArgumentError, "unknown keywords: #{unknown_keywords.join(", ")}" if unknown_keywords.any?
 
+      # TODO raise argument error in next major version
+      # TODO better messages
       raise Groupdate::Error, "Unrecognized time zone" unless time_zone
-      raise Groupdate::Error, "Unrecognized :week_start option" if period == :week && !week_start
+      raise Groupdate::Error, "Unrecognized :week_start option" unless week_start
       raise Groupdate::Error, "Cannot use endless range for :range option" if options[:range].is_a?(Range) && !options[:range].end
+
+      # TODO raise error in next major version
+      warn "[groupdate] :day_start must be between 0 and 24" if (day_start / 3600) < 0 || (day_start / 3600) >= 24
     end
 
     def time_zone

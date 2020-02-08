@@ -32,6 +32,10 @@ class Minitest::Test
     end
   end
 
+  def sqlite?
+    ENV["ADAPTER"] == "sqlite"
+  end
+
   def create_user(created_at, score = 1)
     if ENV["ADAPTER"] == "enumerable"
       user =
@@ -69,7 +73,7 @@ class Minitest::Test
   def call_method(method, field, options)
     if ENV["ADAPTER"] == "enumerable"
       Hash[@users.group_by_period(method, **options) { |u| u.send(field) }.map { |k, v| [k, v.size] }]
-    elsif ENV["ADAPTER"] == "sqlite" && (method == :quarter || options[:time_zone] || options[:day_start] || options[:week_start] || Groupdate.week_start != :sun || (Time.zone && options[:time_zone] != false))
+    elsif sqlite? && (method == :quarter || options[:time_zone] || options[:day_start] || options[:week_start] || Groupdate.week_start != :sun || (Time.zone && options[:time_zone] != false))
       error = assert_raises(Groupdate::Error) { User.group_by_period(method, field, **options).count }
       assert_includes error.message, "not supported for SQLite"
       skip
