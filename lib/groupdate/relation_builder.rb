@@ -30,21 +30,21 @@ module Groupdate
         when "MySQL", "Mysql2", "Mysql2Spatial", "Mysql2Rgeo"
           case period
           when :day_of_week
-            ["DAYOFWEEK(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} second) - 1", time_zone]
+            ["DAYOFWEEK(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second) - 1", time_zone, day_start]
           when :day_of_year
-            ["DAYOFYEAR(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} second)", time_zone]
+            ["DAYOFYEAR(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
           when :hour_of_day
-            ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) + 24 - #{day_start / 3600}) % 24", time_zone]
+            ["(EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?)) + 24 - ?) % 24", time_zone, day_start / 3600]
           when :minute_of_hour
             ["EXTRACT(MINUTE from CONVERT_TZ(#{column}, '+00:00', ?))", time_zone]
           when :day_of_month
-            ["DAYOFMONTH(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} second)", time_zone]
+            ["DAYOFMONTH(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
           when :month_of_year
-            ["MONTH(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} second)", time_zone]
+            ["MONTH(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
           when :week
             ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column} - INTERVAL ((#{7 - week_start} + WEEKDAY(CONVERT_TZ(#{column} - INTERVAL #{day_start} second, '+00:00', ?))) % 7) DAY - INTERVAL #{day_start} second, '+00:00', ?), '%Y-%m-%d 00:00:00') + INTERVAL #{day_start} second, ?, '+00:00')", time_zone, time_zone, time_zone]
           when :quarter
-            ["CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(EXTRACT(YEAR FROM CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} second), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL #{day_start} second) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S'), ?, '+00:00') + INTERVAL #{day_start} second", time_zone, time_zone, time_zone]
+            ["CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(EXTRACT(YEAR FROM CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S'), ?, '+00:00') + INTERVAL ? second", time_zone, day_start, time_zone, day_start, time_zone, day_start]
           else
             format =
               case period
