@@ -197,11 +197,11 @@ class DayStartTest < Minitest::Test
     expected = ENV["ADAPTER"] == "enumerable" ? 0 : 1
 
     time = pt.parse("2013-03-10 06:00:00")
-    assert_result :hour_of_day, expected, time.utc.to_s, true, day_start: 5
+    assert_result :hour_of_day, expected, time, true, day_start: 5
   end
 
   def test_dst_hour_of_day_fall
     time = pt.parse("2013-11-03 06:00:00")
-    assert_result :hour_of_day, 1, time.utc.to_s, true, day_start: 5
+    assert_result :hour_of_day, 1, time, true, day_start: 5
   end
 end

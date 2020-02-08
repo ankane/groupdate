@@ -303,8 +303,8 @@ class BasicTest < Minitest::Test
 
   def test_brasilia_summer_time
     brasilia = ActiveSupport::TimeZone["Brasilia"]
-    create_user(brasilia.parse("2014-10-19 02:00:00").utc.to_s)
-    create_user(brasilia.parse("2014-10-20 02:00:00").utc.to_s)
+    create_user brasilia.parse("2014-10-19 02:00:00")
+    create_user brasilia.parse("2014-10-20 02:00:00")
     expected = {
       Date.parse("2014-10-19") => 1,
       Date.parse("2014-10-20") => 1
@@ -346,7 +346,7 @@ class BasicTest < Minitest::Test
           while time < end_at
             # prevent mysql error
             if time.utc.to_s != "2013-03-10 02:00:00 UTC"
-              assert_result_date :week, start_at.strftime("%Y-%m-%d"), time.utc.to_s, true, week_start: week_start, day_start: hour
+              assert_result_date :week, start_at.strftime("%Y-%m-%d"), time, true, week_start: week_start, day_start: hour
               User.delete_all
             end
             time += 1.hour
