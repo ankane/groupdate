@@ -1,6 +1,7 @@
 ## 4.3.1 (unreleased)
 
 - Fixed error around DST for `group_by_week` and `day_start` with PostgreSQL
+- Fixed bug where `day_start` applied to `minute_of_hour` with PostgreSQL
 
 ## 4.3.0 (2019-12-26)
 
