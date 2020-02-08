@@ -132,7 +132,7 @@ module Groupdate
 
           case period
           when :minute_of_hour
-            ["EXTRACT(MINUTE from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(MINUTE from CONVERT_TIMEZONE(?, #{column}::timestamp))::integer", time_zone]
           when :hour_of_day
             ["EXTRACT(HOUR from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :day_of_week
