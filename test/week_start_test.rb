@@ -39,19 +39,19 @@ class WeekStartTest < Minitest::Test
 
   # day of week week start monday
 
-  def test_day_of_week_end_of_day_week_start_mon
+  def test_day_of_week_end_of_day_mon
     assert_result :day_of_week, 1, "2013-01-01 23:59:59", false, week_start: :mon
   end
 
-  def test_day_of_week_start_of_day_week_start_mon
+  def test_day_of_week_start_of_day_mon
     assert_result :day_of_week, 2, "2013-01-02 00:00:00", false, week_start: :mon
   end
 
-  def test_day_of_week_end_of_week_with_time_zone_week_start_mon
+  def test_day_of_week_end_of_week_with_time_zone_mon
     assert_result :day_of_week, 1, "2013-01-02 07:59:59", true, week_start: :mon
   end
 
-  def test_day_of_week_start_of_week_with_time_zone_week_start_mon
+  def test_day_of_week_start_of_week_with_time_zone_mon
     assert_result :day_of_week, 2, "2013-01-02 08:00:00", true, week_start: :mon
   end
 
