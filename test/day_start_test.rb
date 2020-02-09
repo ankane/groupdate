@@ -244,7 +244,7 @@ class DayStartTest < Minitest::Test
     assert_result :hour_of_day, expected, time, true, day_start: 1
   end
 
-  def test_dst_again
+  def test_dst_dates_false
     skip
 
     ["2013-03-09", "2013-03-10", "2013-03-11"].each do |week|
