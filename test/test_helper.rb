@@ -98,7 +98,14 @@ class Minitest::Test
     create_user time_str
     expected = {Date.parse(expected_str) => 1}
     assert_equal expected, call_method(method, :created_at, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
-    expected = {(time_zone ? pt : utc).parse(expected_str) + options[:day_start].to_f.hours => 1}
+
+    expected_time = (time_zone ? pt : utc).parse(expected_str)
+    if options[:day_start]
+      expected_time += options[:day_start].to_f.hours
+      # expected_time = expected_time.change(hour: options[:day_start], min: (options[:day_start] % 1) * 60)
+    end
+    expected = {expected_time => 1}
+
     assert_equal expected, call_method(method, :created_at, options.merge(dates: false, time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
     # assert_equal expected, call_method(method, :created_on, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
   end
