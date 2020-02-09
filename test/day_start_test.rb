@@ -243,4 +243,14 @@ class DayStartTest < Minitest::Test
     time = pt.parse("2013-11-03 01:00:00") + 1.hour # second 1 am of the day
     assert_result :hour_of_day, expected, time, true, day_start: 1
   end
+
+  def test_dst_again
+    skip
+
+    ["2013-03-09", "2013-03-10", "2013-03-11"].each do |week|
+      create_user pt.parse(week)
+    end
+    results = call_method(:day, :created_at, day_start: 3, dates: false, time_zone: pt)
+    assert_equal [3, 3, 3], results.keys.map(&:hour)
+  end
 end
