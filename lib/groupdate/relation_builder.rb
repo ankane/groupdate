@@ -30,9 +30,9 @@ module Groupdate
         when "MySQL", "Mysql2", "Mysql2Spatial", "Mysql2Rgeo"
           case period
           when :minute_of_hour
-            ["EXTRACT(MINUTE from CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
+            ["MINUTE(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
           when :hour_of_day
-            ["EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
+            ["HOUR(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
           when :day_of_week
             ["DAYOFWEEK(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second) - 1", time_zone, day_start]
           when :day_of_month
