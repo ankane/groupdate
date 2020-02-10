@@ -27,7 +27,7 @@ module Groupdate
       adapter_name = @relation.connection.adapter_name
       query =
         case adapter_name
-        when "MySQL", "Mysql2", "Mysql2Spatial", "Mysql2Rgeo"
+        when "Mysql2", "Mysql2Spatial", "Mysql2Rgeo"
           case period
           when :minute_of_hour
             ["MINUTE(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
@@ -155,11 +155,6 @@ module Groupdate
         else
           raise Groupdate::Error, "Connection adapter not supported: #{adapter_name}"
         end
-
-      # TODO drop support for MySQL adapter in next major version
-      if adapter_name == "MySQL" && period == :week
-        query[0] = "CAST(#{query[0]} AS DATETIME)"
-      end
 
       clause = @relation.send(:sanitize_sql_array, query)
 
