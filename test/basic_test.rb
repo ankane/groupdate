@@ -332,7 +332,7 @@ class BasicTest < Minitest::Test
 
     # before and after DST weeks
     weeks = ["2013-03-03", "2013-03-10", "2013-03-17", "2013-10-27", "2013-11-03", "2013-11-10"]
-    weekdays = [:sun, :mon, :tue, :wed, :thu, :fri, :sat]
+    weekdays = [:sun, :mon] #, :tue, :wed, :thu, :fri, :sat]
     hours = [0, 1, 2, 3, 21, 22]
 
     hours.each do |hour|
