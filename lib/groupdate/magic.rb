@@ -2,6 +2,8 @@ require "i18n"
 
 module Groupdate
   class Magic
+    DAYS = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+
     attr_accessor :period, :options, :group_index
 
     def initialize(period:, **options)
@@ -49,8 +51,7 @@ module Groupdate
     def week_start
       @week_start ||= begin
         v = (options[:week_start] || Groupdate.week_start).to_sym
-        [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday].index(v) ||
-        [:mon, :tue, :wed, :thu, :fri, :sat, :sun].index(v)
+        DAYS.index(v) || [:mon, :tue, :wed, :thu, :fri, :sat, :sun].index(v)
       end
     end
 

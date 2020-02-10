@@ -3,7 +3,6 @@ module Groupdate
     attr_reader :period, :time_zone, :day_start, :week_start, :options
 
     CHECK_PERIODS = [:day, :week, :month, :quarter, :year]
-    DAYS = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
     def initialize(period:, time_zone:, day_start:, week_start:, **options)
       @period = period
@@ -12,7 +11,7 @@ module Groupdate
       @day_start = day_start
       @options = options
       @round_time = {}
-      @week_start_key = DAYS[@week_start] if @week_start
+      @week_start_key = Groupdate::Magic::DAYS[@week_start] if @week_start
     end
 
     def generate(data, default_value:, series_default: true, multiple_groups: false, group_index: nil)
