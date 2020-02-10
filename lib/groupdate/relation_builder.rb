@@ -85,7 +85,12 @@ module Groupdate
             week_start_interval = "#{week_start} day"
             ["(DATE_TRUNC('week', #{column}::timestamptz AT TIME ZONE ? - INTERVAL ? - INTERVAL ?) + INTERVAL ? + INTERVAL ?) AT TIME ZONE ?", time_zone, day_start_interval, week_start_interval, week_start_interval, day_start_interval, time_zone]
           else
-            ["(DATE_TRUNC(?, #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?) + INTERVAL ?) AT TIME ZONE ?", period, time_zone, day_start_interval, day_start_interval, time_zone]
+            if day_start == 0
+              # prettier
+              ["DATE_TRUNC(?, #{column}::timestamptz AT TIME ZONE ?) AT TIME ZONE ?", period, time_zone, time_zone]
+            else
+              ["(DATE_TRUNC(?, #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?) + INTERVAL ?) AT TIME ZONE ?", period, time_zone, day_start_interval, day_start_interval, time_zone]
+            end
           end
         when "SQLite"
           raise Groupdate::Error, "Time zones not supported for SQLite" unless @time_zone.utc_offset.zero?
