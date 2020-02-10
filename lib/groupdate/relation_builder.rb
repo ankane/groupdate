@@ -69,17 +69,17 @@ module Groupdate
 
           case period
           when :minute_of_hour
-            ["EXTRACT(MINUTE from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(MINUTE FROM #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :hour_of_day
-            ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(HOUR FROM #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :day_of_week
-            ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(DOW FROM #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :day_of_month
-            ["EXTRACT(DAY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(DAY FROM #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :day_of_year
-            ["EXTRACT(DOY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(DOY FROM #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :month_of_year
-            ["EXTRACT(MONTH from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(MONTH FROM #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :week # start on Sunday, not PostgreSQL default Monday
             # TODO just subtract number of days from day of week like MySQL?
             week_start_interval = "#{week_start} day"
