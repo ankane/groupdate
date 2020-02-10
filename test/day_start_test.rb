@@ -214,9 +214,19 @@ class DayStartTest < Minitest::Test
     assert_result_date :day, "2013-03-10", time, true, day_start: 3
   end
 
+  def test_dst_day_fall
+    time = pt.parse("2013-11-03 01:00:00") + 1.hour # second 1 am of the day
+    assert_result_date :day, "2013-11-03", time, true, day_start: 1
+  end
+
   def test_dst_week_spring
     time = pt.parse("2013-03-10 03:00:00")
     assert_result_date :week, "2013-03-10", time, true, day_start: 3
+  end
+
+  def test_dst_week_fall
+    time = pt.parse("2013-11-03 01:00:00") + 1.hour # second 1 am of the day
+    assert_result_date :week, "2013-11-03", time, true, day_start: 1
   end
 
   def test_dst_hour_of_day_spring
@@ -229,11 +239,19 @@ class DayStartTest < Minitest::Test
     assert_result :hour_of_day, 0, time, true, day_start: 1
   end
 
-  def test_dst_dates_false
+  def test_dst_dates_false_spring
     ["2013-03-09", "2013-03-10", "2013-03-11"].each do |week|
       create_user pt.parse(week)
     end
     results = call_method(:day, :created_at, day_start: 3, dates: false, time_zone: pt)
     assert_equal [3, 3, 3], results.keys.map(&:hour)
+  end
+
+  def test_dst_dates_false_fall
+    ["2013-11-02", "2013-11-03", "2013-11-04"].each do |week|
+      create_user pt.parse(week)
+    end
+    results = call_method(:day, :created_at, day_start: 1, dates: false, time_zone: pt)
+    assert_equal [1, 1, 1], results.keys.map(&:hour)
   end
 end
