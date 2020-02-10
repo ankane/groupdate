@@ -215,8 +215,8 @@ class DayStartTest < Minitest::Test
   end
 
   def test_dst_day_fall
-    time = pt.parse("2013-11-03 03:00:00")
-    assert_result_date :day, "2013-11-03", time, true, day_start: 3
+    time = pt.parse("2013-11-03 01:00:00") + 1.hour # second 1 am of the day
+    assert_result_date :day, "2013-11-03", time, true, day_start: 1
   end
 
   def test_dst_week_spring
@@ -225,8 +225,8 @@ class DayStartTest < Minitest::Test
   end
 
   def test_dst_week_fall
-    time = pt.parse("2013-11-03 03:00:00")
-    assert_result_date :week, "2013-11-03", time, true, day_start: 3
+    time = pt.parse("2013-11-03 01:00:00") + 1.hour # second 1 am of the day
+    assert_result_date :week, "2013-11-03", time, true, day_start: 1
   end
 
   def test_dst_hour_of_day_spring
@@ -235,8 +235,8 @@ class DayStartTest < Minitest::Test
   end
 
   def test_dst_hour_of_day_fall
-    time = pt.parse("2013-11-03 03:00:00")
-    assert_result :hour_of_day, 0, time, true, day_start: 3
+    time = pt.parse("2013-11-03 01:00:00") + 1.hour # second 1 am of the day
+    assert_result :hour_of_day, 0, time, true, day_start: 1
   end
 
   def test_dst_dates_false_spring_before
