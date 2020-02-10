@@ -203,13 +203,21 @@ class DayStartTest < Minitest::Test
   # invalid
 
   def test_too_small
-    # TODO raise error
-    call_method(:day, :created_at, day_start: -1)
+    skip "call_method expects different error message" if sqlite?
+
+    error = assert_raises(ArgumentError) do
+      call_method(:day, :created_at, day_start: -1)
+    end
+    assert_equal ":day_start must be between 0 and 24", error.message
   end
 
   def test_too_large
-    # TODO raise error
-    call_method(:day, :created_at, day_start: 24)
+    skip "call_method expects different error message" if sqlite?
+
+    error = assert_raises(ArgumentError) do
+      call_method(:day, :created_at, day_start: 24)
+    end
+    assert_equal ":day_start must be between 0 and 24", error.message
   end
 
   # dst behavior

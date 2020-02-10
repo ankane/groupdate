@@ -269,9 +269,10 @@ class BasicTest < Minitest::Test
   def test_endless_range
     skip if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("2.6.0")
 
-    assert_raises Groupdate::Error do
+    error = assert_raises ArgumentError do
       call_method(:day, :created_at, series: true, range: eval('Date.parse("2013-05-01")..'))
     end
+    assert_equal "Cannot use endless range for :range option", error.message
   end
 
   # date range
