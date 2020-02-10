@@ -9,6 +9,8 @@ require "ostruct"
 ENV["TZ"] = "UTC"
 
 adapter = ENV["ADAPTER"]
+abort "No adapter specified" unless adapter
+
 puts "Using #{adapter}"
 require_relative "adapters/#{adapter}"
 
