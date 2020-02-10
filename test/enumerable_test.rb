@@ -52,11 +52,9 @@ class EnumerableTest < Minitest::Test
   end
 
   def test_permit
-    def test_permit
-      error = assert_raises(ArgumentError) do
-        [].group_by_period(:day, permit: %w(week)) { nil }
-      end
-      assert_equal "Unpermitted period", error.message
+    error = assert_raises(ArgumentError) do
+      [].group_by_period(:day, permit: %w(week)) { nil }
     end
+    assert_equal "Unpermitted period", error.message
   end
 end
