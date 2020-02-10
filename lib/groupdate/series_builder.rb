@@ -125,7 +125,8 @@ module Groupdate
               if options[:current] == false
                 round_time(start_at - step)...round_time(now)
               else
-                round_time(start_at)..now
+                # extend to end of current period
+                round_time(start_at)...(round_time(now) + step)
               end
           end
         end

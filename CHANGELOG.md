@@ -5,6 +5,7 @@
 - Fixed bug where `day_start` not applied to `minute_of_hour` with MySQL
 - Fixed bug with non-integer `day_start` and `hour_of_day` with MySQL
 - Removed deprecated positional arguments for time zone and range
+- Made `last` option extend to end of current period
 
 ## 4.3.0 (2019-12-26)
 
