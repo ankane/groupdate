@@ -328,7 +328,7 @@ class BasicTest < Minitest::Test
   end
 
   def test_week_middle_of_week_with_time_zone_frequently
-    skip # takes while
+    # skip # takes while
 
     # before and after DST weeks
     weeks = ["2013-03-03", "2013-03-10", "2013-03-17", "2013-10-27", "2013-11-03", "2013-11-10"]

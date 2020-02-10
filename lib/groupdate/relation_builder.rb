@@ -42,7 +42,8 @@ module Groupdate
           when :month_of_year
             ["MONTH(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
           when :week
-            ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second - INTERVAL ((? + 5 + DAYOFWEEK(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)) % 7) DAY, '%Y-%m-%d 00:00:00') + INTERVAL ? second, ?, '+00:00')", time_zone, day_start, 7 - week_start, time_zone, day_start, day_start, time_zone]
+            converted = "CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second"
+            ["CONVERT_TZ(DATE_FORMAT(#{converted} - INTERVAL ((? + 5 + DAYOFWEEK(#{converted})) % 7) DAY, '%Y-%m-%d 00:00:00') + INTERVAL ? second, ?, '+00:00')", time_zone, day_start, 7 - week_start, time_zone, day_start, day_start, time_zone]
           when :quarter
             ["CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(YEAR(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S') + INTERVAL ? second, ?, '+00:00')", time_zone, day_start, time_zone, day_start, day_start, time_zone]
           else
@@ -80,10 +81,9 @@ module Groupdate
             ["EXTRACT(DOY FROM #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
           when :month_of_year
             ["EXTRACT(MONTH FROM #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
-          when :week # start on Sunday, not PostgreSQL default Monday
-            # TODO just subtract number of days from day of week like MySQL?
-            week_start_interval = "#{week_start} day"
-            ["(DATE_TRUNC('week', #{column}::timestamptz AT TIME ZONE ? - INTERVAL ? - INTERVAL ?) + INTERVAL ? + INTERVAL ?) AT TIME ZONE ?", time_zone, day_start_interval, week_start_interval, week_start_interval, day_start_interval, time_zone]
+          when :week
+            converted = "#{column}::timestamptz AT TIME ZONE ? - INTERVAL ?"
+            ["(DATE_TRUNC('day', #{converted} - INTERVAL '1 day' * ((? + 6 + EXTRACT(DOW FROM #{converted}))::integer % 7)) + INTERVAL ?) AT TIME ZONE ?", time_zone, day_start_interval, 7 - week_start, time_zone, day_start_interval, day_start_interval, time_zone]
           else
             if day_start == 0
               # prettier
