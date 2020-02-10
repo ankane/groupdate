@@ -15,7 +15,7 @@ module Groupdate
   METHODS = PERIODS.map { |v| :"group_by_#{v}" } + [:group_by_period]
 
   mattr_accessor :week_start, :day_start, :time_zone, :dates
-  self.week_start = :sun
+  self.week_start = :sunday
   self.day_start = 0
   self.dates = true
 
