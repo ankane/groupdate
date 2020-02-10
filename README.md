@@ -11,7 +11,7 @@ The simplest way to group by:
 
 :cake: Get the entire series - **the other best part**
 
-Supports PostgreSQL, MySQL, and Redshift, plus arrays and hashes (and limited support for [SQLite](#for-sqlite))
+Supports PostgreSQL and MySQL, plus arrays and hashes (and limited support for [SQLite](#for-sqlite))
 
 :cupid: Goes hand in hand with [Chartkick](https://www.chartkick.com)
 
@@ -273,6 +273,12 @@ Groupdate.time_zone = false
 ```
 
 ## Upgrading
+
+### 5.0
+
+Groupdate 5.0 brings a number of improvements. Here are a few to be aware of:
+
+- Dropped support for Redshift
 
 ### 4.0
 

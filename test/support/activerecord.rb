@@ -22,30 +22,15 @@ end
 class Post < ActiveRecord::Base
 end
 
-# migrations
-if ENV["ADAPTER"] == "redshift"
-  if ActiveRecord::Migration.table_exists?(:users)
-    ActiveRecord::Migration.drop_table(:users, force: :cascade)
-  end
+ActiveRecord::Migration.create_table :users, force: true do |t|
+  t.string :name
+  t.integer :score
+  t.timestamp :created_at
+  t.column :deleted_at, :timestamptz if ENV["ADAPTER"] == "postgresql"
+  t.date :created_on
+end
 
-  if ActiveRecord::Migration.table_exists?(:posts)
-    ActiveRecord::Migration.drop_table(:posts, force: :cascade)
-  end
-
-  ActiveRecord::Migration.execute "CREATE TABLE users (id INT IDENTITY(1,1) PRIMARY KEY, name VARCHAR(255), score INT, created_at DATETIME, created_on DATE);"
-
-  ActiveRecord::Migration.execute "CREATE TABLE posts (id INT IDENTITY(1,1) PRIMARY KEY, user_id INT REFERENCES users, created_at DATETIME);"
-else
-  ActiveRecord::Migration.create_table :users, force: true do |t|
-    t.string :name
-    t.integer :score
-    t.timestamp :created_at
-    t.column :deleted_at, :timestamptz if ENV["ADAPTER"] == "postgresql"
-    t.date :created_on
-  end
-
-  ActiveRecord::Migration.create_table :posts, force: true do |t|
-    t.references :user
-    t.timestamp :created_at
-  end
+ActiveRecord::Migration.create_table :posts, force: true do |t|
+  t.references :user
+  t.timestamp :created_at
 end

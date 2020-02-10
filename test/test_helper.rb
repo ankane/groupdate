@@ -62,10 +62,6 @@ class Minitest::Test
       end
 
       user.save!
-
-      # hack for Redshift adapter, which doesn't return id on creation...
-      user = User.last if user.id.nil?
-
       user.update_columns(created_at: nil, created_on: nil) if created_at.nil?
     end
 
