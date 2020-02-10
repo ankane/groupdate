@@ -2,9 +2,8 @@ module Enumerable
   Groupdate::PERIODS.each do |period|
     define_method :"group_by_#{period}" do |*args, **options, &block|
       if block
-        # TODO throw error in Groupdate 5
-        warn "[groupdate] positional arguments are deprecated" if args.any?
-        Groupdate::Magic::Enumerable.group_by(self, period, (args[0] || {}).merge(options), &block)
+        raise ArgumentError, "wrong number of arguments (given #{args.size}, expected 0)" if args.any?
+        Groupdate::Magic::Enumerable.group_by(self, period, options, &block)
       elsif respond_to?(:scoping)
         scoping { @klass.group_by_period(period, *args, **options, &block) }
       else
@@ -15,9 +14,7 @@ module Enumerable
 
   def group_by_period(period, *args, **options, &block)
     if block || !respond_to?(:scoping)
-      # TODO throw error in Groupdate 5
-      warn "[groupdate] positional arguments are deprecated" if args.any?
-      options = (args[0] || {}).merge(options)
+      raise ArgumentError, "wrong number of arguments (given #{args.size + 1}, expected 1)" if args.any?
 
       Groupdate::Magic.validate_period(period, options.delete(:permit))
       send("group_by_#{period}", **options, &block)

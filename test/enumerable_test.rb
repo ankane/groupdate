@@ -30,4 +30,18 @@ class EnumerableTest < Minitest::Test
     user = create_user("2014-01-21")
     assert_raises(ArgumentError) { [user].group_by_day { nil } }
   end
+
+  def test_too_many_arguments
+    error = assert_raises(ArgumentError) do
+      [].group_by_day(:bad) { nil }
+    end
+    assert_equal "wrong number of arguments (given 1, expected 0)", error.message
+  end
+
+  def test_too_many_arguments_group_by_period
+    error = assert_raises(ArgumentError) do
+      [].group_by_period(:day, :bad) { nil }
+    end
+    assert_equal "wrong number of arguments (given 2, expected 1)", error.message
+  end
 end
