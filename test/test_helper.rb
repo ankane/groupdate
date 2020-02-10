@@ -27,7 +27,7 @@ time: {
 
 class Minitest::Test
   def setup
-    if ENV["ADAPTER"] == "enumerable"
+    if enumerable?
       @users = []
     else
       User.delete_all
