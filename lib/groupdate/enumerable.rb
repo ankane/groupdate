@@ -6,7 +6,7 @@ module Enumerable
         warn "[groupdate] positional arguments are deprecated" if args.any?
         Groupdate::Magic::Enumerable.group_by(self, period, (args[0] || {}).merge(options), &block)
       elsif respond_to?(:scoping)
-        scoping { @klass.send(:"group_by_#{period}", *args, **options, &block) }
+        scoping { @klass.group_by_period(period, *args, **options, &block) }
       else
         raise ArgumentError, "no block given"
       end
@@ -26,7 +26,7 @@ module Enumerable
         raise ArgumentError, "Unpermitted period"
       end
     else
-      scoping { @klass.send(:group_by_period, period, *args, **options, &block) }
+      scoping { @klass.group_by_period(period, *args, **options, &block) }
     end
   end
 end
