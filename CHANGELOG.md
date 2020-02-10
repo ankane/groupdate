@@ -11,6 +11,7 @@
 - Dropped support for `mysql` gem (last release was 2013)
 - Made `day_start` behavior consistent between Active Record and enumerable
 - Added support for full weekday names
+- Added support for `week_start` for SQLite
 
 ## 4.3.0 (2019-12-26)
 
