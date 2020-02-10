@@ -23,12 +23,18 @@ class EnumerableTest < Minitest::Test
   end
 
   def test_no_block
-    assert_raises(ArgumentError) { [].group_by_day(:created_at) }
+    error = assert_raises(ArgumentError) do
+      [].group_by_day(:created_at)
+    end
+    assert_equal "no block given", error.message
   end
 
   def test_null
     user = create_user("2014-01-21")
-    assert_raises(ArgumentError) { [user].group_by_day { nil } }
+    error = assert_raises(ArgumentError) do
+      [user].group_by_day { nil }
+    end
+    assert_equal "Not a time", error.message
   end
 
   def test_too_many_arguments
@@ -43,5 +49,14 @@ class EnumerableTest < Minitest::Test
       [].group_by_period(:day, :bad) { nil }
     end
     assert_equal "wrong number of arguments (given 2, expected 1)", error.message
+  end
+
+  def test_permit
+    def test_permit
+      error = assert_raises(ArgumentError) do
+        [].group_by_period(:day, permit: %w(week)) { nil }
+      end
+      assert_equal "Unpermitted period", error.message
+    end
   end
 end
