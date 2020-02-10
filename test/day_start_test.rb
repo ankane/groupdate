@@ -1,28 +1,6 @@
 require_relative "test_helper"
 
 class DayStartTest < Minitest::Test
-  # second not affected
-
-  def test_second_end_of_second
-    assert_result_time :second, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:00.999", false, day_start: 2
-  end
-
-  def test_second_start_of_second
-    assert_result_time :second, "2013-05-03 00:00:01 UTC", "2013-05-03 00:00:01.000", false, day_start: 2
-  end
-
-  # minute not affected
-
-  def test_minute_end_of_minute
-    skip "non-integer day_start currently affects"
-    assert_result_time :minute, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:59", false, day_start: 1.99
-  end
-
-  def test_minute_start_of_minute
-    skip "non-integer day_start currently affects"
-    assert_result_time :minute, "2013-05-03 00:01:00 UTC", "2013-05-03 00:01:00", false, day_start: 1.99
-  end
-
   # day hour starts at 2 am
 
   def test_day_end_of_day
@@ -218,6 +196,15 @@ class DayStartTest < Minitest::Test
       call_method(:day, :created_at, day_start: 24)
     end
     assert_equal ":day_start must be between 0 and 24", error.message
+  end
+
+  def test_bad_method
+    skip "call_method expects different error message" if sqlite?
+
+    error = assert_raises(ArgumentError) do
+      call_method(:minute, :created_at, day_start: 24)
+    end
+    assert_equal "unknown keywords: day_start", error.message
   end
 
   # dst behavior

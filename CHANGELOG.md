@@ -4,8 +4,10 @@
 - Fixed error around DST for `group_by_week` and `day_start` with PostgreSQL
 - Fixed bug where `day_start` not applied to `minute_of_hour` with MySQL
 - Fixed bug with non-integer `day_start` and `hour_of_day` with MySQL
+- Fixed bug where non-integer `day_start` applied to periods under an hour
 - Removed deprecated positional arguments for time zone and range
 - Made `last` option extend to end of current period
+- Raise error when `day_start` and `week_start` passed to unsupported methods
 
 ## 4.3.0 (2019-12-26)
 

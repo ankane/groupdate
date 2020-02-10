@@ -8,9 +8,29 @@ module Groupdate
       @period = period
       @options = options
 
-      unknown_keywords = options.keys - [:day_start, :time_zone, :dates, :series, :week_start, :format, :locale, :range, :reverse]
-      raise ArgumentError, "unknown keywords: #{unknown_keywords.join(", ")}" if unknown_keywords.any?
+      validate_keywords
+      validate_arguments
+    end
 
+    def validate_keywords
+      known_keywords = [:time_zone, :dates, :series, :format, :locale, :range, :reverse]
+
+      if %i[week day_of_week].include?(period)
+        known_keywords << :week_start
+      end
+
+      if %i[day week month quarter year day_of_week hour_of_day day_of_month day_of_year month_of_year].include?(period)
+        known_keywords << :day_start
+      else
+        # prevent Groupdate.day_start from applying
+        @day_start = 0
+      end
+
+      unknown_keywords = options.keys - known_keywords
+      raise ArgumentError, "unknown keywords: #{unknown_keywords.join(", ")}" if unknown_keywords.any?
+    end
+
+    def validate_arguments
       # TODO better messages
       raise ArgumentError, "Unrecognized time zone" unless time_zone
       raise ArgumentError, "Unrecognized :week_start option" unless week_start
@@ -27,7 +47,7 @@ module Groupdate
     end
 
     def week_start
-      @week_start ||= [:mon, :tue, :wed, :thu, :fri, :sat, :sun].index((options[:week_start] || options[:start] || Groupdate.week_start).to_sym)
+      @week_start ||= [:mon, :tue, :wed, :thu, :fri, :sat, :sun].index((options[:week_start] || Groupdate.week_start).to_sym)
     end
 
     def day_start
