@@ -3,6 +3,7 @@ module Groupdate
     attr_reader :period, :time_zone, :day_start, :week_start, :options
 
     CHECK_PERIODS = [:day, :week, :month, :quarter, :year]
+    DAYS = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
     def initialize(period:, time_zone:, day_start:, week_start:, **options)
       @period = period
@@ -11,6 +12,7 @@ module Groupdate
       @day_start = day_start
       @options = options
       @round_time = {}
+      @week_start_key = DAYS[@week_start] if @week_start
     end
 
     def generate(data, default_value:, series_default: true, multiple_groups: false, group_index: nil)
@@ -63,9 +65,7 @@ module Groupdate
         when :day
           time.beginning_of_day
         when :week
-          # same logic as MySQL group
-          weekday = (time.wday - 1) % 7
-          (time - ((7 - week_start + weekday) % 7).days).midnight
+          time.beginning_of_week(@week_start_key)
         when :month
           time.beginning_of_month
         when :quarter
@@ -77,7 +77,7 @@ module Groupdate
         when :minute_of_hour
           time.min
         when :day_of_week
-          (time.wday - 1 - week_start) % 7
+          time.days_to_week_start(@week_start_key)
         when :day_of_month
           time.day
         when :month_of_year
