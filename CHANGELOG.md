@@ -9,6 +9,7 @@
 - Made `last` option extend to end of current period
 - Raise error when `day_start` and `week_start` passed to unsupported methods
 - Dropped support for `mysql` gem (last release was 2013)
+- Made `day_start` behavior consistent between Active Record and enumerable
 
 ## 4.3.0 (2019-12-26)
 
