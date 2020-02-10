@@ -111,10 +111,9 @@ module Groupdate
         time_range = options[:range]
         if time_range.is_a?(Range) && time_range.first.is_a?(Date)
           # convert range of dates to range of times
-          # use parsing instead of in_time_zone due to Rails < 4
-          last = time_zone.parse(time_range.last.to_s)
+          last = time_range.last.in_time_zone(time_zone)
           last += 1.day unless time_range.exclude_end?
-          time_range = Range.new(time_zone.parse(time_range.first.to_s), last, true)
+          time_range = Range.new(time_range.first.in_time_zone(time_zone), last, true)
         elsif !time_range && options[:last]
           if period == :quarter
             step = 3.months
