@@ -53,6 +53,7 @@ You can group by:
 
 and
 
+- minute_of_hour
 - hour_of_day
 - day_of_week (Sunday = 0, Monday = 1, etc)
 - day_of_month
