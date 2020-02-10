@@ -87,13 +87,13 @@ Time zone objects also work. To see a list of available time zones in Rails, run
 Weeks start on Sunday by default. Change this with:
 
 ```ruby
-Groupdate.week_start = :mon # first three letters of day
+Groupdate.week_start = :monday
 ```
 
 or
 
 ```ruby
-User.group_by_week(:created_at, week_start: :mon).count
+User.group_by_week(:created_at, week_start: :monday).count
 ```
 
 ### Day Start

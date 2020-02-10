@@ -47,7 +47,11 @@ module Groupdate
     end
 
     def week_start
-      @week_start ||= [:mon, :tue, :wed, :thu, :fri, :sat, :sun].index((options[:week_start] || Groupdate.week_start).to_sym)
+      @week_start ||= begin
+        v = (options[:week_start] || Groupdate.week_start).to_sym
+        [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday].index(v) ||
+        [:mon, :tue, :wed, :thu, :fri, :sat, :sun].index(v)
+      end
     end
 
     def day_start
