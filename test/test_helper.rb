@@ -111,8 +111,7 @@ class Minitest::Test
 
     expected_time = (time_zone ? pt : utc).parse(expected_str)
     if options[:day_start]
-      expected_time += options[:day_start].to_f.hours
-      # expected_time = expected_time.change(hour: options[:day_start], min: (options[:day_start] % 1) * 60)
+      expected_time = expected_time.change(hour: options[:day_start], min: (options[:day_start] % 1) * 60)
     end
     expected = {expected_time => 1}
 

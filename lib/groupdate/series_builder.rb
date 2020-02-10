@@ -47,8 +47,8 @@ module Groupdate
       time = time.to_time.in_time_zone(time_zone)
 
       if day_start != 0
-        # TODO apply day_start to a time object that's not affected by DST
-        # time = time.change(zone: utc)
+        # apply day_start to a time object that's not affected by DST
+        time = time.change(zone: utc)
         time -= day_start.seconds
       end
 
@@ -90,8 +90,7 @@ module Groupdate
 
       if day_start != 0 && time.is_a?(Time)
         time += day_start.seconds
-        # TODO convert back
-        # time = time.change(zone: time_zone)
+        time = time.change(zone: time_zone)
       end
 
       time

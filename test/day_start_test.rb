@@ -210,40 +210,26 @@ class DayStartTest < Minitest::Test
   # dst behavior
 
   def test_dst_day_spring
-    # TODO make consistent
-    expected = enumerable? ? "2013-03-09" : "2013-03-10"
-
     time = pt.parse("2013-03-10 03:00:00")
-    assert_result_date :day, expected, time, true, day_start: 3
+    assert_result_date :day, "2013-03-10", time, true, day_start: 3
   end
 
   def test_dst_week_spring
-    # TODO make consistent
-    expected = enumerable? ? "2013-03-03" : "2013-03-10"
-
     time = pt.parse("2013-03-10 03:00:00")
-    assert_result_date :week, expected, time, true, day_start: 3
+    assert_result_date :week, "2013-03-10", time, true, day_start: 3
   end
 
   def test_dst_hour_of_day_spring
-    # TODO make consistent
-    expected = enumerable? ? 23 : 0
-
     time = pt.parse("2013-03-10 03:00:00")
-    assert_result :hour_of_day, expected, time, true, day_start: 3
+    assert_result :hour_of_day, 0, time, true, day_start: 3
   end
 
   def test_dst_hour_of_day_fall
-    # TODO make consistent
-    expected = enumerable? ? 1 : 0
-
     time = pt.parse("2013-11-03 01:00:00") + 1.hour # second 1 am of the day
-    assert_result :hour_of_day, expected, time, true, day_start: 1
+    assert_result :hour_of_day, 0, time, true, day_start: 1
   end
 
   def test_dst_dates_false
-    skip
-
     ["2013-03-09", "2013-03-10", "2013-03-11"].each do |week|
       create_user pt.parse(week)
     end

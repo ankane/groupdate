@@ -42,9 +42,9 @@ module Groupdate
           when :month_of_year
             ["MONTH(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
           when :week
-            ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second - INTERVAL ((? + WEEKDAY(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)) % 7) DAY, '%Y-%m-%d 00:00:00'), ?, '+00:00') + INTERVAL ? second", time_zone, day_start, 7 - week_start, time_zone, day_start, time_zone, day_start]
+            ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second - INTERVAL ((? + WEEKDAY(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)) % 7) DAY, '%Y-%m-%d 00:00:00') + INTERVAL ? second, ?, '+00:00')", time_zone, day_start, 7 - week_start, time_zone, day_start, day_start, time_zone]
           when :quarter
-            ["CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(EXTRACT(YEAR FROM CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S'), ?, '+00:00') + INTERVAL ? second", time_zone, day_start, time_zone, day_start, time_zone, day_start]
+            ["CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(EXTRACT(YEAR FROM CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S') + INTERVAL ? second, ?, '+00:00')", time_zone, day_start, time_zone, day_start, day_start, time_zone]
           else
             format =
               case period
@@ -62,7 +62,7 @@ module Groupdate
                 "%Y-01-01 00:00:00"
               end
 
-            ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second, ?), ?, '+00:00') + INTERVAL ? second", time_zone, day_start, format, time_zone, day_start]
+            ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second, ?) + INTERVAL ? second, ?, '+00:00')", time_zone, day_start, format, day_start, time_zone]
           end
         when "PostgreSQL", "PostGIS"
           day_start_interval = "#{day_start} second"
@@ -83,9 +83,9 @@ module Groupdate
           when :week # start on Sunday, not PostgreSQL default Monday
             # TODO just subtract number of days from day of week like MySQL?
             week_start_interval = "#{week_start} day"
-            ["DATE_TRUNC('week', #{column}::timestamptz AT TIME ZONE ? - INTERVAL ? - INTERVAL ?) AT TIME ZONE ? + INTERVAL ? + INTERVAL ?", time_zone, day_start_interval, week_start_interval, time_zone, week_start_interval, day_start_interval]
+            ["(DATE_TRUNC('week', #{column}::timestamptz AT TIME ZONE ? - INTERVAL ? - INTERVAL ?) + INTERVAL ? + INTERVAL ?) AT TIME ZONE ?", time_zone, day_start_interval, week_start_interval, week_start_interval, day_start_interval, time_zone]
           else
-            ["DATE_TRUNC(?, #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?) AT TIME ZONE ? + INTERVAL ?", period, time_zone, day_start_interval, time_zone, day_start_interval]
+            ["(DATE_TRUNC(?, #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?) + INTERVAL ?) AT TIME ZONE ?", period, time_zone, day_start_interval, day_start_interval, time_zone]
           end
         when "SQLite"
           raise Groupdate::Error, "Time zones not supported for SQLite" unless @time_zone.utc_offset.zero?
