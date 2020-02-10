@@ -157,7 +157,7 @@ class DatabaseTest < Minitest::Test
 
     # for sqlite, double-quoted string literals are accepted
     # https://www.sqlite.org/quirks.html
-    if ENV["ADAPTER"] == "sqlite"
+    if sqlite?
       assert_equal ({"created_at2" => 1}), User.group(:created_at2).count
 
       error = assert_raises(Groupdate::Error) do

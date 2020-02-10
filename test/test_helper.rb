@@ -36,10 +36,18 @@ class Minitest::Test
     ENV["ADAPTER"] == "sqlite"
   end
 
+  def enumerable?
+    ENV["ADAPTER"] == "enumerable"
+  end
+
+  def postgresql?
+    ENV["ADAPTER"] == "postgresql"
+  end
+
   def create_user(created_at, score = 1)
     created_at = created_at.utc.to_s if created_at.is_a?(Time)
 
-    if ENV["ADAPTER"] == "enumerable"
+    if enumerable?
       user =
         OpenStruct.new(
           name: "Andrew",
@@ -57,7 +65,7 @@ class Minitest::Test
           created_on: created_at ? Date.parse(created_at) : nil
         )
 
-      if ENV["ADAPTER"] == "postgresql"
+      if postgresql?
         user.deleted_at = user.created_at
       end
 
@@ -73,7 +81,7 @@ class Minitest::Test
   end
 
   def call_method(method, field, options)
-    if ENV["ADAPTER"] == "enumerable"
+    if enumerable?
       Hash[@users.group_by_period(method, **options) { |u| u.send(field) }.map { |k, v| [k, v.size] }]
     elsif sqlite? && (method == :quarter || options[:time_zone] || options[:day_start] || options[:week_start] || Groupdate.week_start != :sun || (Time.zone && options[:time_zone] != false))
       error = assert_raises(Groupdate::Error) { User.group_by_period(method, field, **options).count }
@@ -88,7 +96,7 @@ class Minitest::Test
     expected = {utc.parse(expected).in_time_zone(time_zone ? "Pacific Time (US & Canada)" : utc) => 1}
     assert_equal expected, result(method, time_str, time_zone, :created_at, options)
 
-    if ENV["ADAPTER"] == "postgresql"
+    if postgresql?
       # test timestamptz
       assert_equal expected, result(method, time_str, time_zone, :deleted_at, options)
     end
