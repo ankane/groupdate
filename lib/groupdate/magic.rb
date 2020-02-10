@@ -52,6 +52,11 @@ module Groupdate
       series_builder.time_range
     end
 
+    def self.validate_period(period, permit)
+      permitted_periods = ((permit || Groupdate::PERIODS).map(&:to_sym) & Groupdate::PERIODS).map(&:to_s)
+      raise ArgumentError, "Unpermitted period" unless permitted_periods.include?(period.to_s)
+    end
+
     class Enumerable < Magic
       def group_by(enum, &_block)
         group = enum.group_by do |v|

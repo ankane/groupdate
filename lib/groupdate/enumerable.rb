@@ -18,13 +18,9 @@ module Enumerable
       # TODO throw error in Groupdate 5
       warn "[groupdate] positional arguments are deprecated" if args.any?
       options = (args[0] || {}).merge(options)
-      # to_sym is unsafe on user input, so convert to strings
-      permitted_periods = ((options.delete(:permit) || Groupdate::PERIODS).map(&:to_sym) & Groupdate::PERIODS).map(&:to_s)
-      if permitted_periods.include?(period.to_s)
-        send("group_by_#{period}", **options, &block)
-      else
-        raise ArgumentError, "Unpermitted period"
-      end
+
+      Groupdate::Magic.validate_period(period, options.delete(:permit))
+      send("group_by_#{period}", **options, &block)
     else
       scoping { @klass.group_by_period(period, *args, **options, &block) }
     end
