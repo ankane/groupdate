@@ -14,11 +14,13 @@ class DayStartTest < Minitest::Test
   # minute not affected
 
   def test_minute_end_of_minute
-    assert_result_time :minute, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:59", false, day_start: 2
+    skip "non-integer day_start currently affects"
+    assert_result_time :minute, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:59", false, day_start: 1.99
   end
 
   def test_minute_start_of_minute
-    assert_result_time :minute, "2013-05-03 00:01:00 UTC", "2013-05-03 00:01:00", false, day_start: 2
+    skip "non-integer day_start currently affects"
+    assert_result_time :minute, "2013-05-03 00:01:00 UTC", "2013-05-03 00:01:00", false, day_start: 1.99
   end
 
   # day hour starts at 2 am
