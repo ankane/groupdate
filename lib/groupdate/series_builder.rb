@@ -48,7 +48,7 @@ module Groupdate
 
       if day_start != 0
         # apply day_start to a time object that's not affected by DST
-        time = time.change(zone: utc)
+        time = change_zone.call(time, utc)
         time -= day_start.seconds
       end
 
@@ -90,10 +90,21 @@ module Groupdate
 
       if day_start != 0 && time.is_a?(Time)
         time += day_start.seconds
-        time = time.change(zone: time_zone)
+        time = change_zone.call(time, time_zone)
       end
 
       time
+    end
+
+    def change_zone
+      @change_zone ||= begin
+        if ActiveSupport::VERSION::STRING >= "5.2"
+          ->(time, zone) { time.change(zone: zone) }
+        else
+          # TODO make more efficient
+          ->(time, zone) { zone.parse(time.strftime("%Y-%m-%d %H:%M:%S")) }
+        end
+      end
     end
 
     def time_range
