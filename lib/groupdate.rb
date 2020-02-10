@@ -1,9 +1,12 @@
+# dependencies
 require "active_support/core_ext/module/attribute_accessors"
 require "active_support/time"
-require "groupdate/version"
+
+# modules
+require "groupdate/magic"
 require "groupdate/relation_builder"
 require "groupdate/series_builder"
-require "groupdate/magic"
+require "groupdate/version"
 
 module Groupdate
   class Error < RuntimeError; end
