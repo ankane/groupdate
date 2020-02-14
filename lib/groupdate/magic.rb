@@ -108,7 +108,7 @@ module Groupdate
                 k.to_time
               end
 
-              k.beginning_of_day.ctime.in_time_zone(time_zone)
+              (k.beginning_of_day + day_start.seconds).ctime.in_time_zone(time_zone)
             end
           end
         end
