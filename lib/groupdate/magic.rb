@@ -88,15 +88,28 @@ module Groupdate
       end
 
       def cast_method
+        utc = ActiveSupport::TimeZone['UTC']
+
         @cast_method ||= begin
           case period
           when :minute_of_hour, :hour_of_day, :day_of_month, :day_of_year, :month_of_year
             lambda { |k| k.to_i }
           when :day_of_week
             lambda { |k| (k.to_i - 1 - week_start) % 7 }
-          else
-            utc = ActiveSupport::TimeZone["UTC"]
-            lambda { |k| (k.is_a?(String) || !k.respond_to?(:to_time) ? utc.parse(k.to_s) : k.to_time).in_time_zone(time_zone) }
+          when :second, :minute, :hour
+            lambda do |k|
+              (k.is_a?(String) || !k.respond_to?(:to_time) ? utc.parse(k.to_s) : k.to_time).in_time_zone(time_zone)
+            end
+          else # [:day, :week, :month, :quarter, :year]
+            lambda do |k|
+              if k.is_a?(String) || !k.respond_to?(:to_time)
+                utc.parse(k.to_s)
+              else
+                k.to_time
+              end
+
+              k.beginning_of_day.ctime.in_time_zone(time_zone)
+            end
           end
         end
       end
