@@ -219,7 +219,7 @@ class DayStartTest < Minitest::Test
     expected = enumerable? ? "2013-03-09" : "2013-03-10"
 
     time = pt.parse("2013-03-10 03:00:00")
-    assert_result_date :day, expected, time, true, day_start: 2
+    assert_result_date :day, expected, time, true, day_start: 3
   end
 
   def test_dst_week_spring
@@ -227,7 +227,7 @@ class DayStartTest < Minitest::Test
     expected = enumerable? ? "2013-03-03" : "2013-03-10"
 
     time = pt.parse("2013-03-10 03:00:00")
-    assert_result_date :week, expected, time, true, day_start: 2
+    assert_result_date :week, expected, time, true, day_start: 3
   end
 
   def test_dst_hour_of_day_spring
