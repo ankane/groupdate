@@ -102,11 +102,11 @@ module Groupdate
             end
           else # [:day, :week, :month, :quarter, :year]
             lambda do |k|
-              if k.is_a?(String) || !k.respond_to?(:to_time)
-                utc.parse(k.to_s)
-              else
-                k.to_time
-              end
+              k = if k.is_a?(String) || !k.respond_to?(:to_time)
+                    utc.parse(k.to_s)
+                  else
+                    k.to_time
+                  end
 
               (k.beginning_of_day + day_start.seconds).ctime.in_time_zone(time_zone)
             end
