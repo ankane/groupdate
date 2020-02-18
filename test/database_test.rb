@@ -292,6 +292,15 @@ class DatabaseTest < Minitest::Test
     assert_equal 1, result[utc.parse("2014-01-22 00:50:00")]
   end
 
+  def test_duration_relation
+    create_user("2014-01-21 00:12:34")
+    create_user("2014-01-22 00:56:12")
+    result = User.all.group_by_duration(10.minutes, :created_at).count
+    assert_equal 149, result.size
+    assert_equal 1, result[utc.parse("2014-01-21 00:10:00")]
+    assert_equal 1, result[utc.parse("2014-01-22 00:50:00")]
+  end
+
   def test_duration_period
     error = assert_raises ArgumentError do
       User.group_by_period(10.minutes, :created_at).count
