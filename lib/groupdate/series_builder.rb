@@ -40,8 +40,8 @@ module Groupdate
       # Other database and Active Support return the 1st hour (as expected)
       # Active Support good: ActiveSupport::TimeZone["America/Los_Angeles"].parse("2013-11-03 01:00:00")
       # MySQL good: SELECT CONVERT_TZ('2013-11-03 01:00:00', 'America/Los_Angeles', 'Etc/UTC');
-      # PostgreSQL not good: SELECT '2013-11-03 01:00:00'::timestamp AT TIME ZONE 'America/Los_Angeles';
       # Ruby not good: Time.parse("2013-11-03 01:00:00")
+      # PostgreSQL not good: SELECT '2013-11-03 01:00:00'::timestamp AT TIME ZONE 'America/Los_Angeles';
       # we need to account for this here
 
       # only check for database
