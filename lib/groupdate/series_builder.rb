@@ -35,6 +35,15 @@ module Groupdate
         [key, value]
       end]
 
+      # this is a fun one
+      # PostgreSQL and Ruby both return the 2nd hour when parsing a backward time change
+      # Other database and Active Support return the 1st hour (as expected)
+      # Active Support good: ActiveSupport::TimeZone["America/Los_Angeles"].parse("2013-11-03 01:00:00")
+      # MySQL good: SELECT CONVERT_TZ('2013-11-03 01:00:00', 'America/Los_Angeles', 'Etc/UTC');
+      # PostgreSQL not good: SELECT '2013-11-03 01:00:00'::timestamp AT TIME ZONE 'America/Los_Angeles';
+      # Ruby not good: Time.parse("2013-11-03 01:00:00")
+      # we need to account for this here
+
       # only check for database
       # only checks remaining keys to avoid expensive calls to round_time
       if series_default && CHECK_PERIODS.include?(period)
