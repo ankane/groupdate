@@ -14,9 +14,14 @@ module Groupdate
       unknown_keywords = options.keys - known_keywords
       raise ArgumentError, "unknown keywords: #{unknown_keywords.join(", ")}" if unknown_keywords.any?
 
+      # TODO raise argument error in next major version
+      # TODO better messages
       raise Groupdate::Error, "Unrecognized time zone" unless time_zone
-      raise Groupdate::Error, "Unrecognized :week_start option" if period == :week && !week_start
+      raise Groupdate::Error, "Unrecognized :week_start option" unless week_start
       raise Groupdate::Error, "Cannot use endless range for :range option" if options[:range].is_a?(Range) && !options[:range].end
+
+      # TODO raise error in next major version
+      warn "[groupdate] :day_start must be between 0 and 24" if (day_start / 3600) < 0 || (day_start / 3600) >= 24
     end
 
     def time_zone
@@ -88,10 +93,10 @@ module Groupdate
       def cast_method
         @cast_method ||= begin
           case period
+          when :minute_of_hour, :hour_of_day, :day_of_month, :day_of_year, :month_of_year
+            lambda { |k| k.to_i }
           when :day_of_week
             lambda { |k| (k.to_i - 1 - week_start) % 7 }
-          when :hour_of_day, :day_of_month, :day_of_year, :month_of_year, :minute_of_hour
-            lambda { |k| k.to_i }
           else
             utc = ActiveSupport::TimeZone["UTC"]
             lambda { |k| (k.is_a?(String) || !k.respond_to?(:to_time) ? utc.parse(k.to_s) : k.to_time).in_time_zone(time_zone) }

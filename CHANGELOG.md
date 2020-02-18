@@ -1,6 +1,16 @@
-## 4.2.1 (unreleased)
+## 4.4.0 (unreleased)
 
 - Added experimental `group_by_duration` method
+- Fixed error around DST for `group_by_week` with MySQL
+- Fixed error around DST for `group_by_week` and `day_start` with PostgreSQL
+- Fixed bug where `day_start` not applied to `minute_of_hour` with MySQL
+- Fixed bug with non-integer `day_start` and `hour_of_day` with MySQL
+
+## 4.3.0 (2019-12-26)
+
+- Fixed error with empty results in Ruby 2.7
+- Fixed deprecation warnings in Ruby 2.7
+- Deprecated positional arguments for time zone and range
 
 ## 4.2.0 (2019-10-28)
 

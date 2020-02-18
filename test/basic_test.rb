@@ -303,8 +303,8 @@ class BasicTest < Minitest::Test
 
   def test_brasilia_summer_time
     brasilia = ActiveSupport::TimeZone["Brasilia"]
-    create_user(brasilia.parse("2014-10-19 02:00:00").utc.to_s)
-    create_user(brasilia.parse("2014-10-20 02:00:00").utc.to_s)
+    create_user brasilia.parse("2014-10-19 02:00:00")
+    create_user brasilia.parse("2014-10-20 02:00:00")
     expected = {
       Date.parse("2014-10-19") => 1,
       Date.parse("2014-10-20") => 1
@@ -318,5 +318,41 @@ class BasicTest < Minitest::Test
       Date.parse("2018-10-28") => 1
     }
     assert_equal expected, call_method(:week, :created_at, time_zone: "Brasilia")
+  end
+
+  # extra tests for week
+
+  def test_week_middle_of_week_with_time_zone
+    assert_result_date :week, "2013-03-10", "2013-03-11 07:15:00", true
+  end
+
+  def test_week_middle_of_week_with_time_zone_frequently
+    skip # takes while
+
+    # before and after DST weeks
+    weeks = ["2013-03-03", "2013-03-10", "2013-03-17", "2013-10-27", "2013-11-03", "2013-11-10"]
+    weekdays = [:sun, :mon, :tue, :wed, :thu, :fri, :sat]
+    hours = [0, 1, 2, 3, 21, 22]
+
+    hours.each do |hour|
+      puts hour
+      weekdays.each_with_index do |week_start, i|
+        puts week_start
+        weeks.each do |week|
+          puts week
+          start_at = (pt.parse(week) + i.days).change(hour: hour)
+          time = start_at.dup
+          end_at = (time + 1.week).change(hour: hour)
+          while time < end_at
+            # prevent mysql error
+            if time.utc.to_s != "2013-03-10 02:00:00 UTC"
+              assert_result_date :week, start_at.strftime("%Y-%m-%d"), time, true, week_start: week_start, day_start: hour
+              User.delete_all
+            end
+            time += 1.hour
+          end
+        end
+      end
+    end
   end
 end

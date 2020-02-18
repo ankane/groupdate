@@ -50,8 +50,11 @@ module Groupdate
 
       time = time.to_time.in_time_zone(time_zone)
 
-      # only if day_start != 0 for performance
-      time -= day_start.seconds if day_start != 0
+      if day_start != 0
+        # TODO apply day_start to a time object that's not affected by DST
+        # time = time.change(zone: utc)
+        time -= day_start.seconds
+      end
 
       time =
         case period
@@ -89,8 +92,11 @@ module Groupdate
           raise Groupdate::Error, "Invalid period"
         end
 
-      # only if day_start != 0 for performance
-      time += day_start.seconds if day_start != 0 && time.is_a?(Time)
+      if day_start != 0 && time.is_a?(Time)
+        time += day_start.seconds
+        # TODO convert back
+        # time = time.change(zone: time_zone)
+      end
 
       time
     end
@@ -172,8 +178,8 @@ module Groupdate
             tr
           end
 
-        if time_range.first
-          series = [round_time(time_range.first)]
+        if time_range.begin
+          series = [round_time(time_range.begin)]
 
           if period == :quarter
             step = 3.months
@@ -205,34 +211,36 @@ module Groupdate
     end
 
     def key_format
-      locale = options[:locale] || I18n.locale
-      use_dates = options.key?(:dates) ? options[:dates] : Groupdate.dates
+      @key_format ||= begin
+        locale = options[:locale] || I18n.locale
+        use_dates = options.key?(:dates) ? options[:dates] : Groupdate.dates
 
-      if options[:format]
-        if options[:format].respond_to?(:call)
-          options[:format]
-        else
-          sunday = time_zone.parse("2014-03-02 00:00:00")
-          lambda do |key|
-            case period
-            when :hour_of_day
-              key = sunday + key.hours + day_start.seconds
-            when :minute_of_hour
-              key = sunday + key.minutes + day_start.seconds
-            when :day_of_week
-              key = sunday + key.days + (week_start + 1).days
-            when :day_of_month
-              key = Date.new(2014, 1, key).to_time
-            when :month_of_year
-              key = Date.new(2014, key, 1).to_time
+        if options[:format]
+          if options[:format].respond_to?(:call)
+            options[:format]
+          else
+            sunday = time_zone.parse("2014-03-02 00:00:00")
+            lambda do |key|
+              case period
+              when :hour_of_day
+                key = sunday + key.hours + day_start.seconds
+              when :minute_of_hour
+                key = sunday + key.minutes + day_start.seconds
+              when :day_of_week
+                key = sunday + key.days + (week_start + 1).days
+              when :day_of_month
+                key = Date.new(2014, 1, key).to_time
+              when :month_of_year
+                key = Date.new(2014, key, 1).to_time
+              end
+              I18n.localize(key, format: options[:format], locale: locale)
             end
-            I18n.localize(key, format: options[:format], locale: locale)
           end
+        elsif [:day, :week, :month, :quarter, :year].include?(period) && use_dates
+          lambda { |k| k.to_date }
+        else
+          lambda { |k| k }
         end
-      elsif [:day, :week, :month, :quarter, :year].include?(period) && use_dates
-        lambda { |k| k.to_date }
-      else
-        lambda { |k| k }
       end
     end
 
@@ -269,6 +277,10 @@ module Groupdate
 
     def entire_series?(series_default)
       options.key?(:series) ? options[:series] : series_default
+    end
+
+    def utc
+      @utc ||= ActiveSupport::TimeZone["Etc/UTC"]
     end
   end
 end
