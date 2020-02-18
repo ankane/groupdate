@@ -4,6 +4,7 @@
 - Fixed error around DST for `group_by_week` and `day_start` with PostgreSQL
 - Fixed bug where `day_start` not applied to `minute_of_hour` with MySQL
 - Fixed bug with non-integer `day_start` and `hour_of_day` with MySQL
+- Improved performance of `format` option
 
 ## 4.3.0 (2019-12-26)
 

@@ -205,34 +205,36 @@ module Groupdate
     end
 
     def key_format
-      locale = options[:locale] || I18n.locale
-      use_dates = options.key?(:dates) ? options[:dates] : Groupdate.dates
+      @key_format ||= begin
+        locale = options[:locale] || I18n.locale
+        use_dates = options.key?(:dates) ? options[:dates] : Groupdate.dates
 
-      if options[:format]
-        if options[:format].respond_to?(:call)
-          options[:format]
-        else
-          sunday = time_zone.parse("2014-03-02 00:00:00")
-          lambda do |key|
-            case period
-            when :hour_of_day
-              key = sunday + key.hours + day_start.seconds
-            when :minute_of_hour
-              key = sunday + key.minutes + day_start.seconds
-            when :day_of_week
-              key = sunday + key.days + (week_start + 1).days
-            when :day_of_month
-              key = Date.new(2014, 1, key).to_time
-            when :month_of_year
-              key = Date.new(2014, key, 1).to_time
+        if options[:format]
+          if options[:format].respond_to?(:call)
+            options[:format]
+          else
+            sunday = time_zone.parse("2014-03-02 00:00:00")
+            lambda do |key|
+              case period
+              when :hour_of_day
+                key = sunday + key.hours + day_start.seconds
+              when :minute_of_hour
+                key = sunday + key.minutes + day_start.seconds
+              when :day_of_week
+                key = sunday + key.days + (week_start + 1).days
+              when :day_of_month
+                key = Date.new(2014, 1, key).to_time
+              when :month_of_year
+                key = Date.new(2014, key, 1).to_time
+              end
+              I18n.localize(key, format: options[:format], locale: locale)
             end
-            I18n.localize(key, format: options[:format], locale: locale)
           end
+        elsif [:day, :week, :month, :quarter, :year].include?(period) && use_dates
+          lambda { |k| k.to_date }
+        else
+          lambda { |k| k }
         end
-      elsif [:day, :week, :month, :quarter, :year].include?(period) && use_dates
-        lambda { |k| k.to_date }
-      else
-        lambda { |k| k }
       end
     end
 
