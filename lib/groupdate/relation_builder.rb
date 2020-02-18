@@ -83,10 +83,8 @@ module Groupdate
             ["EXTRACT(DOY FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :month_of_year
             ["EXTRACT(MONTH FROM #{day_start_column})::integer", time_zone, day_start_interval]
-          when :week # start on Sunday, not PostgreSQL default Monday
-            # TODO just subtract number of days from day of week like MySQL?
-            week_start_interval = "#{week_start} day"
-            ["(DATE_TRUNC('week', #{day_start_column} - INTERVAL ?) + INTERVAL ? + INTERVAL ?) AT TIME ZONE ?", time_zone, day_start_interval, week_start_interval, week_start_interval, day_start_interval, time_zone]
+          when :week
+            ["(DATE_TRUNC('day', #{day_start_column} - INTERVAL '1 day' * ((? + EXTRACT(DOW FROM #{day_start_column})::integer) % 7)) + INTERVAL ?) AT TIME ZONE ?", time_zone, day_start_interval, 13 - week_start, time_zone, day_start_interval, day_start_interval, time_zone]
           else
             if day_start == 0
               # prettier
