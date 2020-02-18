@@ -67,31 +67,32 @@ module Groupdate
             ["CONVERT_TZ(DATE_FORMAT(#{day_start_column}, ?) + INTERVAL ? second, ?, '+00:00')", time_zone, day_start, format, day_start, time_zone]
           end
         when "PostgreSQL", "PostGIS"
+          day_start_column = "#{column}::timestamptz AT TIME ZONE ? - INTERVAL ?"
           day_start_interval = "#{day_start} second"
 
           case period
           when :minute_of_hour
-            ["EXTRACT(MINUTE FROM #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(MINUTE FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :hour_of_day
-            ["EXTRACT(HOUR FROM #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(HOUR FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :day_of_week
-            ["EXTRACT(DOW FROM #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(DOW FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :day_of_month
-            ["EXTRACT(DAY FROM #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(DAY FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :day_of_year
-            ["EXTRACT(DOY FROM #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(DOY FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :month_of_year
-            ["EXTRACT(MONTH FROM #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(MONTH FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :week # start on Sunday, not PostgreSQL default Monday
             # TODO just subtract number of days from day of week like MySQL?
             week_start_interval = "#{week_start} day"
-            ["(DATE_TRUNC('week', #{column}::timestamptz AT TIME ZONE ? - INTERVAL ? - INTERVAL ?) + INTERVAL ? + INTERVAL ?) AT TIME ZONE ?", time_zone, day_start_interval, week_start_interval, week_start_interval, day_start_interval, time_zone]
+            ["(DATE_TRUNC('week', #{day_start_column} - INTERVAL ?) + INTERVAL ? + INTERVAL ?) AT TIME ZONE ?", time_zone, day_start_interval, week_start_interval, week_start_interval, day_start_interval, time_zone]
           else
             if day_start == 0
               # prettier
-              ["DATE_TRUNC(?, #{column}::timestamptz AT TIME ZONE ?) AT TIME ZONE ?", period, time_zone, time_zone]
+              ["DATE_TRUNC(?, #{day_start_column}) AT TIME ZONE ?", period, time_zone, day_start_interval, time_zone]
             else
-              ["(DATE_TRUNC(?, #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?) + INTERVAL ?) AT TIME ZONE ?", period, time_zone, day_start_interval, day_start_interval, time_zone]
+              ["(DATE_TRUNC(?, #{day_start_column}) + INTERVAL ?) AT TIME ZONE ?", period, time_zone, day_start_interval, day_start_interval, time_zone]
             end
           end
         when "SQLite"
