@@ -153,6 +153,7 @@ module Groupdate
             # Redshift does not return timezone information; it
             # always says it is in UTC time, so we must convert
             # back to UTC to play properly with the rest of Groupdate.
+            week_start_interval = "#{week_start} day"
             ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, CONVERT_TIMEZONE(?, #{column}) - INTERVAL ? - INTERVAL ?))::timestamp + INTERVAL ? + INTERVAL ?", time_zone, period, time_zone, day_start_interval, week_start_interval, week_start_interval, day_start_interval]
           when Integer
             raise Groupdate::Error, "Not implemented yet"
