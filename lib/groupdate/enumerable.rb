@@ -25,9 +25,12 @@ module Enumerable
 
   def group_by_duration(duration, *args, **options, &block)
     if block
+      raise ArgumentError, "wrong number of arguments (given #{args.size + 1}, expected 1)" if args.any?
+
+      # TODO validate duration
       Groupdate::Magic::Enumerable.group_by(self, duration.to_i, options, &block)
     elsif respond_to?(:scoping)
-      scoping { @klass.send(:group_by_duration, duration, *args, options, &block) }
+      scoping { @klass.group_by_duration(duration, *args, options, &block) }
     else
       raise ArgumentError, "no block given"
     end
