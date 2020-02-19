@@ -275,29 +275,13 @@ Groupdate.time_zone = false
 
 ## Upgrading
 
-### 4.0
+### 5.0
 
-Groupdate 4.0 brings a number of improvements. Here are a few to be aware of:
+Groupdate 5.0 brings a number of improvements. Here are a few to be aware of:
 
-- `group_by` methods return an `ActiveRecord::Relation` instead of a `Groupdate::Series`
-- Invalid options now throw an `ArgumentError`
-- `week_start` now affects `day_of_week`
-- Custom calculation methods are supported by default
-
-### 3.0
-
-Groupdate 3.0 brings a number of improvements. Here are a few to be aware of:
-
-- `Date` objects are now returned for day, week, month, quarter, and year by default. Use `dates: false` for the previous behavior, or change this globally with `Groupdate.dates = false`.
-- Array and hash methods no longer return the entire series by default. Use `series: true` for the previous behavior.
-- The `series: false` option now returns the correct type and order, and plays nicely with other options.
-
-### 2.0
-
-Groupdate 2.0 brings a number of improvements. Here are two things to be aware of:
-
-- the entire series is returned by default
-- `ActiveSupport::TimeWithZone` keys are now returned for every database adapter - adapters previously returned `Time` or `String` keys
+- The `week_start` option is now supported for SQLite
+- The `day_start` option is now consistent between Active Record and enumerable
+- Deprecated positional arguments for time zone and range have been removed
 
 ## History
 

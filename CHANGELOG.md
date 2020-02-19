@@ -5,10 +5,8 @@
 - Made `day_start` behavior consistent between Active Record and enumerable
 - Made `last` option extend to end of current period
 - Raise error when `day_start` and `week_start` passed to unsupported methods
-- Fixed error around DST for `group_by_week` with MySQL
-- Fixed error around DST for `group_by_week` and `day_start` with PostgreSQL
-- Fixed bug with non-integer `day_start` and `hour_of_day` with MySQL
-- Fixed bug where non-integer `day_start` applied to periods under an hour
+- The `day_start` option no longer applies to shorter periods
+- Fixed `inconsistent time zone info` errors around DST with MySQL and PostgreSQL
 - Removed deprecated positional arguments for time zone and range
 - Dropped support for `mysql` gem (last release was 2013)
 
