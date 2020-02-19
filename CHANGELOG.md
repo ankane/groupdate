@@ -1,4 +1,4 @@
-## 5.0.0 (unreleased)
+## 5.0.0 (2020-02-18)
 
 - Added support for `week_start` for SQLite
 - Added support for full weekday names
