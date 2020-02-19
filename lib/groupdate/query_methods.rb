@@ -16,6 +16,7 @@ module Groupdate
     end
 
     def group_by_duration(duration, field, **options)
+      # TODO validate duration
       Groupdate::Magic::Relation.generate_relation(self,
         period: duration.to_i,
         field: field,
