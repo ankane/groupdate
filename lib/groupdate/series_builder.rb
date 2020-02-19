@@ -18,13 +18,44 @@ module Groupdate
       series = generate_series(data, multiple_groups, group_index)
       series = handle_multiple(data, series, multiple_groups, group_index)
 
+      data2 = {}
+      series.each do |k|
+        data2[k] = data.delete(k)
+      end
+
+      # this is a fun one
+      # PostgreSQL and Ruby both return the 2nd hour when converting/parsing a backward DST change
+      # Other databases and Active Support return the 1st hour (as expected)
+      # Active Support good: ActiveSupport::TimeZone["America/Los_Angeles"].parse("2013-11-03 01:00:00")
+      # MySQL good: SELECT CONVERT_TZ('2013-11-03 01:00:00', 'America/Los_Angeles', 'Etc/UTC');
+      # Ruby not good: Time.parse("2013-11-03 01:00:00")
+      # PostgreSQL not good: SELECT '2013-11-03 01:00:00'::timestamp AT TIME ZONE 'America/Los_Angeles';
+      # we need to account for this here
+      if series_default && CHECK_PERIODS.include?(period)
+        data.each do |k, v|
+          key = multiple_groups ? k[group_index] : k
+          if day_start != 0 && key.hour == (key - 1.hour).hour
+            key -= 1.hour
+            if multiple_groups
+              k[group_index]  = key
+            else
+              k = key
+            end
+            data2[k] = v
+          elsif key != round_time(key)
+            # only need to show what database returned since it will cast in Ruby time zone
+            raise Groupdate::Error, "Database and Ruby have inconsistent time zone info. Database returned #{key}"
+          end
+        end
+      end
+
       unless entire_series?(series_default)
-        series = series.select { |k| data[k] }
+        series = series.select { |k| data2[k] }
       end
 
       value = 0
       result = Hash[series.map do |k|
-        value = data.delete(k) || (@options[:carry_forward] && value) || default_value
+        value = data2[k] || (@options[:carry_forward] && value) || default_value
         key =
           if multiple_groups
             k[0...group_index] + [key_format.call(k[group_index])] + k[(group_index + 1)..-1]
@@ -34,21 +65,6 @@ module Groupdate
 
         [key, value]
       end]
-
-      # this is a fun one
-      # PostgreSQL and Ruby both return the 2nd hour when parsing a backward time change
-      # Other database and Active Support return the 1st hour (as expected)
-      # Active Support good: ActiveSupport::TimeZone["America/Los_Angeles"].parse("2013-11-03 01:00:00")
-      # MySQL good: SELECT CONVERT_TZ('2013-11-03 01:00:00', 'America/Los_Angeles', 'Etc/UTC');
-      # Ruby not good: Time.parse("2013-11-03 01:00:00")
-      # PostgreSQL not good: SELECT '2013-11-03 01:00:00'::timestamp AT TIME ZONE 'America/Los_Angeles';
-      # we need to account for this here
-
-      # only check for database
-      # only checks remaining keys to avoid expensive calls to round_time
-      if series_default && CHECK_PERIODS.include?(period)
-        check_consistent_time_zone_info(data, multiple_groups, group_index)
-      end
 
       result
     end
@@ -267,21 +283,6 @@ module Groupdate
         series.to_a.reverse
       else
         series
-      end
-    end
-
-    def check_consistent_time_zone_info(data, multiple_groups, group_index)
-      keys = data.keys
-      if multiple_groups
-        keys.map! { |k| k[group_index] }
-        keys.uniq!
-      end
-
-      keys.each do |key|
-        if key != round_time(key)
-          # only need to show what database returned since it will cast in Ruby time zone
-          raise Groupdate::Error, "Database and Ruby have inconsistent time zone info. Database returned #{key}"
-        end
       end
     end
 
