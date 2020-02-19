@@ -154,9 +154,9 @@ module Groupdate
             # always says it is in UTC time, so we must convert
             # back to UTC to play properly with the rest of Groupdate.
             week_start_interval = "#{week_start} day"
-            ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, #{day_start_column} - INTERVAL ?))::timestamp + INTERVAL ? + INTERVAL ?", time_zone, period, time_zone, day_start_interval, week_start_interval, week_start_interval, day_start_interval]
+            ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC('week', #{day_start_column} - INTERVAL ?) + INTERVAL ? + INTERVAL ?)::timestamp", time_zone, time_zone, day_start_interval, week_start_interval, week_start_interval, day_start_interval]
           else
-            ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, #{day_start_column}))::timestamp + INTERVAL ?", time_zone, period, time_zone, day_start_interval, day_start_interval]
+            ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, #{day_start_column}) + INTERVAL ?)::timestamp", time_zone, period, time_zone, day_start_interval, day_start_interval]
           end
         else
           raise Groupdate::Error, "Connection adapter not supported: #{adapter_name}"
