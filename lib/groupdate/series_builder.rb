@@ -37,7 +37,7 @@ module Groupdate
           # TODO only do this for PostgreSQL
           # this may mask some inconsistent time zone errors
           # but not sure there's a better approach
-          if key.hour == (key - 1.hour).hour
+          if key.hour == (key - 1.hour).hour && series.include?(key - 1.hour)
             key -= 1.hour
             if multiple_groups
               k[group_index]  = key
