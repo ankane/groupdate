@@ -269,9 +269,10 @@ class BasicTest < Minitest::Test
   def test_endless_range
     skip if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("2.6.0")
 
-    assert_raises Groupdate::Error do
+    error = assert_raises ArgumentError do
       call_method(:day, :created_at, series: true, range: eval('Date.parse("2013-05-01")..'))
     end
+    assert_equal "Cannot use endless range for :range option", error.message
   end
 
   # date range
@@ -331,7 +332,7 @@ class BasicTest < Minitest::Test
 
     # before and after DST weeks
     weeks = ["2013-03-03", "2013-03-10", "2013-03-17", "2013-10-27", "2013-11-03", "2013-11-10"]
-    weekdays = [:sun, :mon, :tue, :wed, :thu, :fri, :sat]
+    weekdays = [:sun, :mon] #, :tue, :wed, :thu, :fri, :sat]
     hours = [0, 1, 2, 3, 21, 22]
 
     hours.each do |hour|
@@ -346,8 +347,12 @@ class BasicTest < Minitest::Test
           while time < end_at
             # prevent mysql error
             if time.utc.to_s != "2013-03-10 02:00:00 UTC"
-              assert_result_date :week, start_at.strftime("%Y-%m-%d"), time, true, week_start: week_start, day_start: hour
-              User.delete_all
+              assert_result_time :week, start_at.utc.to_s, time, true, dates: false, day_start: hour, week_start: week_start
+              if enumerable?
+                @users = []
+              else
+                User.delete_all
+              end
             end
             time += 1.hour
           end

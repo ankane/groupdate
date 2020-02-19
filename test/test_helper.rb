@@ -9,6 +9,8 @@ require "ostruct"
 ENV["TZ"] = "UTC"
 
 adapter = ENV["ADAPTER"]
+abort "No adapter specified" unless adapter
+
 puts "Using #{adapter}"
 require_relative "adapters/#{adapter}"
 
@@ -25,7 +27,7 @@ time: {
 
 class Minitest::Test
   def setup
-    if ENV["ADAPTER"] == "enumerable"
+    if enumerable?
       @users = []
     else
       User.delete_all
@@ -83,7 +85,7 @@ class Minitest::Test
   def call_method(method, field, options)
     if enumerable?
       Hash[@users.group_by_period(method, **options) { |u| u.send(field) }.map { |k, v| [k, v.size] }]
-    elsif sqlite? && (method == :quarter || options[:time_zone] || options[:day_start] || options[:week_start] || Groupdate.week_start != :sun || (Time.zone && options[:time_zone] != false))
+    elsif sqlite? && (method == :quarter || options[:time_zone] || options[:day_start] || (Time.zone && options[:time_zone] != false))
       error = assert_raises(Groupdate::Error) { User.group_by_period(method, field, **options).count }
       assert_includes error.message, "not supported for SQLite"
       skip
@@ -109,8 +111,7 @@ class Minitest::Test
 
     expected_time = (time_zone ? pt : utc).parse(expected_str)
     if options[:day_start]
-      expected_time += options[:day_start].to_f.hours
-      # expected_time = expected_time.change(hour: options[:day_start], min: (options[:day_start] % 1) * 60)
+      expected_time = expected_time.change(hour: options[:day_start], min: (options[:day_start] % 1) * 60)
     end
     expected = {expected_time => 1}
 
