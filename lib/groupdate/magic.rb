@@ -2,23 +2,42 @@ require "i18n"
 
 module Groupdate
   class Magic
+    DAYS = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+
     attr_accessor :period, :options, :group_index
 
     def initialize(period:, **options)
       @period = period
       @options = options
 
-      unknown_keywords = options.keys - [:day_start, :time_zone, :dates, :series, :week_start, :format, :locale, :range, :reverse]
+      validate_keywords
+      validate_arguments
+    end
+
+    def validate_keywords
+      known_keywords = [:time_zone, :dates, :series, :format, :locale, :range, :reverse]
+
+      if %i[week day_of_week].include?(period)
+        known_keywords << :week_start
+      end
+
+      if %i[day week month quarter year day_of_week hour_of_day day_of_month day_of_year month_of_year].include?(period)
+        known_keywords << :day_start
+      else
+        # prevent Groupdate.day_start from applying
+        @day_start = 0
+      end
+
+      unknown_keywords = options.keys - known_keywords
       raise ArgumentError, "unknown keywords: #{unknown_keywords.join(", ")}" if unknown_keywords.any?
+    end
 
-      # TODO raise argument error in next major version
+    def validate_arguments
       # TODO better messages
-      raise Groupdate::Error, "Unrecognized time zone" unless time_zone
-      raise Groupdate::Error, "Unrecognized :week_start option" unless week_start
-      raise Groupdate::Error, "Cannot use endless range for :range option" if options[:range].is_a?(Range) && !options[:range].end
-
-      # TODO raise error in next major version
-      warn "[groupdate] :day_start must be between 0 and 24" if (day_start / 3600) < 0 || (day_start / 3600) >= 24
+      raise ArgumentError, "Unrecognized time zone" unless time_zone
+      raise ArgumentError, "Unrecognized :week_start option" unless week_start
+      raise ArgumentError, "Cannot use endless range for :range option" if options[:range].is_a?(Range) && !options[:range].end
+      raise ArgumentError, ":day_start must be between 0 and 24" if (day_start / 3600) < 0 || (day_start / 3600) >= 24
     end
 
     def time_zone
@@ -30,7 +49,10 @@ module Groupdate
     end
 
     def week_start
-      @week_start ||= [:mon, :tue, :wed, :thu, :fri, :sat, :sun].index((options[:week_start] || options[:start] || Groupdate.week_start).to_sym)
+      @week_start ||= begin
+        v = (options[:week_start] || Groupdate.week_start).to_sym
+        DAYS.index(v) || [:mon, :tue, :wed, :thu, :fri, :sat, :sun].index(v)
+      end
     end
 
     def day_start
@@ -50,6 +72,11 @@ module Groupdate
 
     def time_range
       series_builder.time_range
+    end
+
+    def self.validate_period(period, permit)
+      permitted_periods = ((permit || Groupdate::PERIODS).map(&:to_sym) & Groupdate::PERIODS).map(&:to_s)
+      raise ArgumentError, "Unpermitted period" unless permitted_periods.include?(period.to_s)
     end
 
     class Enumerable < Magic

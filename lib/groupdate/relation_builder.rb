@@ -27,24 +27,26 @@ module Groupdate
       adapter_name = @relation.connection.adapter_name
       query =
         case adapter_name
-        when "MySQL", "Mysql2", "Mysql2Spatial", "Mysql2Rgeo"
+        when "Mysql2", "Mysql2Spatial", "Mysql2Rgeo"
+          day_start_column = "CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second"
+
           case period
           when :minute_of_hour
-            ["EXTRACT(MINUTE from CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
+            ["MINUTE(#{day_start_column})", time_zone, day_start]
           when :hour_of_day
-            ["EXTRACT(HOUR from CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
+            ["HOUR(#{day_start_column})", time_zone, day_start]
           when :day_of_week
-            ["DAYOFWEEK(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second) - 1", time_zone, day_start]
+            ["DAYOFWEEK(#{day_start_column}) - 1", time_zone, day_start]
           when :day_of_month
-            ["DAYOFMONTH(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
+            ["DAYOFMONTH(#{day_start_column})", time_zone, day_start]
           when :day_of_year
-            ["DAYOFYEAR(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
+            ["DAYOFYEAR(#{day_start_column})", time_zone, day_start]
           when :month_of_year
-            ["MONTH(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)", time_zone, day_start]
+            ["MONTH(#{day_start_column})", time_zone, day_start]
           when :week
-            ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second - INTERVAL ((? + WEEKDAY(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second)) % 7) DAY, '%Y-%m-%d 00:00:00'), ?, '+00:00') + INTERVAL ? second", time_zone, day_start, 7 - week_start, time_zone, day_start, time_zone, day_start]
+            ["CONVERT_TZ(DATE_FORMAT(#{day_start_column} - INTERVAL ((? + DAYOFWEEK(#{day_start_column})) % 7) DAY, '%Y-%m-%d 00:00:00') + INTERVAL ? second, ?, '+00:00')", time_zone, day_start, 12 - week_start, time_zone, day_start, day_start, time_zone]
           when :quarter
-            ["CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(EXTRACT(YEAR FROM CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second), '-', LPAD(1 + 3 * (QUARTER(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S'), ?, '+00:00') + INTERVAL ? second", time_zone, day_start, time_zone, day_start, time_zone, day_start]
+            ["CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(YEAR(#{day_start_column}), '-', LPAD(1 + 3 * (QUARTER(#{day_start_column}) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S') + INTERVAL ? second, ?, '+00:00')", time_zone, day_start, time_zone, day_start, day_start, time_zone]
           else
             format =
               case period
@@ -62,38 +64,41 @@ module Groupdate
                 "%Y-01-01 00:00:00"
               end
 
-            ["CONVERT_TZ(DATE_FORMAT(CONVERT_TZ(#{column}, '+00:00', ?) - INTERVAL ? second, ?), ?, '+00:00') + INTERVAL ? second", time_zone, day_start, format, time_zone, day_start]
+            ["CONVERT_TZ(DATE_FORMAT(#{day_start_column}, ?) + INTERVAL ? second, ?, '+00:00')", time_zone, day_start, format, day_start, time_zone]
           end
         when "PostgreSQL", "PostGIS"
+          day_start_column = "#{column}::timestamptz AT TIME ZONE ? - INTERVAL ?"
           day_start_interval = "#{day_start} second"
 
           case period
           when :minute_of_hour
-            ["EXTRACT(MINUTE from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(MINUTE FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :hour_of_day
-            ["EXTRACT(HOUR from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(HOUR FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :day_of_week
-            ["EXTRACT(DOW from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(DOW FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :day_of_month
-            ["EXTRACT(DAY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(DAY FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :day_of_year
-            ["EXTRACT(DOY from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(DOY FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :month_of_year
-            ["EXTRACT(MONTH from #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?)::integer", time_zone, day_start_interval]
-          when :week # start on Sunday, not PostgreSQL default Monday
-            # TODO just subtract number of days from day of week like MySQL?
-            week_start_interval = "#{week_start} day"
-            ["DATE_TRUNC('week', #{column}::timestamptz AT TIME ZONE ? - INTERVAL ? - INTERVAL ?) AT TIME ZONE ? + INTERVAL ? + INTERVAL ?", time_zone, day_start_interval, week_start_interval, time_zone, week_start_interval, day_start_interval]
+            ["EXTRACT(MONTH FROM #{day_start_column})::integer", time_zone, day_start_interval]
+          when :week
+            ["(DATE_TRUNC('day', #{day_start_column} - INTERVAL '1 day' * ((? + EXTRACT(DOW FROM #{day_start_column})::integer) % 7)) + INTERVAL ?) AT TIME ZONE ?", time_zone, day_start_interval, 13 - week_start, time_zone, day_start_interval, day_start_interval, time_zone]
           else
-            ["DATE_TRUNC(?, #{column}::timestamptz AT TIME ZONE ? - INTERVAL ?) AT TIME ZONE ? + INTERVAL ?", period, time_zone, day_start_interval, time_zone, day_start_interval]
+            if day_start == 0
+              # prettier
+              ["DATE_TRUNC(?, #{day_start_column}) AT TIME ZONE ?", period, time_zone, day_start_interval, time_zone]
+            else
+              ["(DATE_TRUNC(?, #{day_start_column}) + INTERVAL ?) AT TIME ZONE ?", period, time_zone, day_start_interval, day_start_interval, time_zone]
+            end
           end
         when "SQLite"
           raise Groupdate::Error, "Time zones not supported for SQLite" unless @time_zone.utc_offset.zero?
           raise Groupdate::Error, "day_start not supported for SQLite" unless day_start.zero?
-          raise Groupdate::Error, "week_start not supported for SQLite" unless week_start == 6
 
           if period == :week
-            ["strftime('%%Y-%%m-%%d 00:00:00 UTC', #{column}, '-6 days', 'weekday 0')"]
+            ["strftime('%Y-%m-%d 00:00:00 UTC', #{column}, '-6 days', ?)", "weekday #{(week_start + 1) % 7}"]
           else
             format =
               case period
@@ -128,38 +133,34 @@ module Groupdate
             ["strftime(?, #{column})", format]
           end
         when "Redshift"
+          day_start_column = "CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?"
           day_start_interval = "#{day_start} second"
 
           case period
           when :minute_of_hour
-            ["EXTRACT(MINUTE from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(MINUTE from #{day_start_column})::integer", time_zone, day_start_interval]
           when :hour_of_day
-            ["EXTRACT(HOUR from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(HOUR from #{day_start_column})::integer", time_zone, day_start_interval]
           when :day_of_week
-            ["EXTRACT(DOW from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(DOW from #{day_start_column})::integer", time_zone, day_start_interval]
           when :day_of_month
-            ["EXTRACT(DAY from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(DAY from #{day_start_column})::integer", time_zone, day_start_interval]
           when :day_of_year
-            ["EXTRACT(DOY from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(DOY from #{day_start_column})::integer", time_zone, day_start_interval]
           when :month_of_year
-            ["EXTRACT(MONTH from CONVERT_TIMEZONE(?, #{column}::timestamp) - INTERVAL ?)::integer", time_zone, day_start_interval]
+            ["EXTRACT(MONTH from #{day_start_column})::integer", time_zone, day_start_interval]
           when :week # start on Sunday, not Redshift default Monday
             # Redshift does not return timezone information; it
             # always says it is in UTC time, so we must convert
             # back to UTC to play properly with the rest of Groupdate.
             week_start_interval = "#{week_start} day"
-            ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, CONVERT_TIMEZONE(?, #{column}) - INTERVAL ? - INTERVAL ?))::timestamp + INTERVAL ? + INTERVAL ?", time_zone, period, time_zone, day_start_interval, week_start_interval, week_start_interval, day_start_interval]
+            ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC('week', #{day_start_column} - INTERVAL ?) + INTERVAL ? + INTERVAL ?)::timestamp", time_zone, time_zone, day_start_interval, week_start_interval, week_start_interval, day_start_interval]
           else
-            ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, CONVERT_TIMEZONE(?, #{column}) - INTERVAL ?))::timestamp + INTERVAL ?", time_zone, period, time_zone, day_start_interval, day_start_interval]
+            ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, #{day_start_column}) + INTERVAL ?)::timestamp", time_zone, period, time_zone, day_start_interval, day_start_interval]
           end
         else
           raise Groupdate::Error, "Connection adapter not supported: #{adapter_name}"
         end
-
-      # TODO drop support for MySQL adapter in next major version
-      if adapter_name == "MySQL" && period == :week
-        query[0] = "CAST(#{query[0]} AS DATETIME)"
-      end
 
       clause = @relation.send(:sanitize_sql_array, query)
 

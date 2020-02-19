@@ -1,28 +1,6 @@
 require_relative "test_helper"
 
 class DayStartTest < Minitest::Test
-  # second not affected
-
-  def test_second_end_of_second
-    assert_result_time :second, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:00.999", false, day_start: 2
-  end
-
-  def test_second_start_of_second
-    assert_result_time :second, "2013-05-03 00:00:01 UTC", "2013-05-03 00:00:01.000", false, day_start: 2
-  end
-
-  # minute not affected
-
-  def test_minute_end_of_minute
-    skip "non-integer day_start currently affects"
-    assert_result_time :minute, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:59", false, day_start: 1.99
-  end
-
-  def test_minute_start_of_minute
-    skip "non-integer day_start currently affects"
-    assert_result_time :minute, "2013-05-03 00:01:00 UTC", "2013-05-03 00:01:00", false, day_start: 1.99
-  end
-
   # day hour starts at 2 am
 
   def test_day_end_of_day
@@ -203,56 +181,93 @@ class DayStartTest < Minitest::Test
   # invalid
 
   def test_too_small
-    # TODO raise error
-    call_method(:day, :created_at, day_start: -1)
+    skip "call_method expects different error message" if sqlite?
+
+    error = assert_raises(ArgumentError) do
+      call_method(:day, :created_at, day_start: -1)
+    end
+    assert_equal ":day_start must be between 0 and 24", error.message
   end
 
   def test_too_large
-    # TODO raise error
-    call_method(:day, :created_at, day_start: 24)
+    skip "call_method expects different error message" if sqlite?
+
+    error = assert_raises(ArgumentError) do
+      call_method(:day, :created_at, day_start: 24)
+    end
+    assert_equal ":day_start must be between 0 and 24", error.message
+  end
+
+  def test_bad_method
+    skip "call_method expects different error message" if sqlite?
+
+    error = assert_raises(ArgumentError) do
+      call_method(:minute, :created_at, day_start: 24)
+    end
+    assert_equal "unknown keywords: day_start", error.message
   end
 
   # dst behavior
 
   def test_dst_day_spring
-    # TODO make consistent
-    expected = enumerable? ? "2013-03-09" : "2013-03-10"
-
     time = pt.parse("2013-03-10 03:00:00")
-    assert_result_date :day, expected, time, true, day_start: 3
+    assert_result_date :day, "2013-03-10", time, true, day_start: 3
+  end
+
+  def test_dst_day_fall
+    time = pt.parse("2013-11-03 01:00:00") + 1.hour # second 1 am of the day
+    assert_result_date :day, "2013-11-03", time, true, day_start: 1
   end
 
   def test_dst_week_spring
-    # TODO make consistent
-    expected = enumerable? ? "2013-03-03" : "2013-03-10"
-
     time = pt.parse("2013-03-10 03:00:00")
-    assert_result_date :week, expected, time, true, day_start: 3
+    assert_result_date :week, "2013-03-10", time, true, day_start: 3
+  end
+
+  def test_dst_week_fall
+    time = pt.parse("2013-11-03 01:00:00") + 1.hour # second 1 am of the day
+    assert_result_date :week, "2013-11-03", time, true, day_start: 1
   end
 
   def test_dst_hour_of_day_spring
-    # TODO make consistent
-    expected = enumerable? ? 23 : 0
-
     time = pt.parse("2013-03-10 03:00:00")
-    assert_result :hour_of_day, expected, time, true, day_start: 3
+    assert_result :hour_of_day, 0, time, true, day_start: 3
   end
 
   def test_dst_hour_of_day_fall
-    # TODO make consistent
-    expected = enumerable? ? 1 : 0
-
     time = pt.parse("2013-11-03 01:00:00") + 1.hour # second 1 am of the day
-    assert_result :hour_of_day, expected, time, true, day_start: 1
+    assert_result :hour_of_day, 0, time, true, day_start: 1
   end
 
-  def test_dst_dates_false
-    skip
-
+  def test_dst_dates_false_spring_before
     ["2013-03-09", "2013-03-10", "2013-03-11"].each do |week|
-      create_user pt.parse(week)
+      create_user pt.parse(week) + 12.hours
+    end
+    results = call_method(:day, :created_at, day_start: 2, dates: false, time_zone: pt)
+    assert_equal [2, 3, 2], results.keys.map(&:hour)
+  end
+
+  def test_dst_dates_false_spring_after
+    ["2013-03-09", "2013-03-10", "2013-03-11"].each do |week|
+      create_user pt.parse(week) + 12.hours
     end
     results = call_method(:day, :created_at, day_start: 3, dates: false, time_zone: pt)
     assert_equal [3, 3, 3], results.keys.map(&:hour)
+  end
+
+  def test_dst_dates_false_fall_before
+    ["2013-11-02", "2013-11-03", "2013-11-04"].each do |week|
+      create_user pt.parse(week) + 12.hours
+    end
+    results = call_method(:day, :created_at, day_start: 1, dates: false, time_zone: pt)
+    assert_equal [1, 1, 1], results.keys.map(&:hour)
+  end
+
+  def test_dst_dates_false_fall_after
+    ["2013-11-02", "2013-11-03", "2013-11-04"].each do |week|
+      create_user pt.parse(week) + 12.hours
+    end
+    results = call_method(:day, :created_at, day_start: 2, dates: false, time_zone: pt)
+    assert_equal [2, 2, 2], results.keys.map(&:hour)
   end
 end

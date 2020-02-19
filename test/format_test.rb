@@ -36,11 +36,6 @@ class FormatTest < Minitest::Test
     assert_format :minute_of_hour, "0", "%-M"
   end
 
-  def test_minute_of_hour_day_start
-    create_user "2017-02-09"
-    assert_format :minute_of_hour, "0", "%-M", day_start: 2
-  end
-
   def test_day_of_week
     create_user "2014-03-01"
     assert_format :day_of_week, "Sat", "%a"

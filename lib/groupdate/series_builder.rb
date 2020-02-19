@@ -11,19 +11,54 @@ module Groupdate
       @day_start = day_start
       @options = options
       @round_time = {}
+      @week_start_key = Groupdate::Magic::DAYS[@week_start] if @week_start
     end
 
     def generate(data, default_value:, series_default: true, multiple_groups: false, group_index: nil)
       series = generate_series(data, multiple_groups, group_index)
       series = handle_multiple(data, series, multiple_groups, group_index)
 
+      verified_data = {}
+      series.each do |k|
+        verified_data[k] = data.delete(k)
+      end
+
+      # this is a fun one
+      # PostgreSQL and Ruby both return the 2nd hour when converting/parsing a backward DST change
+      # Other databases and Active Support return the 1st hour (as expected)
+      # Active Support good: ActiveSupport::TimeZone["America/Los_Angeles"].parse("2013-11-03 01:00:00")
+      # MySQL good: SELECT CONVERT_TZ('2013-11-03 01:00:00', 'America/Los_Angeles', 'Etc/UTC');
+      # Ruby not good: Time.parse("2013-11-03 01:00:00")
+      # PostgreSQL not good: SELECT '2013-11-03 01:00:00'::timestamp AT TIME ZONE 'America/Los_Angeles';
+      # we need to account for this here
+      if series_default && CHECK_PERIODS.include?(period)
+        data.each do |k, v|
+          key = multiple_groups ? k[group_index] : k
+          # TODO only do this for PostgreSQL
+          # this may mask some inconsistent time zone errors
+          # but not sure there's a better approach
+          if key.hour == (key - 1.hour).hour && series.include?(key - 1.hour)
+            key -= 1.hour
+            if multiple_groups
+              k[group_index]  = key
+            else
+              k = key
+            end
+            verified_data[k] = v
+          elsif key != round_time(key)
+            # only need to show what database returned since it will cast in Ruby time zone
+            raise Groupdate::Error, "Database and Ruby have inconsistent time zone info. Database returned #{key}"
+          end
+        end
+      end
+
       unless entire_series?(series_default)
-        series = series.select { |k| data[k] }
+        series = series.select { |k| verified_data[k] }
       end
 
       value = 0
       result = Hash[series.map do |k|
-        value = data.delete(k) || (@options[:carry_forward] && value) || default_value
+        value = verified_data[k] || (@options[:carry_forward] && value) || default_value
         key =
           if multiple_groups
             k[0...group_index] + [key_format.call(k[group_index])] + k[(group_index + 1)..-1]
@@ -34,12 +69,6 @@ module Groupdate
         [key, value]
       end]
 
-      # only check for database
-      # only checks remaining keys to avoid expensive calls to round_time
-      if series_default && CHECK_PERIODS.include?(period)
-        check_consistent_time_zone_info(data, multiple_groups, group_index)
-      end
-
       result
     end
 
@@ -47,8 +76,8 @@ module Groupdate
       time = time.to_time.in_time_zone(time_zone)
 
       if day_start != 0
-        # TODO apply day_start to a time object that's not affected by DST
-        # time = time.change(zone: utc)
+        # apply day_start to a time object that's not affected by DST
+        time = change_zone.call(time, utc)
         time -= day_start.seconds
       end
 
@@ -63,9 +92,7 @@ module Groupdate
         when :day
           time.beginning_of_day
         when :week
-          # same logic as MySQL group
-          weekday = (time.wday - 1) % 7
-          (time - ((7 - week_start + weekday) % 7).days).midnight
+          time.beginning_of_week(@week_start_key)
         when :month
           time.beginning_of_month
         when :quarter
@@ -77,7 +104,7 @@ module Groupdate
         when :minute_of_hour
           time.min
         when :day_of_week
-          (time.wday - 1 - week_start) % 7
+          time.days_to_week_start(@week_start_key)
         when :day_of_month
           time.day
         when :month_of_year
@@ -90,11 +117,21 @@ module Groupdate
 
       if day_start != 0 && time.is_a?(Time)
         time += day_start.seconds
-        # TODO convert back
-        # time = time.change(zone: time_zone)
+        time = change_zone.call(time, time_zone)
       end
 
       time
+    end
+
+    def change_zone
+      @change_zone ||= begin
+        if ActiveSupport::VERSION::STRING >= "5.2"
+          ->(time, zone) { time.change(zone: zone) }
+        else
+          # TODO make more efficient
+          ->(time, zone) { zone.parse(time.strftime("%Y-%m-%d %H:%M:%S")) }
+        end
+      end
     end
 
     def time_range
@@ -102,10 +139,9 @@ module Groupdate
         time_range = options[:range]
         if time_range.is_a?(Range) && time_range.first.is_a?(Date)
           # convert range of dates to range of times
-          # use parsing instead of in_time_zone due to Rails < 4
-          last = time_zone.parse(time_range.last.to_s)
+          last = time_range.last.in_time_zone(time_zone)
           last += 1.day unless time_range.exclude_end?
-          time_range = Range.new(time_zone.parse(time_range.first.to_s), last, true)
+          time_range = Range.new(time_range.first.in_time_zone(time_zone), last, true)
         elsif !time_range && options[:last]
           if period == :quarter
             step = 3.months
@@ -125,7 +161,8 @@ module Groupdate
               if options[:current] == false
                 round_time(start_at - step)...round_time(now)
               else
-                round_time(start_at)..now
+                # extend to end of current period
+                round_time(start_at)...(round_time(now) + step)
               end
           end
         end
@@ -251,21 +288,6 @@ module Groupdate
         series.to_a.reverse
       else
         series
-      end
-    end
-
-    def check_consistent_time_zone_info(data, multiple_groups, group_index)
-      keys = data.keys
-      if multiple_groups
-        keys.map! { |k| k[group_index] }
-        keys.uniq!
-      end
-
-      keys.each do |key|
-        if key != round_time(key)
-          # only need to show what database returned since it will cast in Ruby time zone
-          raise Groupdate::Error, "Database and Ruby have inconsistent time zone info. Database returned #{key}"
-        end
       end
     end
 

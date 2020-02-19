@@ -1,10 +1,15 @@
-## 4.4.0 (unreleased)
+## 5.0.0 (unreleased)
 
-- Fixed error around DST for `group_by_week` with MySQL
-- Fixed error around DST for `group_by_week` and `day_start` with PostgreSQL
-- Fixed bug where `day_start` not applied to `minute_of_hour` with MySQL
-- Fixed bug with non-integer `day_start` and `hour_of_day` with MySQL
+- Added support for `week_start` for SQLite
+- Added support for full weekday names
+- Made `day_start` behavior consistent between Active Record and enumerable
+- Made `last` option extend to end of current period
+- Raise error when `day_start` and `week_start` passed to unsupported methods
+- The `day_start` option no longer applies to shorter periods
+- Fixed `inconsistent time zone info` errors around DST with MySQL and PostgreSQL
 - Improved performance of `format` option
+- Removed deprecated positional arguments for time zone and range
+- Dropped support for `mysql` gem (last release was 2013)
 
 ## 4.3.0 (2019-12-26)
 

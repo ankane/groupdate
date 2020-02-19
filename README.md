@@ -53,6 +53,7 @@ You can group by:
 
 and
 
+- minute_of_hour
 - hour_of_day
 - day_of_week (Sunday = 0, Monday = 1, etc)
 - day_of_month
@@ -87,13 +88,13 @@ Time zone objects also work. To see a list of available time zones in Rails, run
 Weeks start on Sunday by default. Change this with:
 
 ```ruby
-Groupdate.week_start = :mon # first three letters of day
+Groupdate.week_start = :monday
 ```
 
 or
 
 ```ruby
-User.group_by_week(:created_at, week_start: :mon).count
+User.group_by_week(:created_at, week_start: :monday).count
 ```
 
 ### Day Start
@@ -263,7 +264,7 @@ It should return the time instead of `NULL`.
 Groupdate has limited support for SQLite.
 
 - No time zone support
-- No `day_start` or `week_start` options
+- No `day_start` option
 - No `group_by_quarter` method
 
 If your application’s time zone is set to something other than `Etc/UTC` (the default), create an initializer with:
@@ -274,29 +275,13 @@ Groupdate.time_zone = false
 
 ## Upgrading
 
-### 4.0
+### 5.0
 
-Groupdate 4.0 brings a number of improvements. Here are a few to be aware of:
+Groupdate 5.0 brings a number of improvements. Here are a few to be aware of:
 
-- `group_by` methods return an `ActiveRecord::Relation` instead of a `Groupdate::Series`
-- Invalid options now throw an `ArgumentError`
-- `week_start` now affects `day_of_week`
-- Custom calculation methods are supported by default
-
-### 3.0
-
-Groupdate 3.0 brings a number of improvements. Here are a few to be aware of:
-
-- `Date` objects are now returned for day, week, month, quarter, and year by default. Use `dates: false` for the previous behavior, or change this globally with `Groupdate.dates = false`.
-- Array and hash methods no longer return the entire series by default. Use `series: true` for the previous behavior.
-- The `series: false` option now returns the correct type and order, and plays nicely with other options.
-
-### 2.0
-
-Groupdate 2.0 brings a number of improvements. Here are two things to be aware of:
-
-- the entire series is returned by default
-- `ActiveSupport::TimeWithZone` keys are now returned for every database adapter - adapters previously returned `Time` or `String` keys
+- The `week_start` option is now supported for SQLite
+- The `day_start` option is now consistent between Active Record and enumerable
+- Deprecated positional arguments for time zone and range have been removed
 
 ## History
 
