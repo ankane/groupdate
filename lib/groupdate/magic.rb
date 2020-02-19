@@ -36,7 +36,6 @@ module Groupdate
       # TODO better messages
       raise ArgumentError, "Unrecognized time zone" unless time_zone
       raise ArgumentError, "Unrecognized :week_start option" unless week_start
-      raise ArgumentError, "Cannot use endless range for :range option" if options[:range].is_a?(Range) && !options[:range].end
       raise ArgumentError, ":day_start must be between 0 and 24" if (day_start / 3600) < 0 || (day_start / 3600) >= 24
     end
 

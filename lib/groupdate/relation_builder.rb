@@ -179,8 +179,12 @@ module Groupdate
 
     def where_clause
       if @time_range.is_a?(Range)
-        op = @time_range.exclude_end? ? "<" : "<="
-        ["#{column} >= ? AND #{column} #{op} ?", @time_range.first, @time_range.last]
+        if @time_range.end
+          op = @time_range.exclude_end? ? "<" : "<="
+          ["#{column} >= ? AND #{column} #{op} ?", @time_range.first, @time_range.last]
+        else
+          ["#{column} >= ?", @time_range.first]
+        end
       else
         ["#{column} IS NOT NULL"]
       end
