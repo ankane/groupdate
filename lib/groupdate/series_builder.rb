@@ -221,9 +221,10 @@ module Groupdate
           end
 
           last_step = series.last
+          day_start_hour = day_start / 3600
           loop do
             next_step = last_step + step
-            next_step = round_time(next_step) if next_step.hour != day_start # add condition to speed up
+            next_step = round_time(next_step) if next_step.hour != day_start_hour # add condition to speed up
             break unless time_range.cover?(next_step)
 
             if next_step == last_step
