@@ -8,6 +8,11 @@ gemfile:
   - test/gemfiles/activerecord52.gemfile
   - test/gemfiles/activerecord51.gemfile
   - test/gemfiles/activerecord50.gemfile
+matrix:
+ fast_finish: true
+ exclude:
+   - gemfile: Gemfile
+     rvm: 2.4
 services:
   - postgresql
   - mysql
