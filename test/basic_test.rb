@@ -121,6 +121,16 @@ class BasicTest < Minitest::Test
     assert_result_date :year, "2014-01-01", "2014-01-01 08:00:00", true
   end
 
+  # minute of hour
+
+  def test_minute_of_hour_end_of_hour
+    assert_result :minute_of_hour, 59, "2017-02-09 23:59:59"
+  end
+
+  def test_minute_of_hour_beginning_of_hour
+    assert_result :minute_of_hour, 0, "2017-02-09 00:00:00"
+  end
+
   # hour of day
 
   def test_hour_of_day_end_of_hour
@@ -137,16 +147,6 @@ class BasicTest < Minitest::Test
 
   def test_hour_of_day_start_of_hour_with_time_zone
     assert_result :hour_of_day, 1, "2013-01-01 09:00:00", true
-  end
-
-  # minute of hour
-
-  def test_minute_of_hour_end_of_hour
-    assert_result :minute_of_hour, 59, "2017-02-09 23:59:59"
-  end
-
-  def test_minute_of_hour_beginning_of_hour
-    assert_result :minute_of_hour, 0, "2017-02-09 00:00:00"
   end
 
   # day of week
