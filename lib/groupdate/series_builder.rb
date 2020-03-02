@@ -149,6 +149,8 @@ module Groupdate
         elsif !time_range && options[:last]
           if period == :quarter
             step = 3.months
+          elsif period.is_a?(Integer)
+            step = period
           elsif 1.respond_to?(period)
             step = 1.send(period)
           else
