@@ -320,6 +320,11 @@ class DatabaseTest < Minitest::Test
     assert_equal "Unpermitted period", error.message
   end
 
+  def test_duration_last
+    result = User.group_by_duration(10.minutes, :created_at, last: 3).count
+    assert_equal 3, result.size
+  end
+
   private
 
   def this_year
