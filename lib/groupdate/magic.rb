@@ -123,8 +123,11 @@ module Groupdate
           when :day_of_week
             lambda { |k| (k.to_i - 1 - week_start) % 7 }
           when :day, :week, :month, :quarter, :year
+            day_start_hour = day_start / 3600
+            day_start_min = (day_start % 3600) / 60
+            day_start_sec = (day_start % 3600) % 60
             if day_start != 0
-              lambda { |k| series_builder.change_zone.call(k.in_time_zone(utc) + day_start.seconds, time_zone) }
+              lambda { |k| k.in_time_zone(time_zone).change(hour: day_start_hour, min: day_start_min, sec: day_start_sec) }
             else
               lambda { |k| k.in_time_zone(time_zone) }
             end
