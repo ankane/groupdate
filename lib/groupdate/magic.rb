@@ -116,13 +116,15 @@ module Groupdate
 
       def cast_method
         @cast_method ||= begin
+          utc = ActiveSupport::TimeZone["UTC"]
           case period
           when :minute_of_hour, :hour_of_day, :day_of_month, :day_of_year, :month_of_year
             lambda { |k| k.to_i }
           when :day_of_week
             lambda { |k| (k.to_i - 1 - week_start) % 7 }
+          when :day, :week, :month, :quarter, :year
+            lambda { |k| series_builder.change_zone.call(k.in_time_zone(utc) + day_start.seconds, time_zone) }
           else
-            utc = ActiveSupport::TimeZone["UTC"]
             lambda { |k| (k.is_a?(String) || !k.respond_to?(:to_time) ? utc.parse(k.to_s) : k.to_time).in_time_zone(time_zone) }
           end
         end

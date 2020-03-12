@@ -44,9 +44,21 @@ module Groupdate
           when :month_of_year
             ["MONTH(#{day_start_column})", time_zone, day_start]
           when :week
-            ["CONVERT_TZ(DATE_FORMAT(#{day_start_column} - INTERVAL ((? + DAYOFWEEK(#{day_start_column})) % 7) DAY, '%Y-%m-%d 00:00:00') + INTERVAL ? second, ?, '+00:00')", time_zone, day_start, 12 - week_start, time_zone, day_start, day_start, time_zone]
+            ["DATE_FORMAT(#{day_start_column} - INTERVAL ((? + DAYOFWEEK(#{day_start_column})) % 7) DAY, '%Y-%m-%d')", time_zone, day_start, 12 - week_start, time_zone, day_start]
           when :quarter
-            ["CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(YEAR(#{day_start_column}), '-', LPAD(1 + 3 * (QUARTER(#{day_start_column}) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S') + INTERVAL ? second, ?, '+00:00')", time_zone, day_start, time_zone, day_start, day_start, time_zone]
+            ["DATE_FORMAT(DATE(CONCAT(YEAR(#{day_start_column}), '-', LPAD(1 + 3 * (QUARTER(#{day_start_column}) - 1), 2, '00'), '-01')), '%Y-%m-%d')", time_zone, day_start, time_zone, day_start]
+          when :day, :month, :year
+            format =
+              case period
+              when :day
+                "%Y-%m-%d"
+              when :month
+                "%Y-%m-01"
+              else # year
+                "%Y-01-01"
+              end
+
+            ["DATE_FORMAT(#{day_start_column}, ?)", time_zone, day_start, format]
           else
             format =
               case period
@@ -54,14 +66,8 @@ module Groupdate
                 "%Y-%m-%d %H:%i:%S"
               when :minute
                 "%Y-%m-%d %H:%i:00"
-              when :hour
+              else # hour
                 "%Y-%m-%d %H:00:00"
-              when :day
-                "%Y-%m-%d 00:00:00"
-              when :month
-                "%Y-%m-01 00:00:00"
-              else # year
-                "%Y-01-01 00:00:00"
               end
 
             ["CONVERT_TZ(DATE_FORMAT(#{day_start_column}, ?) + INTERVAL ? second, ?, '+00:00')", time_zone, day_start, format, day_start, time_zone]
@@ -84,7 +90,9 @@ module Groupdate
           when :month_of_year
             ["EXTRACT(MONTH FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :week
-            ["(DATE_TRUNC('day', #{day_start_column} - INTERVAL '1 day' * ((? + EXTRACT(DOW FROM #{day_start_column})::integer) % 7)) + INTERVAL ?) AT TIME ZONE ?", time_zone, day_start_interval, 13 - week_start, time_zone, day_start_interval, day_start_interval, time_zone]
+            ["DATE_TRUNC('day', #{day_start_column} - INTERVAL '1 day' * ((? + EXTRACT(DOW FROM #{day_start_column})::integer) % 7))::date", time_zone, day_start_interval, 13 - week_start, time_zone, day_start_interval]
+          when :day, :month, :quarter, :year
+            ["DATE_TRUNC(?, #{day_start_column})::date", period, time_zone, day_start_interval]
           else
             if day_start == 0
               # prettier
