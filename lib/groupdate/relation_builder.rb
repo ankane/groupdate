@@ -94,19 +94,15 @@ module Groupdate
           when :day, :month, :quarter, :year
             ["DATE_TRUNC(?, #{day_start_column})::date", period, time_zone, day_start_interval]
           else
-            if day_start == 0
-              # prettier
-              ["DATE_TRUNC(?, #{day_start_column}) AT TIME ZONE ?", period, time_zone, day_start_interval, time_zone]
-            else
-              ["(DATE_TRUNC(?, #{day_start_column}) + INTERVAL ?) AT TIME ZONE ?", period, time_zone, day_start_interval, day_start_interval, time_zone]
-            end
+            # day start is always 0 for seconds, minute, hour
+            ["DATE_TRUNC(?, #{day_start_column}) AT TIME ZONE ?", period, time_zone, day_start_interval, time_zone]
           end
         when "SQLite"
           raise Groupdate::Error, "Time zones not supported for SQLite" unless @time_zone.utc_offset.zero?
           raise Groupdate::Error, "day_start not supported for SQLite" unless day_start.zero?
 
           if period == :week
-            ["strftime('%Y-%m-%d 00:00:00 UTC', #{column}, '-6 days', ?)", "weekday #{(week_start + 1) % 7}"]
+            ["strftime('%Y-%m-%d', #{column}, '-6 days', ?)", "weekday #{(week_start + 1) % 7}"]
           else
             format =
               case period
