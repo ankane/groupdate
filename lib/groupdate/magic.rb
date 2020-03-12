@@ -123,7 +123,11 @@ module Groupdate
           when :day_of_week
             lambda { |k| (k.to_i - 1 - week_start) % 7 }
           when :day, :week, :month, :quarter, :year
-            lambda { |k| series_builder.change_zone.call(k.in_time_zone(utc) + day_start.seconds, time_zone) }
+            if day_start != 0
+              lambda { |k| series_builder.change_zone.call(k.in_time_zone(utc) + day_start.seconds, time_zone) }
+            else
+              lambda { |k| k.in_time_zone(time_zone) }
+            end
           else
             lambda { |k| (k.is_a?(String) || !k.respond_to?(:to_time) ? utc.parse(k.to_s) : k.to_time).in_time_zone(time_zone) }
           end
