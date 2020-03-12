@@ -44,9 +44,9 @@ module Groupdate
           when :month_of_year
             ["MONTH(#{day_start_column})", time_zone, day_start]
           when :week
-            ["DATE_FORMAT(#{day_start_column} - INTERVAL ((? + DAYOFWEEK(#{day_start_column})) % 7) DAY, '%Y-%m-%d')", time_zone, day_start, 12 - week_start, time_zone, day_start]
+            ["CAST(DATE_FORMAT(#{day_start_column} - INTERVAL ((? + DAYOFWEEK(#{day_start_column})) % 7) DAY, '%Y-%m-%d') AS DATE)", time_zone, day_start, 12 - week_start, time_zone, day_start]
           when :quarter
-            ["DATE_FORMAT(DATE(CONCAT(YEAR(#{day_start_column}), '-', LPAD(1 + 3 * (QUARTER(#{day_start_column}) - 1), 2, '00'), '-01')), '%Y-%m-%d')", time_zone, day_start, time_zone, day_start]
+            ["CAST(CONCAT(YEAR(#{day_start_column}), '-', LPAD(1 + 3 * (QUARTER(#{day_start_column}) - 1), 2, '00'), '-01') AS DATE)", time_zone, day_start, time_zone, day_start]
           when :day, :month, :year
             format =
               case period
@@ -58,7 +58,7 @@ module Groupdate
                 "%Y-01-01"
               end
 
-            ["DATE_FORMAT(#{day_start_column}, ?)", time_zone, day_start, format]
+            ["CAST(DATE_FORMAT(#{day_start_column}, ?) AS DATE)", time_zone, day_start, format]
           else
             format =
               case period
