@@ -129,13 +129,13 @@ module Groupdate
               when :hour
                 "%Y-%m-%d %H:00:00 UTC"
               when :day
-                "%Y-%m-%d 00:00:00 UTC"
+                "%Y-%m-%d"
               when :month
-                "%Y-%m-01 00:00:00 UTC"
+                "%Y-%m-01"
               when :quarter
                 raise Groupdate::Error, "Quarter not supported for SQLite"
               else # year
-                "%Y-01-01 00:00:00 UTC"
+                "%Y-01-01"
               end
 
             ["strftime(?, #{column})", format]
