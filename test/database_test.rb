@@ -15,7 +15,7 @@ class DatabaseTest < Minitest::Test
   end
 
   def test_where_after
-    skip if ENV["ADAPTER"] == "sqlite"
+    skip if sqlite?
 
     create_user "2013-05-01"
     create_user "2013-05-02"
@@ -32,7 +32,9 @@ class DatabaseTest < Minitest::Test
   end
 
   def test_bad_method
-    assert_raises(NoMethodError) { User.group_by_day(:created_at).no_such_method }
+    assert_raises(NoMethodError) do
+      User.group_by_day(:created_at).no_such_method
+    end
   end
 
   def test_respond_to_order
@@ -64,13 +66,15 @@ class DatabaseTest < Minitest::Test
       last_month.to_date => 0,
       this_month.to_date => 1
     }
-    assert_equal expected, call_method(:month, :created_on, last: 2)
+    assert_equal expected, call_method(:month, :created_on, last: 2, time_zone: false)
   ensure
     Time.zone = nil
   end
 
   def test_last_hour_of_day
-    error = assert_raises(ArgumentError) { User.group_by_hour_of_day(:created_at, last: 3).count }
+    error = assert_raises(ArgumentError) do
+      User.group_by_hour_of_day(:created_at, last: 3).count
+    end
     assert_equal "Cannot use last option with hour_of_day", error.message
   end
 
@@ -157,7 +161,7 @@ class DatabaseTest < Minitest::Test
 
     # for sqlite, double-quoted string literals are accepted
     # https://www.sqlite.org/quirks.html
-    if ENV["ADAPTER"] == "sqlite"
+    if sqlite?
       assert_equal ({"created_at2" => 1}), User.group(:created_at2).count
 
       error = assert_raises(Groupdate::Error) do
@@ -203,7 +207,10 @@ class DatabaseTest < Minitest::Test
 
   def test_default_timezone_local
     User.default_timezone = :local
-    assert_raises(Groupdate::Error) { User.group_by_day(:created_at).count }
+    error = assert_raises(Groupdate::Error) do
+      User.group_by_day(:created_at).count
+    end
+    assert_match "must be :utc", error.message
   ensure
     User.default_timezone = :utc
   end
@@ -220,7 +227,10 @@ class DatabaseTest < Minitest::Test
   # no column
 
   def test_no_column
-    assert_raises(ArgumentError) { User.group_by_day.first }
+    error = assert_raises(ArgumentError) do
+      User.group_by_day.first
+    end
+    assert_equal "wrong number of arguments (given 0, expected 1)", error.message
   end
 
   # custom model calculation methods
@@ -278,7 +288,9 @@ class DatabaseTest < Minitest::Test
 
   def test_bad_column
     create_user "2018-01-01"
-    assert_raises { User.group_by_day(:name).count }
+    assert_raises do
+      User.group_by_day(:name).count
+    end
   end
 
   private

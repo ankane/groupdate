@@ -9,6 +9,8 @@ require "ostruct"
 ENV["TZ"] = "UTC"
 
 adapter = ENV["ADAPTER"]
+abort "No adapter specified" unless adapter
+
 puts "Using #{adapter}"
 require_relative "adapters/#{adapter}"
 
@@ -25,15 +27,29 @@ time: {
 
 class Minitest::Test
   def setup
-    if ENV["ADAPTER"] == "enumerable"
+    if enumerable?
       @users = []
     else
       User.delete_all
     end
   end
 
+  def sqlite?
+    ENV["ADAPTER"] == "sqlite"
+  end
+
+  def enumerable?
+    ENV["ADAPTER"] == "enumerable"
+  end
+
+  def postgresql?
+    ENV["ADAPTER"] == "postgresql"
+  end
+
   def create_user(created_at, score = 1)
-    if ENV["ADAPTER"] == "enumerable"
+    created_at = created_at.utc.to_s if created_at.is_a?(Time)
+
+    if enumerable?
       user =
         OpenStruct.new(
           name: "Andrew",
@@ -51,7 +67,7 @@ class Minitest::Test
           created_on: created_at ? Date.parse(created_at) : nil
         )
 
-      if ENV["ADAPTER"] == "postgresql"
+      if postgresql?
         user.deleted_at = user.created_at
       end
 
@@ -67,10 +83,10 @@ class Minitest::Test
   end
 
   def call_method(method, field, options)
-    if ENV["ADAPTER"] == "enumerable"
-      Hash[@users.group_by_period(method, options) { |u| u.send(field) }.map { |k, v| [k, v.size] }]
-    elsif ENV["ADAPTER"] == "sqlite" && (method == :quarter || options[:time_zone] || options[:day_start] || options[:week_start] || Groupdate.week_start != :sun || (Time.zone && options[:time_zone] != false))
-      error = assert_raises(Groupdate::Error) { User.group_by_period(method, field, options).count }
+    if enumerable?
+      Hash[@users.group_by_period(method, **options) { |u| u.send(field) }.map { |k, v| [k, v.size] }]
+    elsif sqlite? && (method == :quarter || options[:time_zone] || options[:day_start] || (Time.zone && options[:time_zone] != false))
+      error = assert_raises(Groupdate::Error) { User.group_by_period(method, field, **options).count }
       assert_includes error.message, "not supported for SQLite"
       skip
     else
@@ -79,7 +95,7 @@ class Minitest::Test
           [r.send(options[:series_label]), r.count]
         end.to_h
       else
-        User.group_by_period(method, field, options).count
+        User.group_by_period(method, field, **options).count
       end
     end
   end
@@ -90,7 +106,7 @@ class Minitest::Test
     assert_equal expected, result(method, time_str, time_zone, :created_at, options)
     assert_equal expected, result(method, time_str, time_zone, :created_at, options.merge(series_label: :label))
 
-    if ENV["ADAPTER"] == "postgresql"
+    if postgresql?
       # test timestamptz
       assert_equal expected, result(method, time_str, time_zone, :deleted_at, options)
       assert_equal expected, result(method, time_str, time_zone, :deleted_at, options.merge(series_label: :label))
@@ -100,13 +116,19 @@ class Minitest::Test
   def assert_result_date(method, expected_str, time_str, time_zone = false, options = {})
     create_user time_str
     expected = {Date.parse(expected_str) => 1}
+
     options.merge!(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil)
     label_options = options.merge(series_label: :label)
 
     assert_equal expected, call_method(method, :created_at, options)
     assert_equal expected, call_method(method, :created_at, label_options)
 
-    expected = {(time_zone ? pt : utc).parse(expected_str) + options[:day_start].to_f.hours => 1}
+    expected_time = (time_zone ? pt : utc).parse(expected_str)
+    if options[:day_start]
+      expected_time = expected_time.change(hour: options[:day_start], min: (options[:day_start] % 1) * 60)
+    end
+    expected = {expected_time => 1}
+    
     assert_equal expected, call_method(method, :created_at, options.merge(dates: false))
     assert_equal expected, call_method(method, :created_at, label_options.merge(dates: false))
     # assert_equal expected, call_method(method, :created_on, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))

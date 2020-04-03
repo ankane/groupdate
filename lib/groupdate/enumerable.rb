@@ -1,31 +1,25 @@
 module Enumerable
   Groupdate::PERIODS.each do |period|
-    define_method :"group_by_#{period}" do |*args, &block|
+    define_method :"group_by_#{period}" do |*args, **options, &block|
       if block
-        Groupdate::Magic::Enumerable.group_by(self, period, args[0] || {}, &block)
+        raise ArgumentError, "wrong number of arguments (given #{args.size}, expected 0)" if args.any?
+        Groupdate::Magic::Enumerable.group_by(self, period, options, &block)
       elsif respond_to?(:scoping)
-        scoping { @klass.send(:"group_by_#{period}", *args, &block) }
+        scoping { @klass.group_by_period(period, *args, **options, &block) }
       else
         raise ArgumentError, "no block given"
       end
     end
   end
 
-  def group_by_period(*args, &block)
+  def group_by_period(period, *args, **options, &block)
     if block || !respond_to?(:scoping)
-      period = args[0]
-      options = args[1] || {}
+      raise ArgumentError, "wrong number of arguments (given #{args.size + 1}, expected 1)" if args.any?
 
-      options = options.dup
-      # to_sym is unsafe on user input, so convert to strings
-      permitted_periods = ((options.delete(:permit) || Groupdate::PERIODS).map(&:to_sym) & Groupdate::PERIODS).map(&:to_s)
-      if permitted_periods.include?(period.to_s)
-        send("group_by_#{period}", options, &block)
-      else
-        raise ArgumentError, "Unpermitted period"
-      end
+      Groupdate::Magic.validate_period(period, options.delete(:permit))
+      send("group_by_#{period}", **options, &block)
     else
-      scoping { @klass.send(:group_by_period, *args, &block) }
+      scoping { @klass.group_by_period(period, *args, **options, &block) }
     end
   end
 end

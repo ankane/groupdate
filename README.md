@@ -32,9 +32,9 @@ For MySQL and SQLite, also follow [these instructions](#additional-instructions)
 ```ruby
 User.group_by_day(:created_at).count
 # {
-#   Sat, 28 May 2016 => 50,
-#   Sun, 29 May 2016 => 100,
-#   Mon, 30 May 2016 => 34
+#   Sat, 24 May 2020 => 50,
+#   Sun, 25 May 2020 => 100,
+#   Mon, 26 May 2020 => 34
 # }
 ```
 
@@ -53,10 +53,11 @@ You can group by:
 
 and
 
+- minute_of_hour
 - hour_of_day
 - day_of_week (Sunday = 0, Monday = 1, etc)
 - day_of_month
-- day_of_year [master]
+- day_of_year
 - month_of_year
 
 Use it anywhere you can use `group`. Works with `count`, `sum`, `minimum`, `maximum`, and `average`. For `median`, check out [ActiveMedian](https://github.com/ankane/active_median).
@@ -74,9 +75,9 @@ or
 ```ruby
 User.group_by_week(:created_at, time_zone: "Pacific Time (US & Canada)").count
 # {
-#   Sun, 06 Mar 2016 => 70,
-#   Sun, 13 Mar 2016 => 54,
-#   Sun, 20 Mar 2016 => 80
+#   Sun, 08 Mar 2020 => 70,
+#   Sun, 15 Mar 2020 => 54,
+#   Sun, 22 Mar 2020 => 80
 # }
 ```
 
@@ -87,13 +88,13 @@ Time zone objects also work. To see a list of available time zones in Rails, run
 Weeks start on Sunday by default. Change this with:
 
 ```ruby
-Groupdate.week_start = :mon # first three letters of day
+Groupdate.week_start = :monday
 ```
 
 or
 
 ```ruby
-User.group_by_week(:created_at, week_start: :mon).count
+User.group_by_week(:created_at, week_start: :monday).count
 ```
 
 ### Day Start
@@ -147,8 +148,8 @@ To get keys in a different format, use:
 ```ruby
 User.group_by_month(:created_at, format: "%b %Y").count
 # {
-#   "Jan 2015" => 10
-#   "Feb 2015" => 12
+#   "Jan 2020" => 10
+#   "Feb 2020" => 12
 # }
 ```
 
@@ -226,23 +227,23 @@ Supports the same options as above
 users.group_by_day(time_zone: time_zone) { |u| u.created_at }
 ```
 
-Count
-
-```ruby
-users.group_by_day { |u| u.created_at }.map { |k, v| [k, v.size] }.to_h
-```
-
 Get the entire series with:
 
 ```ruby
 users.group_by_day(series: true) { |u| u.created_at }
 ```
 
+Count
+
+```ruby
+users.group_by_day { |u| u.created_at }.map { |k, v| [k, v.count] }.to_h
+```
+
 ## Additional Instructions
 
 ### For MySQL
 
-[Time zone support](https://dev.mysql.com/doc/refman/5.7/en/time-zone-support.html) must be installed on the server.
+[Time zone support](https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html) must be installed on the server.
 
 ```sh
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
@@ -263,7 +264,7 @@ It should return the time instead of `NULL`.
 Groupdate has limited support for SQLite.
 
 - No time zone support
-- No `day_start` or `week_start` options
+- No `day_start` option
 - No `group_by_quarter` method
 
 If your application’s time zone is set to something other than `Etc/UTC` (the default), create an initializer with:
@@ -274,29 +275,13 @@ Groupdate.time_zone = false
 
 ## Upgrading
 
-### 4.0
+### 5.0
 
-Groupdate 4.0 brings a number of improvements. Here are a few to be aware of:
+Groupdate 5.0 brings a number of improvements. Here are a few to be aware of:
 
-- `group_by` methods return an `ActiveRecord::Relation` instead of a `Groupdate::Series`
-- Invalid options now throw an `ArgumentError`
-- `week_start` now affects `day_of_week`
-- Custom calculation methods are supported by default
-
-### 3.0
-
-Groupdate 3.0 brings a number of improvements. Here are a few to be aware of:
-
-- `Date` objects are now returned for day, week, month, quarter, and year by default. Use `dates: false` for the previous behavior, or change this globally with `Groupdate.dates = false`.
-- Array and hash methods no longer return the entire series by default. Use `series: true` for the previous behavior.
-- The `series: false` option now returns the correct type and order, and plays nicely with other options.
-
-### 2.0
-
-Groupdate 2.0 brings a number of improvements. Here are two things to be aware of:
-
-- the entire series is returned by default
-- `ActiveSupport::TimeWithZone` keys are now returned for every database adapter - adapters previously returned `Time` or `String` keys
+- The `week_start` option is now supported for SQLite
+- The `day_start` option is now consistent between Active Record and enumerable
+- Deprecated positional arguments for time zone and range have been removed
 
 ## History
 
