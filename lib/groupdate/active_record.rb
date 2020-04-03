@@ -4,3 +4,4 @@ require "groupdate/relation"
 
 ActiveRecord::Base.extend(Groupdate::QueryMethods)
 ActiveRecord::Relation.include(Groupdate::Relation)
+ActiveRecord::Relation.prepend(Groupdate::RelationRecords)

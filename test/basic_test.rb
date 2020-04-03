@@ -243,6 +243,7 @@ class BasicTest < Minitest::Test
     expected = {
       Date.parse("2013-05-03") => 1
     }
+    create_user "2013-05-03"
     assert_equal expected, result(:day, "2013-05-03", false, :created_on)
   end
 
@@ -250,6 +251,7 @@ class BasicTest < Minitest::Test
     expected = {
       Date.parse("2013-05-02") => 1
     }
+    create_user "2013-05-03"
     assert_equal expected, result(:day, "2013-05-03", true, :created_on)
   end
 

@@ -23,6 +23,13 @@ module Groupdate
     end
     result
   end
+
+  def self.process_series_label(relation, result)
+    if relation.groupdate_values
+      result = Groupdate::Magic::Relation.process_series_label(relation, result)
+    end
+    result
+  end
 end
 
 require "groupdate/enumerable"

@@ -1,8 +1,8 @@
 module Groupdate
   class RelationBuilder
-    attr_reader :period, :column, :day_start, :week_start
+    attr_reader :period, :column, :day_start, :week_start, :series_label
 
-    def initialize(relation, column:, period:, time_zone:, time_range:, week_start:, day_start:)
+    def initialize(relation, column:, period:, time_zone:, time_range:, week_start:, day_start:, series_label:)
       @relation = relation
       @column = resolve_column(relation, column)
       @period = period
@@ -10,6 +10,7 @@ module Groupdate
       @time_range = time_range
       @week_start = week_start
       @day_start = day_start
+      @series_label = series_label
 
       if relation.default_timezone == :local
         raise Groupdate::Error, "ActiveRecord::Base.default_timezone must be :utc to use Groupdate"
@@ -17,7 +18,10 @@ module Groupdate
     end
 
     def generate
-      @relation.group(group_clause).where(*where_clause)
+      group_by = group_clause
+      @relation = @relation.group(group_by).where(*where_clause)
+      @relation.select_values += ["#{group_by} AS #{series_label}"] if series_label
+      @relation
     end
 
     private

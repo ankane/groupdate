@@ -13,4 +13,11 @@ module Groupdate
       Groupdate.process_result(self, super, default_value: default_value)
     end
   end
+
+  module RelationRecords
+    def records
+      super
+      Groupdate.process_series_label(self, @records)
+    end
+  end
 end
