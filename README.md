@@ -287,8 +287,6 @@ Groupdate 5.0 brings a number of improvements. Here are a few to be aware of:
 
 View the [changelog](https://github.com/ankane/groupdate/blob/master/CHANGELOG.md)
 
-Groupdate follows [Semantic Versioning](https://semver.org/)
-
 ## Contributing
 
 Everyone is encouraged to help improve this project. Here are a few ways you can help:
