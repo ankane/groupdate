@@ -1,8 +1,8 @@
 module Groupdate
   class RelationBuilder
-    attr_reader :period, :column, :day_start, :week_start
+    attr_reader :period, :column, :day_start, :week_start, :n_seconds
 
-    def initialize(relation, column:, period:, time_zone:, time_range:, week_start:, day_start:)
+    def initialize(relation, column:, period:, time_zone:, time_range:, week_start:, day_start:, n_seconds:)
       @relation = relation
       @column = resolve_column(relation, column)
       @period = period
@@ -10,6 +10,7 @@ module Groupdate
       @time_range = time_range
       @week_start = week_start
       @day_start = day_start
+      @n_seconds = n_seconds
 
       if relation.default_timezone == :local
         raise Groupdate::Error, "ActiveRecord::Base.default_timezone must be :utc to use Groupdate"
@@ -47,8 +48,8 @@ module Groupdate
             ["CONVERT_TZ(DATE_FORMAT(#{day_start_column} - INTERVAL ((? + DAYOFWEEK(#{day_start_column})) % 7) DAY, '%Y-%m-%d 00:00:00') + INTERVAL ? second, ?, '+00:00')", time_zone, day_start, 12 - week_start, time_zone, day_start, day_start, time_zone]
           when :quarter
             ["CONVERT_TZ(DATE_FORMAT(DATE(CONCAT(YEAR(#{day_start_column}), '-', LPAD(1 + 3 * (QUARTER(#{day_start_column}) - 1), 2, '00'), '-01')), '%Y-%m-%d %H:%i:%S') + INTERVAL ? second, ?, '+00:00')", time_zone, day_start, time_zone, day_start, day_start, time_zone]
-          when Integer
-            ["FROM_UNIXTIME((UNIX_TIMESTAMP(#{column}) DIV ?) * ?)", period, period]
+          when :custom
+            ["FROM_UNIXTIME((UNIX_TIMESTAMP(#{column}) DIV ?) * ?)", n_seconds, n_seconds]
           else
             format =
               case period
@@ -87,8 +88,8 @@ module Groupdate
             ["EXTRACT(MONTH FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :week
             ["(DATE_TRUNC('day', #{day_start_column} - INTERVAL '1 day' * ((? + EXTRACT(DOW FROM #{day_start_column})::integer) % 7)) + INTERVAL ?) AT TIME ZONE ?", time_zone, day_start_interval, 13 - week_start, time_zone, day_start_interval, day_start_interval, time_zone]
-          when Integer
-            ["TO_TIMESTAMP(FLOOR(EXTRACT(EPOCH FROM #{column}::timestamptz) / ?) * ?)", period, period]
+          when :custom
+            ["TO_TIMESTAMP(FLOOR(EXTRACT(EPOCH FROM #{column}::timestamptz) / ?) * ?)", n_seconds, n_seconds]
           else
             if day_start == 0
               # prettier
@@ -103,8 +104,8 @@ module Groupdate
 
           if period == :week
             ["strftime('%Y-%m-%d 00:00:00 UTC', #{column}, '-6 days', ?)", "weekday #{(week_start + 1) % 7}"]
-          elsif period.is_a?(Integer)
-            ["datetime((strftime('%s', #{column}) / ?) * ?, 'unixepoch')", period, period]
+          elsif period == :custom
+            ["datetime((strftime('%s', #{column}) / ?) * ?, 'unixepoch')", n_seconds, n_seconds]
           else
             format =
               case period
@@ -161,7 +162,7 @@ module Groupdate
             # back to UTC to play properly with the rest of Groupdate.
             week_start_interval = "#{week_start} day"
             ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC('week', #{day_start_column} - INTERVAL ?) + INTERVAL ? + INTERVAL ?)::timestamp", time_zone, time_zone, day_start_interval, week_start_interval, week_start_interval, day_start_interval]
-          when Integer
+          when :custom
             raise Groupdate::Error, "Not implemented yet"
           else
             ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, #{day_start_column}) + INTERVAL ?)::timestamp", time_zone, period, time_zone, day_start_interval, day_start_interval]

@@ -1,14 +1,15 @@
 module Groupdate
   class SeriesBuilder
-    attr_reader :period, :time_zone, :day_start, :week_start, :options
+    attr_reader :period, :time_zone, :day_start, :week_start, :n_seconds, :options
 
     CHECK_PERIODS = [:day, :week, :month, :quarter, :year]
 
-    def initialize(period:, time_zone:, day_start:, week_start:, **options)
+    def initialize(period:, time_zone:, day_start:, week_start:, n_seconds:, **options)
       @period = period
       @time_zone = time_zone
       @week_start = week_start
       @day_start = day_start
+      @n_seconds = n_seconds
       @options = options
       @round_time = {}
       @week_start_key = Groupdate::Magic::DAYS[@week_start] if @week_start
@@ -73,8 +74,8 @@ module Groupdate
     end
 
     def round_time(time)
-      if period.is_a?(Integer)
-        return time_zone.at((time.to_time.to_i / period) * period)
+      if period == :custom
+        return time_zone.at((time.to_time.to_i / n_seconds) * n_seconds)
       end
 
       time = time.to_time.in_time_zone(time_zone)
@@ -149,8 +150,8 @@ module Groupdate
         elsif !time_range && options[:last]
           if period == :quarter
             step = 3.months
-          elsif period.is_a?(Integer)
-            step = period
+          elsif period == :custom
+            step = n_seconds
           elsif 1.respond_to?(period)
             step = 1.send(period)
           else
@@ -222,8 +223,8 @@ module Groupdate
 
           if period == :quarter
             step = 3.months
-          elsif period.is_a?(Integer)
-            step = period
+          elsif period == :custom
+            step = n_seconds
           else
             step = 1.send(period)
           end

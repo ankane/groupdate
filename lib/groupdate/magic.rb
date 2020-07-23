@@ -4,7 +4,7 @@ module Groupdate
   class Magic
     DAYS = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
-    attr_accessor :period, :options, :group_index
+    attr_accessor :period, :options, :group_index, :n_seconds
 
     def initialize(period:, **options)
       @period = period
@@ -15,8 +15,9 @@ module Groupdate
 
       if options[:n]
         raise ArgumentError, "n must be a positive integer" if !options[:n].is_a?(Integer) || options[:n] < 1
-        @period = options[:n]
-        @period *= 60 if period == :minute
+        @period = :custom
+        @n_seconds = options[:n].to_i
+        @n_seconds *= 60 if period == :minute
       end
     end
 
@@ -76,7 +77,8 @@ module Groupdate
           period: period,
           time_zone: time_zone,
           day_start: day_start,
-          week_start: week_start
+          week_start: week_start,
+          n_seconds: n_seconds
         )
     end
 
@@ -184,7 +186,8 @@ module Groupdate
             time_zone: magic.time_zone,
             time_range: magic.time_range,
             week_start: magic.week_start,
-            day_start: magic.day_start
+            day_start: magic.day_start,
+            n_seconds: magic.n_seconds
           ).generate
 
         # add Groupdate info
