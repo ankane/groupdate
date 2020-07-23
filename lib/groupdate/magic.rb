@@ -14,7 +14,7 @@ module Groupdate
       validate_arguments
 
       if options[:n]
-        raise ArgumentError, ":n must be a positive integer" if !options[:n].is_a?(Integer) || options[:n] < 1
+        raise ArgumentError, "n must be a positive integer" if !options[:n].is_a?(Integer) || options[:n] < 1
         @period = options[:n]
         @period *= 60 if period == :minute
       end

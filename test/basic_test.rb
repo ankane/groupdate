@@ -286,14 +286,14 @@ class BasicTest < Minitest::Test
     error = assert_raises(ArgumentError) do
       call_method(:minute, :created_at, n: -1)
     end
-    assert_equal ":n must be a positive integer", error.message
+    assert_equal "n must be a positive integer", error.message
   end
 
   def test_n_non_integer
     error = assert_raises(ArgumentError) do
       call_method(:minute, :created_at, n: 2.5)
     end
-    assert_equal ":n must be a positive integer", error.message
+    assert_equal "n must be a positive integer", error.message
   end
 
   def test_n_day
