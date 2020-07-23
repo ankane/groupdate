@@ -12,6 +12,14 @@ module Groupdate
 
       validate_keywords
       validate_arguments
+
+      if options[:n]
+        if @period == :minute
+          @period = options[:n].to_i * 60
+        else
+          @period = options[:n].to_i
+        end
+      end
     end
 
     def validate_keywords
@@ -28,6 +36,10 @@ module Groupdate
         @day_start = 0
       end
 
+      if %i[second minute].include?(period)
+        known_keywords << :n
+      end
+
       unknown_keywords = options.keys - known_keywords
       raise ArgumentError, "unknown keywords: #{unknown_keywords.join(", ")}" if unknown_keywords.any?
     end
@@ -38,6 +50,7 @@ module Groupdate
       raise ArgumentError, "Unrecognized :week_start option" unless week_start
       raise ArgumentError, "Cannot use endless range for :range option" if options[:range].is_a?(Range) && !options[:range].end
       raise ArgumentError, ":day_start must be between 0 and 24" if (day_start / 3600) < 0 || (day_start / 3600) >= 24
+      raise ArgumentError, ":n must be a positive integer" if options[:n] && (!options[:n].is_a?(Integer) || options[:n] < 1)
     end
 
     def time_zone

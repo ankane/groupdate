@@ -88,7 +88,7 @@ module Groupdate
           when :week
             ["(DATE_TRUNC('day', #{day_start_column} - INTERVAL '1 day' * ((? + EXTRACT(DOW FROM #{day_start_column})::integer) % 7)) + INTERVAL ?) AT TIME ZONE ?", time_zone, day_start_interval, 13 - week_start, time_zone, day_start_interval, day_start_interval, time_zone]
           when Integer
-            "TO_TIMESTAMP((EXTRACT(EPOCH FROM #{column}::timestamptz)::bigint / #{period}) * #{period})"
+            "TO_TIMESTAMP(FLOOR(EXTRACT(EPOCH FROM #{column}::timestamptz) / #{period}) * #{period})"
           else
             if day_start == 0
               # prettier

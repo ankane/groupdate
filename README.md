@@ -194,10 +194,12 @@ User.group_by_period(params[:period], :created_at, permit: ["day", "week"]).coun
 
 Raises an `ArgumentError` for unpermitted periods.
 
-### Custom Duration [master, experimental]
+### Custom Duration [master]
+
+To group by a specific number of minutes or seconds, use:
 
 ```ruby
-User.group_by_duration(10.minutes, :created_at).count
+User.group_by_minute(:created_at, n: 10).count # 10 minutes
 ```
 
 ### Date Columns
