@@ -12,7 +12,7 @@ class BasicTest < Minitest::Test
   end
 
   def test_second_end_of_second_n
-    assert_result_time :second, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:04.8", n: 5
+    assert_result_time :second, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:04.999", n: 5
   end
 
   def test_second_start_of_second_n
