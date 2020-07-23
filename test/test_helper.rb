@@ -94,7 +94,7 @@ class Minitest::Test
     end
   end
 
-  def assert_result_time(method, expected, time_str, time_zone = false, options = {})
+  def assert_result_time(method, expected, time_str, time_zone = false, **options)
     expected = {utc.parse(expected).in_time_zone(time_zone ? "Pacific Time (US & Canada)" : utc) => 1}
     assert_equal expected, result(method, time_str, time_zone, :created_at, options)
 

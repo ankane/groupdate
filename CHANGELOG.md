@@ -1,3 +1,7 @@
+## 5.0.1 (unreleased)
+
+- Added `n` option to minute and second for custom durations
+
 ## 5.0.0 (2020-02-18)
 
 - Added support for `week_start` for SQLite

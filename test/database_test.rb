@@ -293,6 +293,31 @@ class DatabaseTest < Minitest::Test
     end
   end
 
+  # minutes
+
+  def test_minute_n
+    create_user("2014-01-21 00:12:34")
+    create_user("2014-01-22 00:56:12")
+    result = User.group_by_minute(:created_at, n: 10).count
+    assert_equal 149, result.size
+    assert_equal 1, result[utc.parse("2014-01-21 00:10:00")]
+    assert_equal 1, result[utc.parse("2014-01-22 00:50:00")]
+  end
+
+  def test_minute_n_relation
+    create_user("2014-01-21 00:12:34")
+    create_user("2014-01-22 00:56:12")
+    result = User.all.group_by_minute(:created_at, n: 10).count
+    assert_equal 149, result.size
+    assert_equal 1, result[utc.parse("2014-01-21 00:10:00")]
+    assert_equal 1, result[utc.parse("2014-01-22 00:50:00")]
+  end
+
+  def test_minute_n_last
+    result = User.group_by_minute(:created_at, n: 10, last: 3).count
+    assert_equal 3, result.size
+  end
+
   private
 
   def this_year

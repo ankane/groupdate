@@ -12,6 +12,12 @@ module Groupdate
 
       validate_keywords
       validate_arguments
+
+      if options[:n]
+        raise ArgumentError, ":n must be a positive integer" if !options[:n].is_a?(Integer) || options[:n] < 1
+        @period = options[:n]
+        @period *= 60 if period == :minute
+      end
     end
 
     def validate_keywords
@@ -26,6 +32,10 @@ module Groupdate
       else
         # prevent Groupdate.day_start from applying
         @day_start = 0
+      end
+
+      if %i[second minute].include?(period)
+        known_keywords << :n
       end
 
       unknown_keywords = options.keys - known_keywords

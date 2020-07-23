@@ -57,4 +57,10 @@ class EnumerableTest < Minitest::Test
     end
     assert_equal "Unpermitted period", error.message
   end
+
+  def test_minute_n
+    user_a = create_user("2014-01-21 00:01:23")
+    user_b = create_user("2014-01-22 00:04:56")
+    assert_equal 145, [user_a, user_b].group_by_minute(series: true, n: 10, &:created_at).size
+  end
 end

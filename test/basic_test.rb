@@ -11,6 +11,14 @@ class BasicTest < Minitest::Test
     assert_result_time :second, "2013-05-03 00:00:01 UTC", "2013-05-03 00:00:01.000"
   end
 
+  def test_second_end_of_second_n
+    assert_result_time :second, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:04.999", n: 5
+  end
+
+  def test_second_start_of_second_n
+    assert_result_time :second, "2013-05-03 00:00:05 UTC", "2013-05-03 00:00:05.000", n: 5
+  end
+
   # minute
 
   def test_minute_end_of_minute
@@ -19,6 +27,14 @@ class BasicTest < Minitest::Test
 
   def test_minute_start_of_minute
     assert_result_time :minute, "2013-05-03 00:01:00 UTC", "2013-05-03 00:01:00"
+  end
+
+  def test_minute_end_of_minute_n
+    assert_result_time :minute, "2013-05-03 00:00:00 UTC", "2013-05-03 00:04:59", n: 5
+  end
+
+  def test_minute_start_of_minute_n
+    assert_result_time :minute, "2013-05-03 00:05:00 UTC", "2013-05-03 00:05:00", n: 5
   end
 
   # hour
@@ -262,6 +278,22 @@ class BasicTest < Minitest::Test
     assert_equal expected, call_method(:day, :created_at, time_zone: false)
   ensure
     Time.zone = nil
+  end
+
+  # n
+
+  def test_n_negative
+    error = assert_raises(ArgumentError) do
+      call_method(:minute, :created_at, n: -1)
+    end
+    assert_equal ":n must be a positive integer", error.message
+  end
+
+  def test_n_non_integer
+    error = assert_raises(ArgumentError) do
+      call_method(:minute, :created_at, n: 2.5)
+    end
+    assert_equal ":n must be a positive integer", error.message
   end
 
   # endless range
