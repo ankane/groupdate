@@ -14,14 +14,5 @@ module Groupdate
       Groupdate::Magic.validate_period(period, permit)
       send("group_by_#{period}", field, **options)
     end
-
-    def group_by_duration(duration, field, **options)
-      # TODO validate duration
-      Groupdate::Magic::Relation.generate_relation(self,
-        period: duration.to_i,
-        field: field,
-        **options
-      )
-    end
   end
 end
