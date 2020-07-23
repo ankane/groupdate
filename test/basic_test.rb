@@ -296,6 +296,13 @@ class BasicTest < Minitest::Test
     assert_equal ":n must be a positive integer", error.message
   end
 
+  def test_n_day
+    error = assert_raises(ArgumentError) do
+      call_method(:day, :created_at, n: 2.5)
+    end
+    assert_equal "unknown keywords: n", error.message
+  end
+
   # endless range
 
   def test_endless_range
