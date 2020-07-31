@@ -1,4 +1,4 @@
-## 5.0.1 (unreleased)
+## 5.1.0 (2020-07-30)
 
 - Added `n` option to minute and second for custom durations
 
