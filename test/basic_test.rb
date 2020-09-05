@@ -309,12 +309,13 @@ class BasicTest < Minitest::Test
     skip unless beginless_range_supported?
 
     create_user "2013-05-01"
+    create_user "2013-05-04 12:00:00"
     create_user "2013-06-01"
     expected = {
       Date.parse("2013-05-01") => 1,
       Date.parse("2013-05-02") => 0,
       Date.parse("2013-05-03") => 0,
-      Date.parse("2013-05-04") => 0
+      Date.parse("2013-05-04") => 1
     }
     assert_equal expected, call_method(:day, :created_at, series: true, range: eval('..Date.parse("2013-05-04")'))
   end
