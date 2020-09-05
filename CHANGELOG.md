@@ -1,6 +1,6 @@
 ## 5.2.0 (unreleased)
 
-- Added support for endless ranges in `range` option
+- Added support for beginless and endless ranges in `range` option
 
 ## 5.1.0 (2020-07-30)
 

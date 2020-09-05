@@ -190,7 +190,11 @@ module Groupdate
       if @time_range.is_a?(Range)
         if @time_range.end
           op = @time_range.exclude_end? ? "<" : "<="
-          ["#{column} >= ? AND #{column} #{op} ?", @time_range.first, @time_range.last]
+          if @time_range.begin
+            ["#{column} >= ? AND #{column} #{op} ?", @time_range.first, @time_range.last]
+          else
+            ["#{column} #{op} ?", @time_range.last]
+          end
         else
           ["#{column} >= ?", @time_range.first]
         end

@@ -303,6 +303,45 @@ class BasicTest < Minitest::Test
     assert_equal "unknown keywords: n", error.message
   end
 
+  # beginless range
+
+  def test_beginless_range
+    skip unless beginless_range_supported?
+
+    create_user "2013-05-01"
+    create_user "2013-06-01"
+    expected = {
+      Date.parse("2013-05-01") => 1,
+      Date.parse("2013-05-02") => 0,
+      Date.parse("2013-05-03") => 0,
+      Date.parse("2013-05-04") => 0
+    }
+    assert_equal expected, call_method(:day, :created_at, series: true, range: eval('..Date.parse("2013-05-04")'))
+  end
+
+  def test_beginless_range_exclude_end
+    skip unless beginless_range_supported?
+
+    create_user "2013-05-01"
+    create_user "2013-06-01"
+    expected = {
+      Date.parse("2013-05-01") => 1,
+      Date.parse("2013-05-02") => 0,
+      Date.parse("2013-05-03") => 0
+    }
+    assert_equal expected, call_method(:day, :created_at, series: true, range: eval('...Date.parse("2013-05-04")'))
+  end
+
+  def test_beginless_range_empty
+    skip unless beginless_range_supported?
+
+    assert_empty call_method(:day, :created_at, series: true, range: eval('..Date.parse("2013-05-04")'))
+  end
+
+  def beginless_range_supported?
+    RUBY_VERSION.to_f >= 2.7
+  end
+
   # endless range
 
   def test_endless_range
@@ -315,13 +354,13 @@ class BasicTest < Minitest::Test
       Date.parse("2013-05-02") => 0,
       Date.parse("2013-05-03") => 1
     }
-    assert_equal expected, call_method(:day, :created_at, range: eval('Date.parse("2013-05-01")..'))
+    assert_equal expected, call_method(:day, :created_at, series: true, range: eval('Date.parse("2013-05-01")..'))
   end
 
   def test_endless_range_empty
     skip unless endless_range_supported?
 
-    assert_empty call_method(:day, :created_at, range: eval('Date.parse("2013-05-01")..'))
+    assert_empty call_method(:day, :created_at, series: true, range: eval('Date.parse("2013-05-01")..'))
   end
 
   def endless_range_supported?
