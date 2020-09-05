@@ -142,6 +142,7 @@ module Groupdate
     def time_range
       @time_range ||= begin
         time_range = options[:range]
+        # entire range must be Date if begin or end is Date
         if time_range.is_a?(Range) && (time_range.begin.is_a?(Date) || time_range.end.is_a?(Date))
           if time_range.begin
             start = time_zone.parse(time_range.first.to_s)
