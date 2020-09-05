@@ -11,7 +11,6 @@ module Groupdate
       @day_start = day_start
       @n_seconds = n_seconds
       @options = options
-      @round_time = {}
       @week_start_key = Groupdate::Magic::DAYS[@week_start] if @week_start
     end
 
