@@ -1,3 +1,7 @@
+## 5.2.0 (unreleased)
+
+- Added support for endless ranges in `range` option
+
 ## 5.1.0 (2020-07-30)
 
 - Added `n` option to minute and second for custom durations

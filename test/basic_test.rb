@@ -306,12 +306,26 @@ class BasicTest < Minitest::Test
   # endless range
 
   def test_endless_range
-    skip if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("2.6.0")
+    skip unless endless_range_supported?
 
-    error = assert_raises ArgumentError do
-      call_method(:day, :created_at, series: true, range: eval('Date.parse("2013-05-01")..'))
-    end
-    assert_equal "Cannot use endless range for :range option", error.message
+    create_user "2013-01-01"
+    create_user "2013-05-03"
+    expected = {
+      Date.parse("2013-05-01") => 0,
+      Date.parse("2013-05-02") => 0,
+      Date.parse("2013-05-03") => 1
+    }
+    assert_equal expected, call_method(:day, :created_at, range: eval('Date.parse("2013-05-01")..'))
+  end
+
+  def test_endless_range_empty
+    skip unless endless_range_supported?
+
+    assert_empty call_method(:day, :created_at, range: eval('Date.parse("2013-05-01")..'))
+  end
+
+  def endless_range_supported?
+    RUBY_VERSION.to_f >= 2.6
   end
 
   # date range

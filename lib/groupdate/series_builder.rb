@@ -144,9 +144,11 @@ module Groupdate
         time_range = options[:range]
         if time_range.is_a?(Range) && time_range.first.is_a?(Date)
           # convert range of dates to range of times
-          last = time_range.last.in_time_zone(time_zone)
-          last += 1.day unless time_range.exclude_end?
-          time_range = Range.new(time_range.first.in_time_zone(time_zone), last, true)
+          if time_range.end
+            last = time_zone.parse(time_range.last.to_s)
+            last += 1.day unless time_range.exclude_end?
+          end
+          time_range = Range.new(time_zone.parse(time_range.first.to_s), last, true)
         elsif !time_range && options[:last]
           if period == :quarter
             step = 3.months
@@ -200,7 +202,7 @@ module Groupdate
       else
         time_range = self.time_range
         time_range =
-          if time_range.is_a?(Range)
+          if time_range.is_a?(Range) && time_range.end
             time_range
           else
             # use first and last values
@@ -211,11 +213,19 @@ module Groupdate
                 data.keys.sort
               end
 
-            tr = sorted_keys.first..sorted_keys.last
-            if options[:current] == false && sorted_keys.any? && round_time(now) >= tr.last
-              tr = tr.first...round_time(now)
+            if time_range.is_a?(Range)
+              if sorted_keys.any?
+                time_range.begin..sorted_keys.last
+              else
+                nil..nil
+              end
+            else
+              tr = sorted_keys.first..sorted_keys.last
+              if options[:current] == false && sorted_keys.any? && round_time(now) >= tr.last
+                tr = tr.first...round_time(now)
+              end
+              tr
             end
-            tr
           end
 
         if time_range.begin
