@@ -60,7 +60,7 @@ and
 - day_of_year
 - month_of_year
 
-Use it anywhere you can use `group`. Works with `count`, `sum`, `minimum`, `maximum`, and `average`. For `median`, check out [ActiveMedian](https://github.com/ankane/active_median).
+Use it anywhere you can use `group`. Works with `count`, `sum`, `minimum`, `maximum`, and `average`. For `median` and `percentile`, check out [ActiveMedian](https://github.com/ankane/active_median).
 
 ### Time Zones
 
