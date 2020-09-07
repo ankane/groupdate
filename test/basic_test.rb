@@ -303,6 +303,24 @@ class BasicTest < Minitest::Test
     assert_equal "unknown keywords: n", error.message
   end
 
+  # range
+
+  def test_range_string
+    create_user "2013-05-01"
+    message = "[groupdate] Range bounds should be Date or Time, not String. This will raise an error in Groupdate 6"
+    _, stderr = capture_io do
+      call_method(:day, :created_at, range: "2013-05-01".."2013-05-04")
+    end
+    assert_match message, stderr
+  end
+
+  def test_range_numeric
+    error = assert_raises(ArgumentError) do
+      call_method(:day, :created_at, range: 1..3)
+    end
+    assert_equal "Range bounds should be Date or Time, not Integer", error.message
+  end
+
   # beginless range
 
   def test_beginless_range

@@ -1,3 +1,7 @@
+## 5.2.1 (unreleased)
+
+- Improved error message for invalid ranges
+
 ## 5.2.0 (2020-09-07)
 
 - Added warning for non-attribute argument

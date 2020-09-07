@@ -141,16 +141,32 @@ module Groupdate
     def time_range
       @time_range ||= begin
         time_range = options[:range]
-        # entire range must be Date if begin or end is Date
-        if time_range.is_a?(Range) && (time_range.begin.is_a?(Date) || time_range.end.is_a?(Date))
-          if time_range.begin
-            start = time_zone.parse(time_range.first.to_s)
+
+        if time_range.is_a?(Range)
+          # entire range must be Date if begin or end is Date
+          if time_range.begin.is_a?(Date) || time_range.end.is_a?(Date)
+            if time_range.begin
+              start = time_zone.parse(time_range.first.to_s)
+            end
+            if time_range.end
+              last = time_zone.parse(time_range.last.to_s)
+              last += 1.day unless time_range.exclude_end?
+            end
+            time_range = Range.new(start, last, true)
+          else
+            [time_range.begin, time_range.end].each do |v|
+              case v
+              when nil, Date, Time
+                # good
+              when String
+                # TODO raise error in Groupdate 6
+                warn "[groupdate] Range bounds should be Date or Time, not #{v.class.name}. This will raise an error in Groupdate 6"
+                break
+              else
+                raise ArgumentError, "Range bounds should be Date or Time, not #{v.class.name}"
+              end
+            end
           end
-          if time_range.end
-            last = time_zone.parse(time_range.last.to_s)
-            last += 1.day unless time_range.exclude_end?
-          end
-          time_range = Range.new(start, last, true)
         elsif !time_range && options[:last]
           if period == :quarter
             step = 3.months
