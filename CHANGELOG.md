@@ -1,4 +1,4 @@
-## 5.2.0 (unreleased)
+## 5.2.0 (2020-09-07)
 
 - Added warning for non-attribute argument
 - Added support for beginless and endless ranges in `range` option
