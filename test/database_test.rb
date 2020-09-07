@@ -151,6 +151,17 @@ class DatabaseTest < Minitest::Test
     assert_empty User.joins(:posts).group_by_day("created_at").count
   end
 
+  # TODO add warning
+  def test_column_string_function
+    function = sqlite? ? "datetime('now')" : "NOW()"
+    assert_empty User.joins(:posts).group_by_day(function).count
+  end
+
+  def test_column_string_function_arel
+    function = sqlite? ? "datetime('now')" : "NOW()"
+    assert_empty User.joins(:posts).group_by_day(Arel.sql(function)).count
+  end
+
   def test_column_symbol_with_join
     assert_empty User.joins(:posts).group(:created_at).count
     assert_empty User.joins(:posts).group_by_day(:created_at).count
