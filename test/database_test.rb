@@ -178,6 +178,15 @@ class DatabaseTest < Minitest::Test
     end
   end
 
+  def test_symbol_quoted
+    sql = User.group_by_day(:missing).to_sql
+    quoted_name = User.connection.quote_column_name("missing")
+    refute_equal quoted_name, "missing"
+    assert_match quoted_name, sql
+    # important: makes sure all instances are quoted
+    assert_equal sql.split("missing").size, sql.split(quoted_name).size
+  end
+
   def test_alias_attribute
     assert_empty User.group(:signed_up_at).count
     assert_empty User.group_by_day(:signed_up_at).count
