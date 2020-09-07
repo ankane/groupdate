@@ -136,27 +136,27 @@ class DatabaseTest < Minitest::Test
 
   # column values
 
-  def test_string
+  def test_column_string
     assert_empty User.group("created_at").count
     assert_empty User.group_by_day("created_at").count
   end
 
-  def test_table_name
+  def test_column_table_name
     assert_empty User.group("users.created_at").count
     assert_empty User.group_by_day("users.created_at").count
   end
 
-  def test_string_with_join
+  def test_column_string_with_join
     assert_empty User.joins(:posts).group("created_at").count
     assert_empty User.joins(:posts).group_by_day("created_at").count
   end
 
-  def test_symbol_with_join
+  def test_column_symbol_with_join
     assert_empty User.joins(:posts).group(:created_at).count
     assert_empty User.joins(:posts).group_by_day(:created_at).count
   end
 
-  def test_symbol_undefined_attribute
+  def test_column_symbol_undefined_attribute
     create_user "2018-01-01"
 
     # for sqlite, double-quoted string literals are accepted
@@ -178,7 +178,7 @@ class DatabaseTest < Minitest::Test
     end
   end
 
-  def test_symbol_quoted
+  def test_column_symbol_quoted
     sql = User.group_by_day(:missing).to_sql
     quoted_name = User.connection.quote_column_name("missing")
     refute_equal quoted_name, "missing"
@@ -187,7 +187,7 @@ class DatabaseTest < Minitest::Test
     assert_equal sql.split("missing").size, sql.split(quoted_name).size
   end
 
-  def test_alias_attribute
+  def test_column_alias_attribute
     assert_empty User.group(:signed_up_at).count
     assert_empty User.group_by_day(:signed_up_at).count
   end
