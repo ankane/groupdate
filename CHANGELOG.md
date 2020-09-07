@@ -1,5 +1,6 @@
 ## 5.2.0 (unreleased)
 
+- Added warning for non-attribute argument
 - Added support for beginless and endless ranges in `range` option
 
 ## 5.1.0 (2020-07-30)

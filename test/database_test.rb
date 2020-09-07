@@ -151,10 +151,12 @@ class DatabaseTest < Minitest::Test
     assert_empty User.joins(:posts).group_by_day("created_at").count
   end
 
-  # TODO add warning
   def test_column_string_function
     function = sqlite? ? "datetime('now')" : "NOW()"
-    assert_empty User.joins(:posts).group_by_day(function).count
+    message = "[groupdate] Non-attribute argument: NOW(). Use Arel.sql() for known-safe values. This will raise an error in Groupdate 6\n"
+    assert_output(nil, message) do
+      User.joins(:posts).group_by_day(function).count
+    end
   end
 
   def test_column_string_function_arel
