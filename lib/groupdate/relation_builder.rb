@@ -3,6 +3,9 @@ module Groupdate
     attr_reader :period, :column, :day_start, :week_start, :n_seconds
 
     def initialize(relation, column:, period:, time_zone:, time_range:, week_start:, day_start:, n_seconds:)
+      # very important
+      validate_column(column)
+
       @relation = relation
       @column = resolve_column(relation, column)
       @period = period
@@ -216,8 +219,6 @@ module Groupdate
     # need to convert both where_clause (easy)
     # and group_clause (not easy) if want to avoid this
     def resolve_column(relation, column)
-      validate_column(column)
-
       node = relation.send(:relation).send(:arel_columns, [column]).first
       node = Arel::Nodes::SqlLiteral.new(node) if node.is_a?(String)
       relation.connection.visitor.accept(node, Arel::Collectors::SQLString.new).value
