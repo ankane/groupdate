@@ -39,7 +39,7 @@ task :profile do
   ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
 
   ActiveRecord::Migration.create_table :users, force: true do |t|
-    t.timestamp :created_at
+    t.datetime :created_at
   end
 
   class User < ActiveRecord::Base

@@ -39,13 +39,13 @@ else
   ActiveRecord::Migration.create_table :users, force: true do |t|
     t.string :name
     t.integer :score
-    t.timestamp :created_at
+    t.datetime :created_at
     t.column :deleted_at, :timestamptz if ENV["ADAPTER"] == "postgresql"
     t.date :created_on
   end
 
   ActiveRecord::Migration.create_table :posts, force: true do |t|
     t.references :user
-    t.timestamp :created_at
+    t.datetime :created_at
   end
 end
