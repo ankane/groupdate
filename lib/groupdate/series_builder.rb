@@ -143,30 +143,33 @@ module Groupdate
         time_range = options[:range]
 
         if time_range.is_a?(Range)
-          # entire range must be Date if begin or end is Date
-          if time_range.begin.is_a?(Date) || time_range.end.is_a?(Date)
-            if time_range.begin
-              start = time_zone.parse(time_range.first.to_s)
-            end
-            if time_range.end
-              last = time_zone.parse(time_range.last.to_s)
-              last += 1.day unless time_range.exclude_end?
-            end
-            time_range = Range.new(start, last, true)
-          else
-            [time_range.begin, time_range.end].each do |v|
-              case v
-              when nil, Date, Time
-                # good
-              when String
-                # TODO raise error in Groupdate 6
-                warn "[groupdate] Range bounds should be Date or Time, not #{v.class.name}. This will raise an error in Groupdate 6"
-                break
-              else
-                raise ArgumentError, "Range bounds should be Date or Time, not #{v.class.name}"
-              end
+          # check types
+          [time_range.begin, time_range.end].each do |v|
+            case v
+            when nil, Date, Time
+              # good
+            when String
+              # TODO raise error in Groupdate 6
+              warn "[groupdate] Range bounds should be Date or Time, not #{v.class.name}. This will raise an error in Groupdate 6"
+              break
+            else
+              raise ArgumentError, "Range bounds should be Date or Time, not #{v.class.name}"
             end
           end
+
+          start = time_range.begin
+          start = start.in_time_zone(time_zone) if start
+
+          exclude_end = time_range.exclude_end?
+
+          finish = time_range.end
+          finish = finish.in_time_zone(time_zone) if finish
+          if time_range.end.is_a?(Date) && !exclude_end
+            finish += 1.day
+            exclude_end = true
+          end
+
+          time_range = Range.new(start, finish, exclude_end)
         elsif !time_range && options[:last]
           if period == :quarter
             step = 3.months

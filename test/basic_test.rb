@@ -305,6 +305,29 @@ class BasicTest < Minitest::Test
 
   # range
 
+  def test_range_date
+    ENV["TZ"] = "Europe/Oslo"
+    expected = {
+      Date.parse("2013-05-01") => 0,
+      Date.parse("2013-05-02") => 0,
+      Date.parse("2013-05-03") => 0
+    }
+    assert_equal expected, call_method(:day, :created_at, series: true, range: Date.parse("2013-05-01")..Date.parse("2013-05-03"))
+  ensure
+    ENV["TZ"] = "UTC"
+  end
+
+  def test_range_date_exclude_end
+    ENV["TZ"] = "Europe/Oslo"
+    expected = {
+      Date.parse("2013-05-01") => 0,
+      Date.parse("2013-05-02") => 0
+    }
+    assert_equal expected, call_method(:day, :created_at, series: true, range: Date.parse("2013-05-01")...Date.parse("2013-05-03"))
+  ensure
+    ENV["TZ"] = "UTC"
+  end
+
   def test_range_string
     create_user "2013-05-01"
     message = "[groupdate] Range bounds should be Date or Time, not String. This will raise an error in Groupdate 6"
@@ -384,31 +407,6 @@ class BasicTest < Minitest::Test
 
   def endless_range_supported?
     RUBY_VERSION.to_f >= 2.6
-  end
-
-  # date range
-
-  def test_date_range
-    ENV["TZ"] = "Europe/Oslo"
-    expected = {
-      Date.parse("2013-05-01") => 0,
-      Date.parse("2013-05-02") => 0,
-      Date.parse("2013-05-03") => 0
-    }
-    assert_equal expected, call_method(:day, :created_at, series: true, range: Date.parse("2013-05-01")..Date.parse("2013-05-03"))
-  ensure
-    ENV["TZ"] = "UTC"
-  end
-
-  def test_date_range_exclude_end
-    ENV["TZ"] = "Europe/Oslo"
-    expected = {
-      Date.parse("2013-05-01") => 0,
-      Date.parse("2013-05-02") => 0
-    }
-    assert_equal expected, call_method(:day, :created_at, series: true, range: Date.parse("2013-05-01")...Date.parse("2013-05-03"))
-  ensure
-    ENV["TZ"] = "UTC"
   end
 
   # Brasilia Summer Time
