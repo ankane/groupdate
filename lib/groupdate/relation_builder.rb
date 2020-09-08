@@ -194,12 +194,12 @@ module Groupdate
         if @time_range.end
           op = @time_range.exclude_end? ? "<" : "<="
           if @time_range.begin
-            ["#{column} >= ? AND #{column} #{op} ?", @time_range.first, @time_range.last]
+            ["#{column} >= ? AND #{column} #{op} ?", @time_range.begin, @time_range.end]
           else
-            ["#{column} #{op} ?", @time_range.last]
+            ["#{column} #{op} ?", @time_range.end]
           end
         else
-          ["#{column} >= ?", @time_range.first]
+          ["#{column} >= ?", @time_range.begin]
         end
       else
         ["#{column} IS NOT NULL"]
