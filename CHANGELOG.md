@@ -1,4 +1,4 @@
-## 5.2.1 (unreleased)
+## 5.2.1 (2020-09-09)
 
 - Improved error message for invalid ranges
 - Fixed bug with date string ranges
