@@ -4,9 +4,15 @@ require "active_support/time"
 
 # modules
 require "groupdate/magic"
-require "groupdate/relation_builder"
 require "groupdate/series_builder"
 require "groupdate/version"
+
+# adapters
+require "groupdate/adapters/base_adapter"
+require "groupdate/adapters/mysql_adapter"
+require "groupdate/adapters/postgresql_adapter"
+require "groupdate/adapters/redshift_adapter"
+require "groupdate/adapters/sqlite_adapter"
 
 module Groupdate
   class Error < RuntimeError; end
@@ -26,7 +32,22 @@ module Groupdate
     end
     result
   end
+
+  def self.adapters
+    @adapters ||= {}
+  end
+
+  def self.register_adapter(name, adapter)
+    Array(name).each do |n|
+      adapters[n] = adapter
+    end
+  end
 end
+
+Groupdate.register_adapter ["Mysql2", "Mysql2Spatial", "Mysql2Rgeo"], Groupdate::Adapters::MySQLAdapter
+Groupdate.register_adapter ["PostgreSQL", "PostGIS"], Groupdate::Adapters::PostgreSQLAdapter
+Groupdate.register_adapter "Redshift", Groupdate::Adapters::RedshiftAdapter
+Groupdate.register_adapter "SQLite", Groupdate::Adapters::SQLiteAdapter
 
 require "groupdate/enumerable"
 

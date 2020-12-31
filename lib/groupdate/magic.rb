@@ -176,9 +176,13 @@ module Groupdate
       def self.generate_relation(relation, field:, **options)
         magic = Groupdate::Magic::Relation.new(**options)
 
+        adapter_name = relation.connection.adapter_name
+        adapter = Groupdate.adapters[adapter_name]
+        raise Groupdate::Error, "Connection adapter not supported: #{adapter_name}" unless adapter
+
         # generate ActiveRecord relation
         relation =
-          RelationBuilder.new(
+          adapter.new(
             relation,
             column: field,
             period: magic.period,
