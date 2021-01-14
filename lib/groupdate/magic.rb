@@ -69,12 +69,25 @@ module Groupdate
       @day_start ||= ((options[:day_start] || Groupdate.day_start).to_f * 3600).round
     end
 
+    def range
+      @range ||= begin
+        time_range = options[:range]
+
+        if time_range.is_a?(Range) && time_range.begin.nil? && time_range.end.nil?
+          nil
+        else
+          time_range
+        end
+      end
+    end
+
     def series_builder
       @series_builder ||=
         SeriesBuilder.new(
           **options,
           period: period,
           time_zone: time_zone,
+          range: range,
           day_start: day_start,
           week_start: week_start,
           n_seconds: n_seconds

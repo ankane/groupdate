@@ -409,6 +409,25 @@ class BasicTest < Minitest::Test
     RUBY_VERSION.to_f >= 2.6
   end
 
+  # beginless and endless range
+
+  def test_beginless_and_endless_range
+    skip unless beginless_and_endless_range_supported?
+
+    create_user "2013-05-01"
+    create_user "2013-05-03"
+    expected = {
+      Date.parse("2013-05-01") => 1,
+      Date.parse("2013-05-02") => 0,
+      Date.parse("2013-05-03") => 1
+    }
+    assert_equal expected, call_method(:day, :created_at, series: true, range: nil..nil)
+  end
+
+  def beginless_and_endless_range_supported?
+    RUBY_VERSION.to_f >= 2.6
+  end
+
   # Brasilia Summer Time
 
   def test_brasilia_summer_time
