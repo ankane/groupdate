@@ -1,3 +1,7 @@
+## 5.2.2 (unreleased)
+
+- Added support for `nil..nil` ranges in `range` option
+
 ## 5.2.1 (2020-09-09)
 
 - Improved error message for invalid ranges
