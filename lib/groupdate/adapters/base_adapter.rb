@@ -5,7 +5,7 @@ module Groupdate
 
       def initialize(relation, column:, period:, time_zone:, time_range:, week_start:, day_start:, n_seconds:)
         # very important
-        validate_column(column)
+        column = validate_column(column)
 
         @relation = relation
         @column = resolve_column(relation, column)
@@ -46,11 +46,15 @@ module Groupdate
 
       # basic version of Active Record disallow_raw_sql!
       # symbol = column (safe), Arel node = SQL (safe), other = untrusted
+      # matches table.column and column
       def validate_column(column)
-        # matches table.column and column
-        unless column.is_a?(Symbol) || column.is_a?(Arel::Nodes::SqlLiteral) || /\A\w+(\.\w+)?\z/i.match(column.to_s)
-          warn "[groupdate] Non-attribute argument: #{column}. Use Arel.sql() for known-safe values. This will raise an error in Groupdate 6"
+        unless column.is_a?(Symbol) || column.is_a?(Arel::Nodes::SqlLiteral)
+          column = column.to_s
+          unless /\A\w+(\.\w+)?\z/i.match(column)
+            warn "[groupdate] Non-attribute argument: #{column}. Use Arel.sql() for known-safe values. This will raise an error in Groupdate 6"
+          end
         end
+        column
       end
 
       # resolves eagerly
