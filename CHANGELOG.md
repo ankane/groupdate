@@ -1,4 +1,4 @@
-## 5.2.2 (unreleased)
+## 5.2.2 (2021-02-08)
 
 - Added support for `nil..nil` ranges in `range` option
 
