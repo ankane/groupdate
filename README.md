@@ -223,6 +223,14 @@ raise "Unpermitted column" unless ["column_a", "column_b"].include?(column)
 User.group_by_day(column).count
 ```
 
+### Default Scopes
+
+If you use Postgres and have a default scope that uses `order`, you may get a `column must appear in the GROUP BY clause` error (just like with Active Record’s `group` method). Remove the `order` scope with:
+
+```ruby
+User.unscope(:order).group_by_day(:count).count
+```
+
 ## Arrays and Hashes
 
 ```ruby
