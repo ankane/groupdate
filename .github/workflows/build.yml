@@ -31,6 +31,7 @@ jobs:
         database: groupdate_test
     - uses: ankane/setup-mysql@v1
       with:
+        mysql-version: 5.7
         database: groupdate_test
     - run: mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
     - run: bundle exec rake test
