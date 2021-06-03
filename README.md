@@ -265,8 +265,6 @@ users.group_by_day { |u| u.created_at }.map { |k, v| [k, v.count] }.to_h
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 ```
 
-or copy and paste [these statements](https://gist.githubusercontent.com/ankane/1d6b0022173186accbf0/raw/time_zone_support.sql) into a SQL console.
-
 You can confirm it worked with:
 
 ```sql
