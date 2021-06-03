@@ -27,9 +27,10 @@ jobs:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
     - uses: ankane/setup-postgres@v1
+      with:
+        database: groupdate_test
     - uses: ankane/setup-mysql@v1
     - run: |
         mysqladmin create groupdate_test
         mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
-        createdb groupdate_test
     - run: bundle exec rake test
