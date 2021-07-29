@@ -46,6 +46,10 @@ class Minitest::Test
     ENV["ADAPTER"] == "postgresql"
   end
 
+  def mysql?
+    ENV["ADAPTER"] == "mysql"
+  end
+
   def create_user(created_at, score = 1)
     created_at = created_at.utc.to_s if created_at.is_a?(Time)
 
