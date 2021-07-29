@@ -23,6 +23,8 @@ class Post < ActiveRecord::Base
 end
 
 # migrations
+# TODO use ActiveRecord::Schema.define when Active Record 5.0 is no longer supported
+# https://github.com/rails/rails/issues/28730
 if ENV["ADAPTER"] == "redshift"
   if ActiveRecord::Migration.table_exists?(:users)
     ActiveRecord::Migration.drop_table(:users, force: :cascade)
