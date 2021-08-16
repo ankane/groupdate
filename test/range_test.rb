@@ -2,26 +2,24 @@ require_relative "test_helper"
 
 class RangeTest < Minitest::Test
   def test_range_date
-    ENV["TZ"] = "Europe/Oslo"
-    expected = {
-      Date.parse("2013-05-01") => 0,
-      Date.parse("2013-05-02") => 0,
-      Date.parse("2013-05-03") => 0
-    }
-    assert_equal expected, call_method(:day, :created_at, series: true, range: Date.parse("2013-05-01")..Date.parse("2013-05-03"))
-  ensure
-    ENV["TZ"] = "UTC"
+    with_tz("Europe/Oslo") do
+      expected = {
+        Date.parse("2013-05-01") => 0,
+        Date.parse("2013-05-02") => 0,
+        Date.parse("2013-05-03") => 0
+      }
+      assert_equal expected, call_method(:day, :created_at, series: true, range: Date.parse("2013-05-01")..Date.parse("2013-05-03"))
+    end
   end
 
   def test_range_date_exclude_end
-    ENV["TZ"] = "Europe/Oslo"
-    expected = {
-      Date.parse("2013-05-01") => 0,
-      Date.parse("2013-05-02") => 0
-    }
-    assert_equal expected, call_method(:day, :created_at, series: true, range: Date.parse("2013-05-01")...Date.parse("2013-05-03"))
-  ensure
-    ENV["TZ"] = "UTC"
+    with_tz("Europe/Oslo") do
+      expected = {
+        Date.parse("2013-05-01") => 0,
+        Date.parse("2013-05-02") => 0
+      }
+      assert_equal expected, call_method(:day, :created_at, series: true, range: Date.parse("2013-05-01")...Date.parse("2013-05-03"))
+    end
   end
 
   def test_range_string
@@ -122,5 +120,12 @@ class RangeTest < Minitest::Test
 
   def beginless_and_endless_range_supported?
     RUBY_VERSION.to_f >= 2.6
+  end
+
+  def with_tz(tz)
+    ENV["TZ"] = tz
+    yield
+  ensure
+    ENV["TZ"] = "UTC"
   end
 end
