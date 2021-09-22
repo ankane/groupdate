@@ -1,3 +1,7 @@
+## 5.2.3 (unreleased)
+
+- Fixed warnings with Active Record 7
+
 ## 5.2.2 (2021-02-08)
 
 - Added support for `nil..nil` ranges in `range` option
