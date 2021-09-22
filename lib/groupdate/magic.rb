@@ -176,6 +176,7 @@ module Groupdate
       end
 
       def check_nils(result, multiple_groups, relation)
+        p result
         has_nils = multiple_groups ? (result.keys.first && result.keys.first[group_index].nil?) : result.key?(nil)
         if has_nils
           if time_zone_support?(relation)
