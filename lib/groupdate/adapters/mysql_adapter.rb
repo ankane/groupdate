@@ -49,7 +49,8 @@ module Groupdate
       end
 
       def clean_group_clause(clause)
-        clause.gsub(/ (\-|\+) INTERVAL 0 second/, "")
+        # zero quoted in Active Record 7+
+        clause.gsub(/ (\-|\+) INTERVAL 0 second/, "").gsub(/ (\-|\+) INTERVAL '0' second/, "")
       end
     end
   end
