@@ -1,6 +1,6 @@
-## 5.2.3 (unreleased)
+## 5.2.3 (2021-12-06)
 
-- Fixed warnings with Active Record 7
+- Fixed error and warnings with Active Record 7
 
 ## 5.2.2 (2021-02-08)
 
