@@ -1,4 +1,4 @@
-## 5.2.4 (unreleased)
+## 5.2.4 (2021-12-15)
 
 - Simplified queries for Active Record 7 and MySQL
 
