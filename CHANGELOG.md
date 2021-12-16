@@ -1,3 +1,7 @@
+## 5.2.4 (unreleased)
+
+- Simplified queries for Active Record 7 and MySQL
+
 ## 5.2.3 (2021-12-06)
 
 - Fixed error and warnings with Active Record 7
