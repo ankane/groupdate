@@ -7,7 +7,7 @@ module Groupdate
 
         query =
           if period == :week
-            ["strftime('%Y-%m-%d 00:00:00 UTC', #{column}, '-6 days', ?)", "weekday #{(week_start + 1) % 7}"]
+            ["strftime('%Y-%m-%d', #{column}, '-6 days', ?)", "weekday #{(week_start + 1) % 7}"]
           elsif period == :custom
             ["datetime((strftime('%s', #{column}) / ?) * ?, 'unixepoch')", n_seconds, n_seconds]
           else
@@ -32,13 +32,13 @@ module Groupdate
               when :hour
                 "%Y-%m-%d %H:00:00 UTC"
               when :day
-                "%Y-%m-%d 00:00:00 UTC"
+                "%Y-%m-%d"
               when :month
-                "%Y-%m-01 00:00:00 UTC"
+                "%Y-%m-01"
               when :quarter
                 raise Groupdate::Error, "Quarter not supported for SQLite"
               else # year
-                "%Y-01-01 00:00:00 UTC"
+                "%Y-01-01"
               end
 
             ["strftime(?, #{column})", format]
