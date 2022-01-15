@@ -193,11 +193,15 @@ module Groupdate
         adapter = Groupdate.adapters[adapter_name]
         raise Groupdate::Error, "Connection adapter not supported: #{adapter_name}" unless adapter
 
+        # very important
+        column = validate_column(field)
+        column = resolve_column(relation, column)
+
         # generate ActiveRecord relation
         relation =
           adapter.new(
             relation,
-            column: field,
+            column: column,
             period: magic.period,
             time_zone: magic.time_zone,
             time_range: magic.time_range,
@@ -211,6 +215,30 @@ module Groupdate
         (relation.groupdate_values ||= []) << magic
 
         relation
+      end
+
+      class << self
+        # basic version of Active Record disallow_raw_sql!
+        # symbol = column (safe), Arel node = SQL (safe), other = untrusted
+        # matches table.column and column
+        def validate_column(column)
+          unless column.is_a?(Symbol) || column.is_a?(Arel::Nodes::SqlLiteral)
+            column = column.to_s
+            unless /\A\w+(\.\w+)?\z/i.match(column)
+              warn "[groupdate] Non-attribute argument: #{column}. Use Arel.sql() for known-safe values. This will raise an error in Groupdate 6"
+            end
+          end
+          column
+        end
+
+        # resolves eagerly
+        # need to convert both where_clause (easy)
+        # and group_clause (not easy) if want to avoid this
+        def resolve_column(relation, column)
+          node = relation.send(:relation).send(:arel_columns, [column]).first
+          node = Arel::Nodes::SqlLiteral.new(node) if node.is_a?(String)
+          relation.connection.visitor.accept(node, Arel::Collectors::SQLString.new).value
+        end
       end
 
       # allow any options to keep flexible for future
