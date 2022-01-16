@@ -145,6 +145,15 @@ module Groupdate
             lambda { |k| k.to_i }
           when :day_of_week
             lambda { |k| (k.to_i - 1 - week_start) % 7 }
+          when :day, :week, :month, :quarter, :year
+            if day_start != 0
+              day_start_hour = day_start / 3600
+              day_start_min = (day_start % 3600) / 60
+              day_start_sec = (day_start % 3600) % 60
+              lambda { |k| k.in_time_zone(time_zone).change(hour: day_start_hour, min: day_start_min, sec: day_start_sec) }
+            else
+              lambda { |k| k.in_time_zone(time_zone) }
+            end
           else
             utc = ActiveSupport::TimeZone["UTC"]
             lambda { |k| (k.is_a?(String) || !k.respond_to?(:to_time) ? utc.parse(k.to_s) : k.to_time).in_time_zone(time_zone) }

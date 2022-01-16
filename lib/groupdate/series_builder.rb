@@ -2,8 +2,6 @@ module Groupdate
   class SeriesBuilder
     attr_reader :period, :time_zone, :day_start, :week_start, :n_seconds, :options
 
-    CHECK_PERIODS = [:day, :week, :month, :quarter, :year]
-
     def initialize(period:, time_zone:, day_start:, week_start:, n_seconds:, **options)
       @period = period
       @time_zone = time_zone
@@ -21,35 +19,6 @@ module Groupdate
       verified_data = {}
       series.each do |k|
         verified_data[k] = data.delete(k)
-      end
-
-      # this is a fun one
-      # PostgreSQL and Ruby both return the 2nd hour when converting/parsing a backward DST change
-      # Other databases and Active Support return the 1st hour (as expected)
-      # Active Support good: ActiveSupport::TimeZone["America/Los_Angeles"].parse("2013-11-03 01:00:00")
-      # MySQL good: SELECT CONVERT_TZ('2013-11-03 01:00:00', 'America/Los_Angeles', 'Etc/UTC');
-      # Ruby not good: Time.parse("2013-11-03 01:00:00")
-      # PostgreSQL not good: SELECT '2013-11-03 01:00:00'::timestamp AT TIME ZONE 'America/Los_Angeles';
-      # we need to account for this here
-      if series_default && CHECK_PERIODS.include?(period)
-        data.each do |k, v|
-          key = multiple_groups ? k[group_index] : k
-          # TODO only do this for PostgreSQL
-          # this may mask some inconsistent time zone errors
-          # but not sure there's a better approach
-          if key.hour == (key - 1.hour).hour && series.include?(key - 1.hour)
-            key -= 1.hour
-            if multiple_groups
-              k[group_index]  = key
-            else
-              k = key
-            end
-            verified_data[k] = v
-          elsif key != round_time(key)
-            # only need to show what database returned since it will cast in Ruby time zone
-            raise Groupdate::Error, "Database and Ruby have inconsistent time zone info. Database returned #{key}"
-          end
-        end
       end
 
       unless entire_series?(series_default)

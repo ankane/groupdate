@@ -12,7 +12,6 @@ require "groupdate/version"
 require "groupdate/adapters/base_adapter"
 require "groupdate/adapters/mysql_adapter"
 require "groupdate/adapters/postgresql_adapter"
-require "groupdate/adapters/redshift_adapter"
 require "groupdate/adapters/sqlite_adapter"
 
 module Groupdate
@@ -46,8 +45,7 @@ module Groupdate
 end
 
 Groupdate.register_adapter ["Mysql2", "Mysql2Spatial", "Mysql2Rgeo"], Groupdate::Adapters::MySQLAdapter
-Groupdate.register_adapter ["PostgreSQL", "PostGIS"], Groupdate::Adapters::PostgreSQLAdapter
-Groupdate.register_adapter "Redshift", Groupdate::Adapters::RedshiftAdapter
+Groupdate.register_adapter ["PostgreSQL", "PostGIS", "Redshift"], Groupdate::Adapters::PostgreSQLAdapter
 Groupdate.register_adapter "SQLite", Groupdate::Adapters::SQLiteAdapter
 
 require "groupdate/enumerable"

@@ -30,12 +30,10 @@ class DayStartTest < Minitest::Test
   end
 
   def test_week_end_of_week_with_time_zone
-    skip "Issue possibly related to alias length with MySQL 8" if mysql?
     assert_result_date :week, "2013-03-17", "2013-03-24 08:59:59", true, day_start: 2
   end
 
   def test_week_start_of_week_with_time_zone
-    skip "Issue possibly related to alias length with MySQL 8" if mysql?
     assert_result_date :week, "2013-03-17", "2013-03-17 09:00:00", true, day_start: 2
   end
 
@@ -68,12 +66,10 @@ class DayStartTest < Minitest::Test
   end
 
   def test_quarter_end_of_quarter_with_time_zone
-    skip "Issue possibly related to alias length with MySQL 8" if mysql?
     assert_result_date :quarter, "2013-01-01", "2013-04-01 08:59:59", true, day_start: 2
   end
 
   def test_quarter_start_of_quarter_with_time_zone
-    skip "Issue possibly related to alias length with MySQL 8" if mysql?
     assert_result_date :quarter, "2013-01-01", "2013-01-01 10:00:00", true, day_start: 2
   end
 
@@ -224,13 +220,11 @@ class DayStartTest < Minitest::Test
   end
 
   def test_dst_week_spring
-    skip "Issue possibly related to alias length with MySQL 8" if mysql?
     time = pt.parse("2013-03-10 03:00:00")
     assert_result_date :week, "2013-03-10", time, true, day_start: 3
   end
 
   def test_dst_week_fall
-    skip "Issue possibly related to alias length with MySQL 8" if mysql?
     time = pt.parse("2013-11-03 01:00:00") + 1.hour # second 1 am of the day
     assert_result_date :week, "2013-11-03", time, true, day_start: 1
   end
