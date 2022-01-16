@@ -23,12 +23,10 @@ class RangeTest < Minitest::Test
   end
 
   def test_range_string
-    create_user "2013-05-01"
-    message = "[groupdate] Range bounds should be Date or Time, not String. This will raise an error in Groupdate 6"
-    _, stderr = capture_io do
+    error = assert_raises(ArgumentError) do
       call_method(:day, :created_at, range: "2013-05-01".."2013-05-04")
     end
-    assert_match message, stderr
+    assert_equal "Range bounds should be Date or Time, not String", error.message
   end
 
   def test_range_numeric

@@ -106,10 +106,6 @@ module Groupdate
             case v
             when nil, Date, Time
               # good
-            when String
-              # TODO raise error in Groupdate 6
-              warn "[groupdate] Range bounds should be Date or Time, not #{v.class.name}. This will raise an error in Groupdate 6"
-              break
             else
               raise ArgumentError, "Range bounds should be Date or Time, not #{v.class.name}"
             end
