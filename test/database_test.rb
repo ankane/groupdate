@@ -152,7 +152,7 @@ class DatabaseTest < Minitest::Test
   end
 
   def test_column_string_function
-    function = sqlite? ? "datetime('now')" : "NOW()"
+    function = now_function
     message = "[groupdate] Non-attribute argument: #{function}. Use Arel.sql() for known-safe values. This will raise an error in Groupdate 6\n"
     _, stderr = capture_io do
       User.joins(:posts).group_by_day(function).count
@@ -161,7 +161,7 @@ class DatabaseTest < Minitest::Test
   end
 
   def test_column_string_function_arel
-    function = sqlite? ? "datetime('now')" : "NOW()"
+    function = now_function
     assert_empty User.joins(:posts).group_by_day(Arel.sql(function)).count
   end
 
@@ -354,5 +354,15 @@ class DatabaseTest < Minitest::Test
 
   def this_month
     Time.now.month
+  end
+
+  def now_function
+    if sqlite?
+      "datetime('now')"
+    elsif redshift?
+      "GETDATE()"
+    else
+      "NOW()"
+    end
   end
 end
