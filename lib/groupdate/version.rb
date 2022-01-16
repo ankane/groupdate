@@ -1,3 +1,3 @@
 module Groupdate
-  VERSION = "5.2.4"
+  VERSION = "6.0.0"
 end

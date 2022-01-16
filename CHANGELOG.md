@@ -1,4 +1,4 @@
-## 6.0.0 (unreleased)
+## 6.0.0 (2022-01-15)
 
 - Changed SQL to return dates instead of times for day, week, month, quarter, and year
 - Added `n` option for Redshift
