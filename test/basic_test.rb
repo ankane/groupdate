@@ -350,7 +350,7 @@ class BasicTest < Minitest::Test
           while time < end_at
             # prevent mysql error
             if time.utc.to_s != "2013-03-10 02:00:00 UTC"
-              assert_result_time :week, start_at.utc.to_s, time, true, dates: false, day_start: hour, week_start: week_start
+              assert_result_time :week, start_at.utc.to_s, time, true, day_start: hour, week_start: week_start
               if enumerable?
                 @users = []
               else

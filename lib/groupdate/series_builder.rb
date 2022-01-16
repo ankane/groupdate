@@ -247,7 +247,6 @@ module Groupdate
     def key_format
       @key_format ||= begin
         locale = options[:locale] || I18n.locale
-        use_dates = options.key?(:dates) ? options[:dates] : Groupdate.dates
 
         if options[:format]
           if options[:format].respond_to?(:call)
@@ -270,7 +269,7 @@ module Groupdate
               I18n.localize(key, format: options[:format], locale: locale)
             end
           end
-        elsif [:day, :week, :month, :quarter, :year].include?(period) && use_dates
+        elsif [:day, :week, :month, :quarter, :year].include?(period)
           lambda { |k| k.to_date }
         else
           lambda { |k| k }

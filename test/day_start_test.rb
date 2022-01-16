@@ -238,36 +238,4 @@ class DayStartTest < Minitest::Test
     time = pt.parse("2013-11-03 01:00:00") + 1.hour # second 1 am of the day
     assert_result :hour_of_day, 0, time, true, day_start: 1
   end
-
-  def test_dst_dates_false_spring_before
-    ["2013-03-09", "2013-03-10", "2013-03-11"].each do |week|
-      create_user pt.parse(week) + 12.hours
-    end
-    results = call_method(:day, :created_at, day_start: 2, dates: false, time_zone: pt)
-    assert_equal [2, 3, 2], results.keys.map(&:hour)
-  end
-
-  def test_dst_dates_false_spring_after
-    ["2013-03-09", "2013-03-10", "2013-03-11"].each do |week|
-      create_user pt.parse(week) + 12.hours
-    end
-    results = call_method(:day, :created_at, day_start: 3, dates: false, time_zone: pt)
-    assert_equal [3, 3, 3], results.keys.map(&:hour)
-  end
-
-  def test_dst_dates_false_fall_before
-    ["2013-11-02", "2013-11-03", "2013-11-04"].each do |week|
-      create_user pt.parse(week) + 12.hours
-    end
-    results = call_method(:day, :created_at, day_start: 1, dates: false, time_zone: pt)
-    assert_equal [1, 1, 1], results.keys.map(&:hour)
-  end
-
-  def test_dst_dates_false_fall_after
-    ["2013-11-02", "2013-11-03", "2013-11-04"].each do |week|
-      create_user pt.parse(week) + 12.hours
-    end
-    results = call_method(:day, :created_at, day_start: 2, dates: false, time_zone: pt)
-    assert_equal [2, 2, 2], results.keys.map(&:hour)
-  end
 end

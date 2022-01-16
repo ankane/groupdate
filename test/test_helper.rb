@@ -123,7 +123,6 @@ class Minitest::Test
     end
     expected = {expected_time => 1}
 
-    assert_equal expected, call_method(method, :created_at, options.merge(dates: false, time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
     # assert_equal expected, call_method(method, :created_on, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
   end
 
