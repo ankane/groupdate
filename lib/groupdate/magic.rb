@@ -146,6 +146,7 @@ module Groupdate
           when :day_of_week
             lambda { |k| (k.to_i - 1 - week_start) % 7 }
           when :day, :week, :month, :quarter, :year
+            # TODO keep as date
             if day_start != 0
               day_start_hour = day_start / 3600
               day_start_min = (day_start % 3600) / 60
