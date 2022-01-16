@@ -1,4 +1,4 @@
-## 6.0.1 (unreleased)
+## 6.0.1 (2022-01-16)
 
 - Fixed incorrect results (error before 6.0) with `includes` with Active Record 6.1+
 
