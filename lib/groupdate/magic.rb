@@ -234,7 +234,7 @@ module Groupdate
           unless column.is_a?(Symbol) || column.is_a?(Arel::Nodes::SqlLiteral)
             column = column.to_s
             unless /\A\w+(\.\w+)?\z/i.match(column)
-              warn "[groupdate] Non-attribute argument: #{column}. Use Arel.sql() for known-safe values. This will raise an error in Groupdate 6"
+              raise ActiveRecord::UnknownAttributeReference, "Query method called with non-attribute argument(s): #{column.inspect}. Use Arel.sql() for known-safe values."
             end
           end
           column

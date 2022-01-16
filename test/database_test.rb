@@ -153,11 +153,10 @@ class DatabaseTest < Minitest::Test
 
   def test_column_string_function
     function = now_function
-    message = "[groupdate] Non-attribute argument: #{function}. Use Arel.sql() for known-safe values. This will raise an error in Groupdate 6\n"
-    _, stderr = capture_io do
-      User.joins(:posts).group_by_day(function).count
+    error = assert_raises(ActiveRecord::UnknownAttributeReference) do
+      User.joins(:posts).group_by_day(now_function).count
     end
-    assert_match message, stderr
+    assert_equal "Query method called with non-attribute argument(s): \"#{function}\". Use Arel.sql() for known-safe values.", error.message
   end
 
   def test_column_string_function_arel

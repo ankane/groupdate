@@ -3,6 +3,7 @@
 - Changed SQL to return dates instead of times for day, week, month, quarter, and year
 - Added `n` option for Redshift
 - Removed `dates` option
+- Raise `ActiveRecord::UnknownAttributeReference` for non-attribute arguments
 - Raise error for ranges with string bounds
 - Dropped support for Ruby < 2.6 and Rails < 5.2
 
