@@ -26,7 +26,7 @@ module Groupdate
       end
 
       value = 0
-      result = Hash[series.map do |k|
+      result = series.to_h do |k|
         value = verified_data[k] || (@options[:carry_forward] && value) || default_value
         key =
           if multiple_groups
@@ -36,7 +36,7 @@ module Groupdate
           end
 
         [key, value]
-      end]
+      end
 
       result
     end
