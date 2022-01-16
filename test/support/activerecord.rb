@@ -27,31 +27,25 @@ class Post < ActiveRecord::Base
 end
 
 # migrations
-# TODO use ActiveRecord::Schema.define when Active Record 5.0 is no longer supported
-# https://github.com/rails/rails/issues/28730
-if ENV["ADAPTER"] == "redshift"
-  if ActiveRecord::Migration.table_exists?(:users)
-    ActiveRecord::Migration.drop_table(:users, force: :cascade)
-  end
+ActiveRecord::Schema.define do
+  if ENV["ADAPTER"] == "redshift"
+    drop_table(:users, force: :cascade) if table_exists?(:users)
+    drop_table(:posts, force: :cascade) if table_exists?(:posts)
 
-  if ActiveRecord::Migration.table_exists?(:posts)
-    ActiveRecord::Migration.drop_table(:posts, force: :cascade)
-  end
+    execute "CREATE TABLE users (id INT IDENTITY(1,1) PRIMARY KEY, name VARCHAR(255), score INT, created_at DATETIME, created_on DATE);"
+    execute "CREATE TABLE posts (id INT IDENTITY(1,1) PRIMARY KEY, user_id INT REFERENCES users, created_at DATETIME);"
+  else
+    create_table :users, force: true do |t|
+      t.string :name
+      t.integer :score
+      t.datetime :created_at
+      t.column :deleted_at, :timestamptz if ENV["ADAPTER"] == "postgresql"
+      t.date :created_on
+    end
 
-  ActiveRecord::Migration.execute "CREATE TABLE users (id INT IDENTITY(1,1) PRIMARY KEY, name VARCHAR(255), score INT, created_at DATETIME, created_on DATE);"
-
-  ActiveRecord::Migration.execute "CREATE TABLE posts (id INT IDENTITY(1,1) PRIMARY KEY, user_id INT REFERENCES users, created_at DATETIME);"
-else
-  ActiveRecord::Migration.create_table :users, force: true do |t|
-    t.string :name
-    t.integer :score
-    t.datetime :created_at
-    t.column :deleted_at, :timestamptz if ENV["ADAPTER"] == "postgresql"
-    t.date :created_on
-  end
-
-  ActiveRecord::Migration.create_table :posts, force: true do |t|
-    t.references :user
-    t.datetime :created_at
+    create_table :posts, force: true do |t|
+      t.references :user
+      t.datetime :created_at
+    end
   end
 end
