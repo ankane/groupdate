@@ -1,6 +1,7 @@
-## 5.2.5 (unreleased)
+## 6.0.0 (unreleased)
 
 - Added `n` option for Redshift
+- Dropped support for Ruby < 2.6 and Rails < 5.2
 
 ## 5.2.4 (2021-12-15)
 

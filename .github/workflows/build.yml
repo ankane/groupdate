@@ -14,10 +14,6 @@ jobs:
           gemfile: gemfiles/activerecord60.gemfile
         - ruby: 2.6
           gemfile: gemfiles/activerecord52.gemfile
-        - ruby: 2.5
-          gemfile: gemfiles/activerecord51.gemfile
-        - ruby: 2.4
-          gemfile: gemfiles/activerecord50.gemfile
     runs-on: ubuntu-latest
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
