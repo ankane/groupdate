@@ -12,7 +12,6 @@ require "groupdate/version"
 require "groupdate/adapters/base_adapter"
 require "groupdate/adapters/mysql_adapter"
 require "groupdate/adapters/postgresql_adapter"
-require "groupdate/adapters/redshift_adapter"
 require "groupdate/adapters/sqlite_adapter"
 
 module Groupdate
