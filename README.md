@@ -22,7 +22,7 @@ Supports PostgreSQL, MySQL, and Redshift, plus arrays and hashes (and limited su
 Add this line to your application’s Gemfile:
 
 ```ruby
-gem 'groupdate'
+gem "groupdate"
 ```
 
 For MySQL and SQLite, also follow [these instructions](#additional-instructions).
@@ -210,19 +210,6 @@ If grouping on date columns which don’t need time zone conversion, use:
 User.group_by_week(:created_on, time_zone: false).count
 ```
 
-### User Input
-
-If passing user input as the column, be sure to sanitize it first [like you must](https://rails-sqli.org/) with `group`.
-
-```ruby
-column = params[:column]
-
-# check against permitted columns
-raise "Unpermitted column" unless ["column_a", "column_b"].include?(column)
-
-User.group_by_day(column).count
-```
-
 ### Default Scopes
 
 If you use Postgres and have a default scope that uses `order`, you may get a `column must appear in the GROUP BY clause` error (just like with Active Record’s `group` method). Remove the `order` scope with:
@@ -289,13 +276,15 @@ Groupdate.time_zone = false
 
 ## Upgrading
 
-### 5.0
+### 6.0
 
-Groupdate 5.0 brings a number of improvements. Here are a few to be aware of:
+Groupdate 6.0 protects against unsafe input by default. For non-attribute arguments, use:
 
-- The `week_start` option is now supported for SQLite
-- The `day_start` option is now consistent between Active Record and enumerable
-- Deprecated positional arguments for time zone and range have been removed
+```ruby
+User.group_by_day(Arel.sql(known_safe_value)).count
+```
+
+Also, the `dates` option has been removed.
 
 ## History
 
