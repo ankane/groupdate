@@ -75,6 +75,13 @@ class ColumnTest < Minitest::Test
     assert_equal "wrong number of arguments (given 0, expected 1)", error.message
   end
 
+  def test_bad
+    create_user "2018-01-01"
+    assert_raises do
+      User.group_by_day(:name).count
+    end
+  end
+
   private
 
   def now_function

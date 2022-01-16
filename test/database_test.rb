@@ -247,15 +247,6 @@ class DatabaseTest < Minitest::Test
     assert_equal 0, call_method(:hour_of_day, :created_at, range: true, series: true)[0]
   end
 
-  # bad column
-
-  def test_bad_column
-    create_user "2018-01-01"
-    assert_raises do
-      User.group_by_day(:name).count
-    end
-  end
-
   # n
 
   def test_n
