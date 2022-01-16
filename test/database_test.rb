@@ -227,6 +227,22 @@ class DatabaseTest < Minitest::Test
     Post.delete_all
   end
 
+  # https://github.com/ankane/groupdate/issues/222#issuecomment-914343044
+  def test_left_outer_joins
+    date = 11.months.ago.in_time_zone(utc).to_date
+    create_user(date.to_s)
+    result = User.left_outer_joins(:posts).where(posts: {id: nil}).group_by_month(:created_at, last: 12, format: "%B").count
+    assert_equal 1, result[date.strftime("%B")]
+  end
+
+  # https://github.com/ankane/groupdate/issues/222#issuecomment-914343044
+  def test_includes
+    date = 11.months.ago.in_time_zone(utc).to_date
+    create_user(date.to_s)
+    result = User.includes(:posts).where(posts: {id: nil}).group_by_month(:created_at, last: 12, format: "%B").count
+    assert_equal 1, result[date.strftime("%B")]
+  end
+
   # activerecord default_timezone option
 
   def test_default_timezone_local
