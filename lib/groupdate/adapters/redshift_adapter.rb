@@ -27,7 +27,7 @@ module Groupdate
             week_start_interval = "#{week_start} day"
             ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC('week', #{day_start_column} - INTERVAL ?) + INTERVAL ? + INTERVAL ?)::timestamp", time_zone, time_zone, day_start_interval, week_start_interval, week_start_interval, day_start_interval]
           when :custom
-            raise Groupdate::Error, "Not implemented yet"
+            ["TIMESTAMP 'epoch' + (FLOOR(EXTRACT(EPOCH FROM #{column}::timestamp) / ?) * ?) * INTERVAL '1 second'", n_seconds, n_seconds]
           else
             ["CONVERT_TIMEZONE(?, 'Etc/UTC', DATE_TRUNC(?, #{day_start_column}) + INTERVAL ?)::timestamp", time_zone, period, time_zone, day_start_interval, day_start_interval]
           end
