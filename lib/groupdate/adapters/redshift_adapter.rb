@@ -9,17 +9,17 @@ module Groupdate
         query =
           case period
           when :minute_of_hour
-            ["EXTRACT(MINUTE from #{day_start_column})::integer", time_zone, day_start_interval]
+            ["EXTRACT(MINUTE FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :hour_of_day
-            ["EXTRACT(HOUR from #{day_start_column})::integer", time_zone, day_start_interval]
+            ["EXTRACT(HOUR FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :day_of_week
-            ["EXTRACT(DOW from #{day_start_column})::integer", time_zone, day_start_interval]
+            ["EXTRACT(DOW FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :day_of_month
-            ["EXTRACT(DAY from #{day_start_column})::integer", time_zone, day_start_interval]
+            ["EXTRACT(DAY FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :day_of_year
-            ["EXTRACT(DOY from #{day_start_column})::integer", time_zone, day_start_interval]
+            ["EXTRACT(DOY FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :month_of_year
-            ["EXTRACT(MONTH from #{day_start_column})::integer", time_zone, day_start_interval]
+            ["EXTRACT(MONTH FROM #{day_start_column})::integer", time_zone, day_start_interval]
           when :week # start on Sunday, not Redshift default Monday
             # Redshift does not return timezone information; it
             # always says it is in UTC time, so we must convert
