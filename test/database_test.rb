@@ -152,16 +152,14 @@ class DatabaseTest < Minitest::Test
   end
 
   def test_column_string_function
-    function = now_function
     error = assert_raises(ActiveRecord::UnknownAttributeReference) do
       User.joins(:posts).group_by_day(now_function).count
     end
-    assert_equal "Query method called with non-attribute argument(s): \"#{function}\". Use Arel.sql() for known-safe values.", error.message
+    assert_equal "Query method called with non-attribute argument(s): \"#{now_function}\". Use Arel.sql() for known-safe values.", error.message
   end
 
   def test_column_string_function_arel
-    function = now_function
-    assert_empty User.joins(:posts).group_by_day(Arel.sql(function)).count
+    assert_empty User.joins(:posts).group_by_day(Arel.sql(now_function)).count
   end
 
   def test_column_symbol_with_join

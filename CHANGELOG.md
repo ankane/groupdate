@@ -4,7 +4,7 @@
 - Added `n` option for Redshift
 - Removed `dates` option
 - Raise `ActiveRecord::UnknownAttributeReference` for non-attribute arguments
-- Raise error for ranges with string bounds
+- Raise `ArgumentError` for ranges with string bounds
 - Dropped support for Ruby < 2.6 and Rails < 5.2
 
 ## 5.2.4 (2021-12-15)
