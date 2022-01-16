@@ -215,6 +215,8 @@ class DatabaseTest < Minitest::Test
       Date.parse("2014-04-01") => 1
     }
     assert_equal expected, user.posts.group_by_day(:created_at).count
+  ensure
+    Post.delete_all
   end
 
   def test_associations_period
@@ -224,6 +226,8 @@ class DatabaseTest < Minitest::Test
       Date.parse("2014-04-01") => 1
     }
     assert_equal expected, user.posts.group_by_period(:day, :created_at).count
+  ensure
+    Post.delete_all
   end
 
   # activerecord default_timezone option
