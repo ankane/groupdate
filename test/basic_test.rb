@@ -253,6 +253,13 @@ class BasicTest < Minitest::Test
     assert_equal time_zone, call_method(:hour, :created_at, time_zone: time_zone).keys.first.time_zone.name
   end
 
+  def test_time_zone_bad
+    error = assert_raises(ArgumentError) do
+      call_method(:hour, :created_at, time_zone: "bad")
+    end
+    assert_equal "Unrecognized time zone", error.message
+  end
+
   # date column
 
   def test_date_column
