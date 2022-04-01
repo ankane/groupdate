@@ -1,7 +1,7 @@
 require_relative "test_helper"
 
 class RangeTest < Minitest::Test
-  def test_range_date
+  def test_date
     with_tz("Europe/Oslo") do
       expected = {
         Date.parse("2013-05-01") => 0,
@@ -12,7 +12,7 @@ class RangeTest < Minitest::Test
     end
   end
 
-  def test_range_date_exclude_end
+  def test_date_exclude_end
     with_tz("Europe/Oslo") do
       expected = {
         Date.parse("2013-05-01") => 0,
@@ -22,14 +22,14 @@ class RangeTest < Minitest::Test
     end
   end
 
-  def test_range_string
+  def test_string
     error = assert_raises(ArgumentError) do
       call_method(:day, :created_at, range: "2013-05-01".."2013-05-04")
     end
     assert_equal "Range bounds should be Date or Time, not String", error.message
   end
 
-  def test_range_numeric
+  def test_numeric
     error = assert_raises(ArgumentError) do
       call_method(:day, :created_at, range: 1..3)
     end
@@ -38,7 +38,7 @@ class RangeTest < Minitest::Test
 
   # beginless range
 
-  def test_beginless_range
+  def test_beginless
     skip unless beginless_range_supported?
 
     create_user "2013-05-01"
@@ -53,7 +53,7 @@ class RangeTest < Minitest::Test
     assert_equal expected, call_method(:day, :created_at, series: true, range: eval('..Date.parse("2013-05-04")'))
   end
 
-  def test_beginless_range_exclude_end
+  def test_beginless_exclude_end
     skip unless beginless_range_supported?
 
     create_user "2013-05-01"
@@ -66,7 +66,7 @@ class RangeTest < Minitest::Test
     assert_equal expected, call_method(:day, :created_at, series: true, range: eval('...Date.parse("2013-05-04")'))
   end
 
-  def test_beginless_range_empty
+  def test_beginless_empty
     skip unless beginless_range_supported?
 
     assert_empty call_method(:day, :created_at, series: true, range: eval('..Date.parse("2013-05-04")'))
@@ -78,7 +78,7 @@ class RangeTest < Minitest::Test
 
   # endless range
 
-  def test_endless_range
+  def test_endless
     create_user "2013-01-01"
     create_user "2013-05-03"
     expected = {
@@ -89,13 +89,13 @@ class RangeTest < Minitest::Test
     assert_equal expected, call_method(:day, :created_at, series: true, range: eval('Date.parse("2013-05-01")..'))
   end
 
-  def test_endless_range_empty
+  def test_endless_empty
     assert_empty call_method(:day, :created_at, series: true, range: eval('Date.parse("2013-05-01")..'))
   end
 
   # beginless and endless range
 
-  def test_beginless_and_endless_range
+  def test_beginless_and_endless
     create_user "2013-05-01"
     create_user "2013-05-03"
     expected = {
