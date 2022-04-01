@@ -125,30 +125,22 @@ module Groupdate
 
           time_range = Range.new(start, finish, exclude_end)
         elsif !time_range && options[:last]
-          if period == :quarter
-            step = 3.months
-          elsif period == :custom
-            step = n_seconds
-          elsif 1.respond_to?(period)
-            step = 1.send(period)
-          else
-            raise ArgumentError, "Cannot use last option with #{period}"
-          end
-          if step
-            # loop instead of multiply to change start_at - see #151
-            start_at = now
-            (options[:last].to_i - 1).times do
-              start_at -= step
-            end
+          step = step()
+          raise ArgumentError, "Cannot use last option with #{period}" unless step
 
-            time_range =
-              if options[:current] == false
-                round_time(start_at - step)...round_time(now)
-              else
-                # extend to end of current period
-                round_time(start_at)...(round_time(now) + step)
-              end
+          # loop instead of multiply to change start_at - see #151
+          start_at = now
+          (options[:last].to_i - 1).times do
+            start_at -= step
           end
+
+          time_range =
+            if options[:current] == false
+              round_time(start_at - step)...round_time(now)
+            else
+              # extend to end of current period
+              round_time(start_at)...(round_time(now) + step)
+            end
         end
         time_range
       end
@@ -210,13 +202,7 @@ module Groupdate
         if time_range.begin
           series = [round_time(time_range.begin)]
 
-          if period == :quarter
-            step = 3.months
-          elsif period == :custom
-            step = n_seconds
-          else
-            step = 1.send(period)
-          end
+          step = step()
 
           last_step = series.last
           day_start_hour = day_start / 3600
@@ -270,6 +256,16 @@ module Groupdate
         else
           lambda { |k| k }
         end
+      end
+    end
+
+    def step
+      if period == :quarter
+        3.months
+      elsif period == :custom
+        n_seconds
+      elsif 1.respond_to?(period)
+        1.send(period)
       end
     end
 
