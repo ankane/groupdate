@@ -1,3 +1,7 @@
+## 6.1.0 (unreleased)
+
+- Added `expand_range` option
+
 ## 6.0.1 (2022-01-16)
 
 - Fixed incorrect results (error before 6.0) with `includes` with Active Record 6.1+

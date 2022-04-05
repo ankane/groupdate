@@ -123,6 +123,14 @@ module Groupdate
             exclude_end = true
           end
 
+          if options[:expand_range]
+            start = round_time(start) if start
+            if finish && !(finish == round_time(finish) && exclude_end)
+              finish = round_time(finish) + step
+              exclude_end = true
+            end
+          end
+
           time_range = Range.new(start, finish, exclude_end)
         elsif !time_range && options[:last]
           step = step()

@@ -22,7 +22,7 @@ module Groupdate
     end
 
     def validate_keywords
-      known_keywords = [:time_zone, :series, :format, :locale, :range, :reverse]
+      known_keywords = [:time_zone, :series, :format, :locale, :range, :expand_range, :reverse]
 
       if %i[week day_of_week].include?(period)
         known_keywords << :week_start

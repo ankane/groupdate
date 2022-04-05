@@ -36,6 +36,30 @@ class RangeTest < Minitest::Test
     assert_equal "Range bounds should be Date or Time, not Integer", error.message
   end
 
+  # expand range
+
+  def test_expand_range
+    create_user "2013-01-01"
+    create_user "2013-12-31"
+
+    expected = {Date.parse("2013-01-01") => 0}
+    assert_equal expected, call_method(:year, :created_at, series: true, range: Date.parse("2013-01-02")..Date.parse("2013-12-30"))
+
+    expected = {Date.parse("2013-01-01") => 2}
+    assert_equal expected, call_method(:year, :created_at, series: true, range: Date.parse("2013-01-02")..Date.parse("2013-12-30"), expand_range: true)
+  end
+
+  def test_expand_range_exclude_end
+    create_user "2013-12-31"
+    create_user "2014-01-01"
+
+    expected = {Date.parse("2013-01-01") => 1}
+    assert_equal expected, call_method(:year, :created_at, series: true, range: Date.parse("2013-01-02")...Date.parse("2014-01-01"), expand_range: true)
+
+    expected = {Date.parse("2013-01-01") => 1, Date.parse("2014-01-01") => 1}
+    assert_equal expected, call_method(:year, :created_at, series: true, range: Date.parse("2013-01-02")..Date.parse("2014-01-01"), expand_range: true)
+  end
+
   # beginless range
 
   def test_beginless
