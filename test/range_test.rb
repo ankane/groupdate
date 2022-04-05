@@ -42,7 +42,8 @@ class RangeTest < Minitest::Test
     create_user "2013-01-01"
     create_user "2013-12-31"
 
-    expected = {Date.parse("2013-01-01") => 0}
+    # enumerable does not filter values
+    expected = {Date.parse("2013-01-01") => enumerable? ? 2 : 0}
     assert_equal expected, call_method(:year, :created_at, series: true, range: Date.parse("2013-01-02")..Date.parse("2013-12-30"))
 
     expected = {Date.parse("2013-01-01") => 2}
