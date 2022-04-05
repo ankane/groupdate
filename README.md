@@ -119,7 +119,7 @@ To get a specific time range, use:
 User.group_by_day(:created_at, range: 2.weeks.ago.midnight..Time.now).count
 ```
 
-To expand the range to the start and end of the time period, use: [unreleased]
+To expand the range to the start and end of the time period, use:
 
 ```ruby
 User.group_by_day(:created_at, range: 2.weeks.ago..Time.now, expand_range: true).count
