@@ -3,6 +3,7 @@ require "i18n"
 module Groupdate
   class Magic
     DAYS = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+    MONTHS = [:january, :february, :march, :april, :may, :june, :july, :august, :september, :october, :november, :december]
 
     attr_accessor :period, :options, :group_index, :n_seconds
 
@@ -35,6 +36,11 @@ module Groupdate
         @day_start = 0
       end
 
+      # only implemented for year for minimal complexity
+      if %i[year].include?(period)
+        known_keywords << :year_start
+      end
+
       if %i[second minute].include?(period)
         known_keywords << :n
       end
@@ -48,6 +54,7 @@ module Groupdate
       raise ArgumentError, "Unrecognized time zone" unless time_zone
       raise ArgumentError, "Unrecognized :week_start option" unless week_start
       raise ArgumentError, ":day_start must be between 0 and 24" if (day_start / 3600) < 0 || (day_start / 3600) >= 24
+      raise ArgumentError, "Unrecognized :year_start option" unless year_start
     end
 
     def time_zone
@@ -67,6 +74,13 @@ module Groupdate
 
     def day_start
       @day_start ||= ((options[:day_start] || Groupdate.day_start).to_f * 3600).round
+    end
+
+    def year_start
+      @year_start ||= begin
+        v = (options[:year_start] || :january).to_sym
+        MONTHS.index(v)
+      end
     end
 
     def range
@@ -90,6 +104,7 @@ module Groupdate
           range: range,
           day_start: day_start,
           week_start: week_start,
+          year_start: year_start,
           n_seconds: n_seconds
         )
     end
@@ -217,6 +232,7 @@ module Groupdate
             time_range: magic.time_range,
             week_start: magic.week_start,
             day_start: magic.day_start,
+            year_start: magic.year_start,
             n_seconds: magic.n_seconds
           ).generate
 

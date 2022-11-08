@@ -1,12 +1,13 @@
 module Groupdate
   class SeriesBuilder
-    attr_reader :period, :time_zone, :day_start, :week_start, :n_seconds, :options
+    attr_reader :period, :time_zone, :day_start, :week_start, :year_start, :n_seconds, :options
 
-    def initialize(period:, time_zone:, day_start:, week_start:, n_seconds:, **options)
+    def initialize(period:, time_zone:, day_start:, week_start:, year_start:, n_seconds:, **options)
       @period = period
       @time_zone = time_zone
       @week_start = week_start
       @day_start = day_start
+      @year_start = year_start
       @n_seconds = n_seconds
       @options = options
       @week_start_key = Groupdate::Magic::DAYS[@week_start] if @week_start
@@ -71,7 +72,11 @@ module Groupdate
         when :quarter
           time.beginning_of_quarter
         when :year
-          time.beginning_of_year
+          if year_start == 0
+            time.beginning_of_year
+          else
+            (time - year_start.months).beginning_of_year + year_start.months
+          end
         when :hour_of_day
           time.hour
         when :minute_of_hour

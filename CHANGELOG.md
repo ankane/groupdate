@@ -1,3 +1,7 @@
+## 6.2.0 (unreleased)
+
+- Added `year_start` option
+
 ## 6.1.0 (2022-04-05)
 
 - Added `expand_range` option

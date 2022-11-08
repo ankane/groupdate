@@ -4,6 +4,7 @@ module Groupdate
       def group_clause
         raise Groupdate::Error, "Time zones not supported for SQLite" unless @time_zone.utc_offset.zero?
         raise Groupdate::Error, "day_start not supported for SQLite" unless day_start.zero?
+        raise Groupdate::Error, "year_start not supported for SQLite" unless year_start.zero?
 
         query =
           if period == :week

@@ -1,9 +1,9 @@
 module Groupdate
   module Adapters
     class BaseAdapter
-      attr_reader :period, :column, :day_start, :week_start, :n_seconds
+      attr_reader :period, :column, :day_start, :week_start, :year_start, :n_seconds
 
-      def initialize(relation, column:, period:, time_zone:, time_range:, week_start:, day_start:, n_seconds:)
+      def initialize(relation, column:, period:, time_zone:, time_range:, week_start:, day_start:, year_start:, n_seconds:)
         @relation = relation
         @column = column
         @period = period
@@ -11,6 +11,7 @@ module Groupdate
         @time_range = time_range
         @week_start = week_start
         @day_start = day_start
+        @year_start = year_start
         @n_seconds = n_seconds
 
         if ActiveRecord::VERSION::MAJOR >= 7

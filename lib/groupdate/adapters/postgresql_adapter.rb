@@ -28,8 +28,15 @@ module Groupdate
             else
               ["TO_TIMESTAMP(FLOOR(EXTRACT(EPOCH FROM #{column}::timestamptz) / ?) * ?)", n_seconds, n_seconds]
             end
-          when :day, :month, :quarter, :year
+          when :day, :month, :quarter
             ["DATE_TRUNC(?, #{day_start_column})::date", period, time_zone, day_start_interval]
+          when :year
+            if year_start != 0
+              year_start_interval = "#{year_start} month"
+              ["(DATE_TRUNC(?, #{day_start_column} - INTERVAL ?) + INTERVAL ?)::date", period, time_zone, day_start_interval, year_start_interval, year_start_interval]
+            else
+              ["DATE_TRUNC(?, #{day_start_column})::date", period, time_zone, day_start_interval]
+            end
           else
             # day start is always 0 for seconds, minute, hour
             ["DATE_TRUNC(?, #{day_start_column}) AT TIME ZONE ?", period, time_zone, day_start_interval, time_zone]

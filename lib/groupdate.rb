@@ -23,6 +23,9 @@ module Groupdate
   mattr_accessor :week_start, :day_start, :time_zone
   self.week_start = :sunday
   self.day_start = 0
+  # no global option for year_start
+  # only implemented for year (and not day_of_year and month_of_year)
+  # to keep complexity minimal
 
   # api for gems like ActiveMedian
   def self.process_result(relation, result, **options)

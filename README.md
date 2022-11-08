@@ -111,6 +111,14 @@ or
 User.group_by_day(:created_at, day_start: 2).count
 ```
 
+### Year Start [unreleased]
+
+You can change the month years start with:
+
+```ruby
+User.group_by_year(:created_at, year_start: :april).count
+```
+
 ### Time Range
 
 To get a specific time range, use:
@@ -271,7 +279,7 @@ It should return the time instead of `NULL`.
 Groupdate has limited support for SQLite.
 
 - No time zone support
-- No `day_start` option
+- No `day_start` or `year_start` option
 - No `group_by_quarter` method
 
 If your application’s time zone is set to something other than `Etc/UTC` (the default), create an initializer with:

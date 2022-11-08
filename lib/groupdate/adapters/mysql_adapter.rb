@@ -23,18 +23,19 @@ module Groupdate
             ["CAST(DATE_FORMAT(#{day_start_column} - INTERVAL ((? + DAYOFWEEK(#{day_start_column})) % 7) DAY, '%Y-%m-%d') AS DATE)", time_zone, day_start, 12 - week_start, time_zone, day_start]
           when :quarter
             ["CAST(CONCAT(YEAR(#{day_start_column}), '-', LPAD(1 + 3 * (QUARTER(#{day_start_column}) - 1), 2, '00'), '-01') AS DATE)", time_zone, day_start, time_zone, day_start]
-          when :day, :month, :year
+          when :day, :month
             format =
               case period
               when :day
                 "%Y-%m-%d"
-              when :month
+              else # month
                 "%Y-%m-01"
-              else # year
-                "%Y-01-01"
               end
 
             ["CAST(DATE_FORMAT(#{day_start_column}, ?) AS DATE)", time_zone, day_start, format]
+          when :year
+            format = "%Y-01-01"
+            ["CAST(DATE_FORMAT(#{day_start_column} - INTERVAL ? month, ?) + INTERVAL ? month AS DATE)", time_zone, day_start, year_start, format, year_start]
           when :custom
             ["FROM_UNIXTIME((UNIX_TIMESTAMP(#{column}) DIV ?) * ?)", n_seconds, n_seconds]
           else
@@ -56,7 +57,7 @@ module Groupdate
 
       def clean_group_clause(clause)
         # zero quoted in Active Record 7+
-        clause.gsub(/ (\-|\+) INTERVAL 0 second/, "").gsub(/ (\-|\+) INTERVAL '0' second/, "")
+        clause.gsub(/ (\-|\+) INTERVAL ('0'|0) (second|month)/, "")
       end
     end
   end
