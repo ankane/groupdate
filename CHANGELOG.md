@@ -1,3 +1,7 @@
+## 6.2.0 (unreleased)
+
+- Added support for async methods with Active Record 7.1
+
 ## 6.1.0 (2022-04-05)
 
 - Added `expand_range` option

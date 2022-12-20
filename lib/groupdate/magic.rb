@@ -125,6 +125,10 @@ module Groupdate
       end
 
       def perform(relation, result, default_value:)
+        if defined?(ActiveRecord::Promise) && result.is_a?(ActiveRecord::Promise)
+          return result.then { |r| perform(relation, r, default_value: default_value) }
+        end
+
         multiple_groups = relation.group_values.size > 1
 
         check_nils(result, multiple_groups, relation)
