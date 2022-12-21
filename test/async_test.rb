@@ -70,4 +70,28 @@ class AsyncTest < Minitest::Test
     }
     assert_equal expected, promise.value
   end
+
+  def test_then
+    create_user "2013-05-01"
+    create_user "2013-05-03"
+    create_user "2013-05-03", 9
+    promise = User.group_by_day(:created_at).async_count
+    expected = {
+      Date.parse("2013-05-01") => 10,
+      Date.parse("2013-05-02") => 0,
+      Date.parse("2013-05-03") => 20
+    }
+    assert_equal expected, promise.then { |s| s.transform_values { |v| v * 10 } }.value
+  end
+
+  def test_status
+    promise = User.group_by_day(:created_at).async_count
+    if sqlite?
+      refute promise.pending?
+    else
+      assert promise.pending?
+    end
+    assert_empty promise.value
+    refute promise.pending?
+  end
 end
