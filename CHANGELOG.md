@@ -1,4 +1,4 @@
-## 6.2.1 (unreleased)
+## 6.2.1 (2023-04-18)
 
 - Fixed extra day with `DateTime` ranges
 
