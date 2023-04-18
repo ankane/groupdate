@@ -118,7 +118,7 @@ module Groupdate
 
           finish = time_range.end
           finish = finish.in_time_zone(time_zone) if finish
-          if time_range.end.is_a?(Date) && !exclude_end
+          if time_range.end.is_a?(Date) && !time_range.end.is_a?(DateTime) && !exclude_end
             finish += 1.day
             exclude_end = true
           end

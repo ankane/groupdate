@@ -36,6 +36,28 @@ class RangeTest < Minitest::Test
     assert_equal "Range bounds should be Date or Time, not Integer", error.message
   end
 
+  def test_time
+    create_user "2013-05-01"
+    create_user "2013-05-02"
+
+    today = Date.parse("2013-05-01")
+    expected = {
+      Date.parse("2013-05-01") => 1
+    }
+    assert_equal expected, call_method(:day, :created_at, series: true, range: today.to_time..today.to_time.end_of_day)
+  end
+
+  def test_datetime
+    create_user "2013-05-01"
+    create_user "2013-05-02"
+
+    today = Date.parse("2013-05-01")
+    expected = {
+      Date.parse("2013-05-01") => 1
+    }
+    assert_equal expected, call_method(:day, :created_at, series: true, range: today.to_datetime..today.to_datetime.end_of_day)
+  end
+
   # expand range
 
   def test_expand_range
