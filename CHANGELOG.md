@@ -1,3 +1,7 @@
+## 6.3.0 (unreleased)
+
+- Dropped support for Ruby < 3 and Rails < 6.1
+
 ## 6.2.1 (2023-04-18)
 
 - Fixed extra day with `DateTime` ranges
