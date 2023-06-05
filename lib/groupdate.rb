@@ -4,15 +4,15 @@ require "active_support/core_ext/module/attribute_accessors"
 require "active_support/time"
 
 # modules
-require "groupdate/magic"
-require "groupdate/series_builder"
-require "groupdate/version"
+require_relative "groupdate/magic"
+require_relative "groupdate/series_builder"
+require_relative "groupdate/version"
 
 # adapters
-require "groupdate/adapters/base_adapter"
-require "groupdate/adapters/mysql_adapter"
-require "groupdate/adapters/postgresql_adapter"
-require "groupdate/adapters/sqlite_adapter"
+require_relative "groupdate/adapters/base_adapter"
+require_relative "groupdate/adapters/mysql_adapter"
+require_relative "groupdate/adapters/postgresql_adapter"
+require_relative "groupdate/adapters/sqlite_adapter"
 
 module Groupdate
   class Error < RuntimeError; end
@@ -47,8 +47,8 @@ Groupdate.register_adapter ["Mysql2", "Mysql2Spatial", "Mysql2Rgeo"], Groupdate:
 Groupdate.register_adapter ["PostgreSQL", "PostGIS", "Redshift"], Groupdate::Adapters::PostgreSQLAdapter
 Groupdate.register_adapter "SQLite", Groupdate::Adapters::SQLiteAdapter
 
-require "groupdate/enumerable"
+require_relative "groupdate/enumerable"
 
 ActiveSupport.on_load(:active_record) do
-  require "groupdate/active_record"
+  require_relative "groupdate/active_record"
 end
