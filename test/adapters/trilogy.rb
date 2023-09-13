@@ -3,4 +3,4 @@ if ActiveRecord::VERSION::STRING.to_f < 7.1
   ActiveRecord::Base.public_send :extend, TrilogyAdapter::Connection
 end
 
-ActiveRecord::Base.establish_connection adapter: "trilogy", database: "groupdate_test"
+ActiveRecord::Base.establish_connection adapter: "trilogy", database: "groupdate_test", host: "127.0.0.1"
