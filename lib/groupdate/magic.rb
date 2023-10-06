@@ -204,6 +204,9 @@ module Groupdate
         magic = Groupdate::Magic::Relation.new(**options)
 
         adapter_name = relation.connection.adapter_name
+        if adapter_name == "litedb" then
+          adapter_name = "sqlite"
+        end
         adapter = Groupdate.adapters[adapter_name]
         raise Groupdate::Error, "Connection adapter not supported: #{adapter_name}" unless adapter
 
