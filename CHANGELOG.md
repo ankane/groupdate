@@ -173,7 +173,7 @@ Breaking changes
 - Added `default_value` option
 - Accept symbol for `format` option
 - Raise `ArgumentError` if no field specified
-- Added support for ActiveRecord 5 beta
+- Added support for Active Record 5 beta
 
 ## 2.5.0 (2015-09-29)
 
@@ -187,18 +187,18 @@ Breaking changes
 - Added `carry_forward` option
 - Added `series: false` option for arrays and hashes
 - Fixed issue w/ Brasilia Summer Time
-- Fixed issues w/ ActiveRecord 4.2
+- Fixed issues w/ Active Record 4.2
 
 ## 2.3.0 (2014-08-31)
 
-- Raise error when ActiveRecord::Base.default_timezone is not `:utc`
+- Raise error when `ActiveRecord::Base.default_timezone` is not `:utc`
 - Added `day_of_month`
 - Added `month_of_year`
 - Do not quote column name
 
 ## 2.2.1 (2014-06-23)
 
-- Fixed ActiveRecord 3 associations
+- Fixed Active Record 3 associations
 
 ## 2.2.0 (2014-06-22)
 
