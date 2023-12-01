@@ -15,7 +15,7 @@ Supports PostgreSQL, MySQL, and Redshift, plus arrays and hashes (and limited su
 
 :cupid: Goes hand in hand with [Chartkick](https://www.chartkick.com)
 
-[![Build Status](https://github.com/ankane/groupdate/workflows/build/badge.svg?branch=master)](https://github.com/ankane/groupdate/actions)
+[![Build Status](https://github.com/ankane/groupdate/actions/workflows/build.yml/badge.svg)](https://github.com/ankane/groupdate/actions)
 
 ## Installation
 
