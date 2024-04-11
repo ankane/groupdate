@@ -45,7 +45,7 @@ end
 
 Groupdate.register_adapter ["Mysql2", "Mysql2Spatial", "Mysql2Rgeo", "Trilogy"], Groupdate::Adapters::MySQLAdapter
 Groupdate.register_adapter ["PostgreSQL", "PostGIS", "Redshift"], Groupdate::Adapters::PostgreSQLAdapter
-Groupdate.register_adapter "SQLite", Groupdate::Adapters::SQLiteAdapter
+Groupdate.register_adapter ["SQLite", "litedb"], Groupdate::Adapters::SQLiteAdapter
 
 require_relative "groupdate/enumerable"
 
