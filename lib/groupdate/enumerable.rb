@@ -5,7 +5,7 @@ module Enumerable
         raise ArgumentError, "wrong number of arguments (given #{args.size}, expected 0)" if args.any?
         Groupdate::Magic::Enumerable.group_by(self, period, options, &block)
       elsif respond_to?(:scoping)
-        scoping { @klass.group_by_period(period, *args, **options, &block) }
+        scoping { klass.group_by_period(period, *args, **options, &block) }
       else
         raise ArgumentError, "no block given"
       end
@@ -19,7 +19,7 @@ module Enumerable
       Groupdate::Magic.validate_period(period, options.delete(:permit))
       send("group_by_#{period}", **options, &block)
     else
-      scoping { @klass.group_by_period(period, *args, **options, &block) }
+      scoping { klass.group_by_period(period, *args, **options, &block) }
     end
   end
 end
