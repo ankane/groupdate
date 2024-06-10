@@ -280,18 +280,6 @@ If your application’s time zone is set to something other than `Etc/UTC` (the 
 Groupdate.time_zone = false
 ```
 
-## Upgrading
-
-### 6.0
-
-Groupdate 6.0 protects against unsafe input by default. For non-attribute arguments, use:
-
-```ruby
-User.group_by_day(Arel.sql(known_safe_value)).count
-```
-
-Also, the `dates` option has been removed.
-
 ## History
 
 View the [changelog](https://github.com/ankane/groupdate/blob/master/CHANGELOG.md)
