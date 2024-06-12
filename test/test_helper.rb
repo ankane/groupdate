@@ -4,7 +4,6 @@ require "minitest/autorun"
 require "minitest/pride"
 require "logger"
 require "active_record"
-require "ostruct"
 
 ENV["TZ"] = "UTC"
 
@@ -19,7 +18,11 @@ end
 puts "Using #{adapter}"
 require_relative "adapters/#{adapter}"
 
-require_relative "support/activerecord" unless adapter == "enumerable"
+if adapter == "enumerable"
+  User = Struct.new(:name, :score, :created_on, :created_at, keyword_init: true)
+else
+  require_relative "support/activerecord"
+end
 
 # i18n
 I18n.enforce_available_locales = true
@@ -64,7 +67,7 @@ class Minitest::Test
 
     if enumerable?
       user =
-        OpenStruct.new(
+        User.new(
           name: "Andrew",
           score: score,
           created_at: created_at ? utc.parse(created_at) : nil,
