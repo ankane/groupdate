@@ -11,7 +11,7 @@ The simplest way to group by:
 
 :cake: Get the entire series - **the other best part**
 
-Supports PostgreSQL, MySQL, and Redshift, plus arrays and hashes (and limited support for [SQLite](#for-sqlite))
+Supports PostgreSQL, MySQL, MariaDB, and Redshift, plus arrays and hashes (and limited support for [SQLite](#for-sqlite))
 
 :cupid: Goes hand in hand with [Chartkick](https://www.chartkick.com)
 
@@ -25,7 +25,7 @@ Add this line to your application’s Gemfile:
 gem "groupdate"
 ```
 
-For MySQL and SQLite, also follow [these instructions](#additional-instructions).
+For MySQL, MariaDB, and SQLite, also follow [these instructions](#additional-instructions).
 
 ## Getting Started
 
@@ -250,7 +250,7 @@ users.group_by_day { |u| u.created_at }.to_h { |k, v| [k, v.count] }
 
 ## Additional Instructions
 
-### For MySQL
+### MySQL & MariaDB<a id="for-mysql"></a>
 
 [Time zone support](https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html) must be installed on the server.
 
@@ -266,7 +266,7 @@ SELECT CONVERT_TZ(NOW(), '+00:00', 'Pacific/Honolulu');
 
 It should return the time instead of `NULL`.
 
-### For SQLite
+### SQLite
 
 Groupdate has limited support for SQLite.
 
