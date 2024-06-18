@@ -180,7 +180,7 @@ module Groupdate
       end
 
       def time_zone_support?(relation)
-        if relation.connection.adapter_name =~ /mysql/i
+        if relation.connection.adapter_name.match?(/mysql/i)
           # need to call klass for Rails < 5.2
           sql = relation.klass.send(:sanitize_sql_array, ["SELECT CONVERT_TZ(NOW(), '+00:00', ?)", time_zone.tzinfo.name])
           !relation.connection.select_all(sql).first.values.first.nil?
@@ -238,7 +238,7 @@ module Groupdate
         def validate_column(column)
           unless column.is_a?(Symbol) || column.is_a?(Arel::Nodes::SqlLiteral)
             column = column.to_s
-            unless /\A\w+(\.\w+)?\z/i.match(column)
+            unless /\A\w+(\.\w+)?\z/i.match?(column)
               raise ActiveRecord::UnknownAttributeReference, "Query method called with non-attribute argument(s): #{column.inspect}. Use Arel.sql() for known-safe values."
             end
           end
@@ -257,7 +257,7 @@ module Groupdate
 
       # allow any options to keep flexible for future
       def self.process_result(relation, result, **options)
-        relation.groupdate_values.reverse.each do |gv|
+        relation.groupdate_values.reverse_each do |gv|
           result = gv.perform(relation, result, default_value: options[:default_value])
         end
         result
