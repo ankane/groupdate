@@ -33,6 +33,10 @@ time: {
   formats: {special: "%b %e, %Y"}
 }
 
+if ActiveSupport::VERSION::STRING.to_f == 7.2
+  ActiveSupport.to_time_preserves_timezone = true
+end
+
 class Minitest::Test
   def setup
     if enumerable?
