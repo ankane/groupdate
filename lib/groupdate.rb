@@ -1,6 +1,6 @@
 # dependencies
 require "active_support"
-require "active_support/core_ext/module/attribute_accessors"
+require "active_support/core_ext/module/attribute_accessors_per_thread"
 require "active_support/time"
 
 # modules
@@ -20,9 +20,9 @@ module Groupdate
   PERIODS = [:second, :minute, :hour, :day, :week, :month, :quarter, :year, :day_of_week, :hour_of_day, :minute_of_hour, :day_of_month, :day_of_year, :month_of_year]
   METHODS = PERIODS.map { |v| :"group_by_#{v}" } + [:group_by_period]
 
-  mattr_accessor :week_start, :day_start, :time_zone
-  self.week_start = :sunday
-  self.day_start = 0
+  thread_mattr_accessor :week_start, default: :sunday
+  thread_mattr_accessor :day_start, default: 0
+  thread_mattr_accessor :time_zone
 
   # api for gems like ActiveMedian
   def self.process_result(relation, result, **options)
