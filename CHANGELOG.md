@@ -1,3 +1,7 @@
+## 6.5.0 (unreleased)
+
+- Added support for Active Record 8
+
 ## 6.4.0 (2023-09-13)
 
 - Added support for Trilogy
