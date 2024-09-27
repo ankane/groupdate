@@ -183,7 +183,7 @@ module Groupdate
         if relation.connection.adapter_name.match?(/mysql/i)
           # need to call klass for Rails < 5.2
           sql = relation.klass.send(:sanitize_sql_array, ["SELECT CONVERT_TZ(NOW(), '+00:00', ?)", time_zone.tzinfo.name])
-          !relation.connection.select_all(sql).first.values.first.nil?
+          !relation.connection.select_all(sql).to_a.first.values.first.nil?
         else
           true
         end

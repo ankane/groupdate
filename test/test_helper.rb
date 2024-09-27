@@ -13,6 +13,10 @@ abort "No adapter specified" unless adapter
 if adapter != "enumerable" && ActiveRecord::VERSION::STRING.to_f >= 7.1
   # must come before ActiveRecord::Base.establish_connection
   ActiveRecord.async_query_executor = :global_thread_pool
+
+  if ActiveRecord::VERSION::MAJOR >= 8
+    ActiveRecord::Base.asynchronous_queries_tracker.start_session
+  end
 end
 
 puts "Using #{adapter}"
@@ -33,7 +37,9 @@ time: {
   formats: {special: "%b %e, %Y"}
 }
 
-if ActiveSupport::VERSION::STRING.to_f == 7.2
+if ActiveSupport::VERSION::STRING.to_f == 8.0
+  ActiveSupport.to_time_preserves_timezone = :zone
+elsif ActiveSupport::VERSION::STRING.to_f == 7.2
   ActiveSupport.to_time_preserves_timezone = true
 end
 
