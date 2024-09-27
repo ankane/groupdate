@@ -1,6 +1,7 @@
 ## 6.5.0 (unreleased)
 
 - Added support for Active Record 8
+- Dropped support for Ruby < 3.1 and Active Record < 7
 
 ## 6.4.0 (2023-09-13)
 
