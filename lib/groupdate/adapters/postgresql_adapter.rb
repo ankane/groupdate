@@ -23,7 +23,7 @@ module Groupdate
           when :week
             ["(DATE_TRUNC('day', #{day_start_column} - INTERVAL '1 day' * ((? + EXTRACT(DOW FROM #{day_start_column})::integer) % 7)) + INTERVAL ?)::date", time_zone, day_start_interval, 13 - week_start, time_zone, day_start_interval, day_start_interval]
           when :custom
-            if @relation.connection.adapter_name == "Redshift"
+            if @adapter_name == "Redshift"
               ["TIMESTAMP 'epoch' + (FLOOR(EXTRACT(EPOCH FROM #{column}::timestamp) / ?) * ?) * INTERVAL '1 second'", n_seconds, n_seconds]
             else
               ["TO_TIMESTAMP(FLOOR(EXTRACT(EPOCH FROM #{column}::timestamptz) / ?) * ?)", n_seconds, n_seconds]

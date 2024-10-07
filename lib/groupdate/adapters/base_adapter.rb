@@ -3,7 +3,7 @@ module Groupdate
     class BaseAdapter
       attr_reader :period, :column, :day_start, :week_start, :n_seconds
 
-      def initialize(relation, column:, period:, time_zone:, time_range:, week_start:, day_start:, n_seconds:)
+      def initialize(relation, column:, period:, time_zone:, time_range:, week_start:, day_start:, n_seconds:, adapter_name: nil)
         @relation = relation
         @column = column
         @period = period
@@ -12,6 +12,7 @@ module Groupdate
         @week_start = week_start
         @day_start = day_start
         @n_seconds = n_seconds
+        @adapter_name = adapter_name
 
         if ActiveRecord::VERSION::MAJOR >= 7
           if ActiveRecord.default_timezone == :local

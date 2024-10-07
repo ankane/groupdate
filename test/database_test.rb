@@ -236,6 +236,15 @@ class DatabaseTest < Minitest::Test
     assert_equal({}, User.group_by_second(:created_at, n: 2.minutes).count)
   end
 
+  def test_connection_leasing
+    ActiveRecord::Base.connection_handler.clear_active_connections!
+    assert_nil ActiveRecord::Base.connection_pool.active_connection?
+    ActiveRecord::Base.connection_pool.with_connection do
+      User.group_by_day(:created_at).count
+    end
+    assert_nil ActiveRecord::Base.connection_pool.active_connection?
+  end
+
   private
 
   def this_year

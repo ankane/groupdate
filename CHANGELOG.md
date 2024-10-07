@@ -1,3 +1,7 @@
+## 6.5.1 (unreleased)
+
+- Fixed connection leasing for Active Record 7.2+
+
 ## 6.5.0 (2024-10-01)
 
 - Added support for Active Record 8

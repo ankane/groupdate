@@ -180,12 +180,13 @@ module Groupdate
       end
 
       def time_zone_support?(relation)
-        if relation.connection.adapter_name.match?(/mysql/i)
-          # need to call klass for Rails < 5.2
-          sql = relation.klass.send(:sanitize_sql_array, ["SELECT CONVERT_TZ(NOW(), '+00:00', ?)", time_zone.tzinfo.name])
-          !relation.connection.select_all(sql).to_a.first.values.first.nil?
-        else
-          true
+        relation.connection_pool.with_connection do |connection|
+          if connection.adapter_name.match?(/mysql|trilogy/i)
+            sql = relation.send(:sanitize_sql_array, ["SELECT CONVERT_TZ(NOW(), '+00:00', ?)", time_zone.tzinfo.name])
+            !connection.select_all(sql).to_a.first.values.first.nil?
+          else
+            true
+          end
         end
       end
 
@@ -203,7 +204,7 @@ module Groupdate
       def self.generate_relation(relation, field:, **options)
         magic = Groupdate::Magic::Relation.new(**options)
 
-        adapter_name = relation.connection.adapter_name
+        adapter_name = relation.connection_pool.with_connection { |c| c.adapter_name }
         adapter = Groupdate.adapters[adapter_name]
         raise Groupdate::Error, "Connection adapter not supported: #{adapter_name}" unless adapter
 
@@ -221,7 +222,8 @@ module Groupdate
             time_range: magic.time_range,
             week_start: magic.week_start,
             day_start: magic.day_start,
-            n_seconds: magic.n_seconds
+            n_seconds: magic.n_seconds,
+            adapter_name: adapter_name
           ).generate
 
         # add Groupdate info
@@ -251,7 +253,7 @@ module Groupdate
         def resolve_column(relation, column)
           node = relation.send(:relation).send(:arel_columns, [column]).first
           node = Arel::Nodes::SqlLiteral.new(node) if node.is_a?(String)
-          relation.connection.visitor.accept(node, Arel::Collectors::SQLString.new).value
+          relation.connection_pool.with_connection { |c| c.visitor.accept(node, Arel::Collectors::SQLString.new).value }
         end
       end
 
