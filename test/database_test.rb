@@ -239,7 +239,9 @@ class DatabaseTest < Minitest::Test
   def test_connection_leasing
     ActiveRecord::Base.connection_handler.clear_active_connections!
     assert_nil ActiveRecord::Base.connection_pool.active_connection?
-    User.group_by_day(:created_at).count
+    ActiveRecord::Base.connection_pool.with_connection do
+      User.group_by_day(:created_at).count
+    end
     assert_nil ActiveRecord::Base.connection_pool.active_connection?
   end
 
