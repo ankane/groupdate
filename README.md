@@ -32,9 +32,9 @@ For MySQL, MariaDB, and SQLite, also follow [these instructions](#additional-ins
 ```ruby
 User.group_by_day(:created_at).count
 # {
-#   Sat, 24 May 2020 => 50,
-#   Sun, 25 May 2020 => 100,
-#   Mon, 26 May 2020 => 34
+#   Wed, 01 Jan 2025 => 50,
+#   Thu, 02 Jan 2025 => 100,
+#   Fri, 03 Jan 2025 => 34
 # }
 ```
 
@@ -75,9 +75,9 @@ or
 ```ruby
 User.group_by_week(:created_at, time_zone: "Pacific Time (US & Canada)").count
 # {
-#   Sun, 08 Mar 2020 => 70,
-#   Sun, 15 Mar 2020 => 54,
-#   Sun, 22 Mar 2020 => 80
+#   Sun, 05 Jan 2025 => 70,
+#   Sun, 12 Jan 2025 => 54,
+#   Sun, 19 Jan 2025 => 80
 # }
 ```
 
@@ -154,8 +154,8 @@ To get keys in a different format, use:
 ```ruby
 User.group_by_month(:created_at, format: "%b %Y").count
 # {
-#   "Jan 2020" => 10
-#   "Feb 2020" => 12
+#   "Jan 2025" => 10
+#   "Feb 2025" => 12
 # }
 ```
 
