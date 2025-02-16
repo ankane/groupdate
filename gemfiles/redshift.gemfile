@@ -4,5 +4,5 @@ gemspec path: ".."
 
 gem "rake"
 gem "minitest"
-gem "activerecord", "~> 6.1.0"
-gem "activerecord6-redshift-adapter"
+gem "activerecord", "~> 7.2.0"
+gem "activerecord7-redshift-adapter-pennylane"
