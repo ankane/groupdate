@@ -6,11 +6,7 @@ else
 end
 
 # rails does this in activerecord/lib/active_record/railtie.rb
-if ActiveRecord::VERSION::MAJOR >= 7
-  ActiveRecord.default_timezone = :utc
-else
-  ActiveRecord::Base.default_timezone = :utc
-end
+ActiveRecord.default_timezone = :utc
 ActiveRecord::Base.time_zone_aware_attributes = true
 
 class User < ActiveRecord::Base

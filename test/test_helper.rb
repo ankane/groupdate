@@ -9,7 +9,7 @@ ENV["TZ"] = "UTC"
 adapter = ENV["ADAPTER"]
 abort "No adapter specified" unless adapter
 
-if adapter != "enumerable" && ActiveRecord::VERSION::STRING.to_f >= 7.1
+if adapter != "enumerable"
   # must come before ActiveRecord::Base.establish_connection
   ActiveRecord.async_query_executor = :global_thread_pool
 

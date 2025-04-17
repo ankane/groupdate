@@ -2,7 +2,7 @@ require_relative "test_helper"
 
 class AsyncTest < Minitest::Test
   def setup
-    skip if ActiveRecord::VERSION::STRING.to_f < 7.1 || enumerable?
+    skip if enumerable?
     super
   end
 

@@ -137,14 +137,13 @@ class DatabaseTest < Minitest::Test
   # activerecord default_timezone option
 
   def test_default_timezone_local
-    base_class = ActiveRecord::VERSION::MAJOR >= 7 ? ActiveRecord : User
-    base_class.default_timezone = :local
+    ActiveRecord.default_timezone = :local
     error = assert_raises(Groupdate::Error) do
       User.group_by_day(:created_at).count
     end
     assert_match "must be :utc", error.message
   ensure
-    base_class.default_timezone = :utc
+    ActiveRecord.default_timezone = :utc
   end
 
   # carry_forward option
