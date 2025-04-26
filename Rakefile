@@ -21,6 +21,7 @@ desc "Run all adapter tests besides redshift"
 task :test do
   ADAPTERS.each do |adapter|
     next if adapter == "redshift"
+    next if ["postgresql", "mysql", "trilogy"].include?(adapter) && RUBY_ENGINE == "jruby"
     Rake::Task["test:#{adapter}"].invoke
   end
 end

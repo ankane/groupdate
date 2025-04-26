@@ -5,8 +5,15 @@ gemspec
 gem "rake"
 gem "minitest"
 gem "activerecord", "~> 8.0.0"
-gem "pg"
-gem "mysql2"
-gem "trilogy"
-gem "sqlite3"
-gem "ruby-prof", require: false
+
+platform :ruby do
+  gem "pg"
+  gem "mysql2"
+  gem "trilogy"
+  gem "sqlite3"
+  gem "ruby-prof", require: false
+end
+
+platform :jruby do
+  gem "sqlite3-ffi"
+end
