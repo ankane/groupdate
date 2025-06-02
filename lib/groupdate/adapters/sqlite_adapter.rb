@@ -54,7 +54,7 @@ module Groupdate
       private
 
       def setup_function
-        @relation.with_connection do |connection|
+        @relation.connection_pool.with_connection do |connection|
           raw_connection = connection.raw_connection
           return if raw_connection.instance_variable_defined?(:@groupdate_function)
 
