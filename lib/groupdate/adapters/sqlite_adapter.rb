@@ -41,7 +41,7 @@ module Groupdate
             ["strftime(?, #{column})", format]
           end
 
-        if period != :custom && (@time_zone.utc_offset != 0 || day_start != 0 || period == :quarter)
+        if period != :custom && (@time_zone != SeriesBuilder.utc || day_start != 0 || period == :quarter)
           setup_function
           week_start = period == :week ? Groupdate::Magic::DAYS[self.week_start].to_s : nil
           query = ["groupdate_internal(?, #{column}, ?, ?, ?)", period, @time_zone.tzinfo.name, day_start, week_start]
