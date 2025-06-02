@@ -42,14 +42,14 @@ module Groupdate
     end
 
     def round_time(time)
-      self.class.round_time(time, period, time_zone, day_start, @week_start_key, n_seconds)
-    end
-
-    def self.round_time(time, period, time_zone, day_start, week_start_key, n_seconds)
       if period == :custom
         return time_zone.at((time.to_time.to_i / n_seconds) * n_seconds)
       end
 
+      self.class.round_time(time, period, time_zone, day_start, @week_start_key)
+    end
+
+    def self.round_time(time, period, time_zone, day_start, week_start_key)
       time = time.to_time.in_time_zone(time_zone)
 
       if day_start != 0
