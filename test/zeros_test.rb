@@ -123,9 +123,6 @@ class ZerosTest < Minitest::Test
   end
 
   def test_datetime
-    # flaky
-    skip if sqlite?
-
     create_user "2013-05-01"
     expected = {
       Date.parse("2013-05-01") => 1
