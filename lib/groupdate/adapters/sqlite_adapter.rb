@@ -58,6 +58,8 @@ module Groupdate
           return if raw_connection.instance_variable_defined?(:@groupdate_function)
 
           utc = SeriesBuilder.utc
+          date_periods = %w[day week month quarter year]
+
           # note: this function is part of the internal API and may change between releases
           # TODO improve performance
           raw_connection.create_function("groupdate_internal", 4) do |func, period, value, time_zone, day_start, week_start|
@@ -67,7 +69,7 @@ module Groupdate
               # cast_result handles week_start for day_of_week
               week_start = :sunday if period == "day_of_week"
               result = SeriesBuilder.round_time(utc.parse(value), period.to_sym, ActiveSupport::TimeZone[time_zone], day_start.to_i, week_start&.to_sym)
-              if %w[day week month quarter year].include?(period)
+              if date_periods.include?(period)
                 result = result.strftime("%Y-%m-%d")
               elsif result.is_a?(Time)
                 result = result.in_time_zone(utc).strftime("%Y-%m-%d %H:%M:%S")

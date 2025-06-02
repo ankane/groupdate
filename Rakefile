@@ -51,7 +51,7 @@ task :profile do
 
   measure_mode = RubyProf::WALL_TIME # RubyProf::ALLOCATIONS
   result = RubyProf::Profile.profile(measure_mode: measure_mode) do
-    User.group_by_day(:created_at).count
+    User.group_by_day(:created_at, time_zone: "Pacific Time (US & Canada)").count
   end
 
   printer = RubyProf::GraphPrinter.new(result)
