@@ -57,7 +57,7 @@ module Groupdate
           raw_connection = connection.raw_connection
           return if raw_connection.instance_variable_defined?(:@groupdate_function)
 
-          utc = ActiveSupport::TimeZone["UTC"]
+          utc = SeriesBuilder.utc
           # note: this function is part of the internal API and may change between releases
           # TODO improve performance
           raw_connection.create_function("groupdate_internal", 4) do |func, period, value, time_zone, day_start, week_start|
