@@ -46,11 +46,11 @@ module Groupdate
         return time_zone.at((time.to_time.to_i / n_seconds) * n_seconds)
       end
 
-      self.class.round_time(time, period, time_zone, day_start, @week_start_key)
+      self.class.round_time(time.to_time, period, time_zone, day_start, @week_start_key)
     end
 
     def self.round_time(time, period, time_zone, day_start, week_start_key)
-      time = time.to_time.in_time_zone(time_zone)
+      time = time.in_time_zone(time_zone)
 
       if day_start != 0
         # apply day_start to a time object that's not affected by DST
