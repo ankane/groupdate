@@ -43,7 +43,7 @@ class RangeTest < Minitest::Test
     expected = {
       Date.parse("2013-05-01") => 1
     }
-    today = Date.parse("2013-05-01").to_time
+    today = Date.parse("2013-05-01").in_time_zone("Etc/UTC")
     assert_equal expected, call_method(:day, :created_at, series: true, range: today..today.end_of_day)
   end
 

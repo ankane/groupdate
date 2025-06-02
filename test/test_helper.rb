@@ -4,7 +4,7 @@ require "minitest/autorun"
 require "minitest/pride"
 require "active_record"
 
-ENV["TZ"] = "UTC"
+ENV["TZ"] = "America/New_York"
 
 adapter = ENV["ADAPTER"]
 abort "No adapter specified" unless adapter
