@@ -11,12 +11,30 @@ class BasicTest < Minitest::Test
     assert_result_time :second, "2013-05-03 00:00:01 UTC", "2013-05-03 00:00:01.000"
   end
 
+  def test_second_end_of_second_with_time_zone
+    assert_result_time :second, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:00.999", true
+  end
+
+  def test_second_start_of_second_with_time_zone
+    assert_result_time :second, "2013-05-03 00:00:01 UTC", "2013-05-03 00:00:01.000", true
+  end
+
+  # second n
+
   def test_second_end_of_second_n
     assert_result_time :second, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:04.999", n: 5
   end
 
   def test_second_start_of_second_n
     assert_result_time :second, "2013-05-03 00:00:05 UTC", "2013-05-03 00:00:05.000", n: 5
+  end
+
+  def test_second_end_of_second_n_with_time_zone
+    assert_result_time :second, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:04.999", true, n: 5
+  end
+
+  def test_second_start_of_second_n_with_time_zone
+    assert_result_time :second, "2013-05-03 00:00:05 UTC", "2013-05-03 00:00:05.000", true, n: 5
   end
 
   # minute
@@ -29,12 +47,30 @@ class BasicTest < Minitest::Test
     assert_result_time :minute, "2013-05-03 00:01:00 UTC", "2013-05-03 00:01:00"
   end
 
+  def test_minute_end_of_minute_with_time_zone
+    assert_result_time :minute, "2013-05-03 00:00:00 UTC", "2013-05-03 00:00:59", true
+  end
+
+  def test_minute_start_of_minute_with_time_zone
+    assert_result_time :minute, "2013-05-03 00:01:00 UTC", "2013-05-03 00:01:00", true
+  end
+
+  # minute n
+
   def test_minute_end_of_minute_n
     assert_result_time :minute, "2013-05-03 00:00:00 UTC", "2013-05-03 00:04:59", n: 5
   end
 
   def test_minute_start_of_minute_n
     assert_result_time :minute, "2013-05-03 00:05:00 UTC", "2013-05-03 00:05:00", n: 5
+  end
+
+  def test_minute_end_of_minute_n_with_time_zone
+    assert_result_time :minute, "2013-05-03 00:00:00 UTC", "2013-05-03 00:04:59", true, n: 5
+  end
+
+  def test_minute_start_of_minute_n_with_time_zone
+    assert_result_time :minute, "2013-05-03 00:05:00 UTC", "2013-05-03 00:05:00", true, n: 5
   end
 
   # hour
@@ -45,6 +81,14 @@ class BasicTest < Minitest::Test
 
   def test_hour_start_of_hour
     assert_result_time :hour, "2013-05-03 01:00:00 UTC", "2013-05-03 01:00:00"
+  end
+
+  def test_hour_end_of_hour_with_time_zone
+    assert_result_time :hour, "2013-05-03 00:00:00 UTC", "2013-05-03 00:59:59", true
+  end
+
+  def test_hour_start_of_hour_with_time_zone
+    assert_result_time :hour, "2013-05-03 01:00:00 UTC", "2013-05-03 01:00:00", true
   end
 
   # day
