@@ -10,8 +10,7 @@ ADAPTERS.each do |adapter|
     Rake::TestTask.new(adapter => "env:#{adapter}") do |t|
       t.description = "Run tests for #{adapter}"
       t.libs << "test"
-      # TODO permit works for enumerable, just need to make tests work
-      exclude = adapter == "enumerable" ? /associations|column|database|multiple_group|permit/ : /enumerable/
+      exclude = adapter == "enumerable" ? /associations|column|database|multiple_group/ : /enumerable/
       t.test_files = FileList["test/**/*_test.rb"].exclude(exclude)
     end
   end
