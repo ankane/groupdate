@@ -1,3 +1,9 @@
+## 6.7.0 (unreleased)
+
+- Added time zone support for SQLite
+- Added `day_start` support for SQLite
+- Added `group_by_quarter` support for SQLite
+
 ## 6.6.0 (2025-05-04)
 
 - Dropped support for Ruby < 3.2 and Active Record < 7.1
