@@ -44,7 +44,7 @@ module Groupdate
         if period != :custom && (@time_zone.utc_offset != 0 || day_start != 0 || period == :quarter)
           setup_function
           week_start = period == :week ? Groupdate::Magic::DAYS[self.week_start].to_s : nil
-          query = ["groupdate(?, #{column}, ?, ?, ?)", period, @time_zone.tzinfo.name, day_start, week_start]
+          query = ["groupdate_internal(?, #{column}, ?, ?, ?)", period, @time_zone.tzinfo.name, day_start, week_start]
         end
 
         @relation.send(:sanitize_sql_array, query)
@@ -58,8 +58,9 @@ module Groupdate
           return if raw_connection.instance_variable_defined?(:@groupdate_function)
 
           utc = ActiveSupport::TimeZone["UTC"]
+          # note: this function is part of the internal API and may change between releases
           # TODO improve performance
-          raw_connection.create_function("groupdate", 4) do |func, period, value, time_zone, day_start, week_start|
+          raw_connection.create_function("groupdate_internal", 4) do |func, period, value, time_zone, day_start, week_start|
             if value.nil?
               func.result = nil
             else
