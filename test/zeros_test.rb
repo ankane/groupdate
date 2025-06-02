@@ -149,7 +149,7 @@ class ZerosTest < Minitest::Test
     keys.each_with_index do |key, i|
       expected[utc.parse(key).in_time_zone(time_zone ? "Pacific Time (US & Canada)" : utc)] = i == 1 ? 1 : 0
     end
-    assert_equal expected, call_method(method, :created_at, **options, series: true, time_zone: time_zone ? "Pacific Time (US & Canada)" : nil, range: Time.parse(range_start)..Time.parse(range_end))
+    assert_equal expected, call_method(method, :created_at, **options, series: true, time_zone: time_zone ? "Pacific Time (US & Canada)" : nil, range: utc.parse(range_start)..utc.parse(range_end))
   end
 
   def assert_zeros_date(method, created_at, keys, range_start, range_end, time_zone = nil, **options)
@@ -158,6 +158,6 @@ class ZerosTest < Minitest::Test
     keys.each_with_index do |key, i|
       expected[Date.parse(key)] = i == 1 ? 1 : 0
     end
-    assert_equal expected, call_method(method, :created_at, **options, series: true, time_zone: time_zone ? "Pacific Time (US & Canada)" : nil, range: Time.parse(range_start)..Time.parse(range_end))
+    assert_equal expected, call_method(method, :created_at, **options, series: true, time_zone: time_zone ? "Pacific Time (US & Canada)" : nil, range: utc.parse(range_start)..utc.parse(range_end))
   end
 end
