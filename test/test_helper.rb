@@ -107,7 +107,7 @@ class Minitest::Test
     user
   end
 
-  def call_method(method, field, options)
+  def call_method(method, field, **options)
     if enumerable?
       @users.group_by_period(method, **options) { |u| u.send(field) }.to_h { |k, v| [k, v.size] }
     else
@@ -117,18 +117,18 @@ class Minitest::Test
 
   def assert_result_time(method, expected, time_str, time_zone = false, **options)
     expected = {utc.parse(expected).in_time_zone(time_zone ? "Pacific Time (US & Canada)" : utc) => 1}
-    assert_equal expected, result(method, time_str, time_zone, :created_at, options)
+    assert_equal expected, result(method, time_str, time_zone, :created_at, **options)
 
     if postgresql?
       # test timestamptz
-      assert_equal expected, result(method, time_str, time_zone, :deleted_at, options)
+      assert_equal expected, result(method, time_str, time_zone, :deleted_at, **options)
     end
   end
 
-  def assert_result_date(method, expected_str, time_str, time_zone = false, options = {})
+  def assert_result_date(method, expected_str, time_str, time_zone = false, **options)
     create_user time_str
     expected = {Date.parse(expected_str) => 1}
-    assert_equal expected, call_method(method, :created_at, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
+    assert_equal expected, call_method(method, :created_at, **options, time_zone: time_zone ? "Pacific Time (US & Canada)" : nil)
 
     expected_time = (time_zone ? pt : utc).parse(expected_str)
     if options[:day_start]
@@ -139,13 +139,13 @@ class Minitest::Test
     # assert_equal expected, call_method(method, :created_on, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
   end
 
-  def assert_result(method, expected, time_str, time_zone = false, options = {})
-    assert_equal 1, result(method, time_str, time_zone, :created_at, options)[expected]
+  def assert_result(method, expected, time_str, time_zone = false, **options)
+    assert_equal 1, result(method, time_str, time_zone, :created_at, **options)[expected]
   end
 
-  def result(method, time_str, time_zone = false, attribute = :created_at, options = {})
+  def result(method, time_str, time_zone = false, attribute = :created_at, **options)
     create_user time_str unless attribute == :deleted_at
-    call_method(method, attribute, options.merge(time_zone: time_zone ? "Pacific Time (US & Canada)" : nil))
+    call_method(method, attribute, **options, time_zone: time_zone ? "Pacific Time (US & Canada)" : nil)
   end
 
   def utc

@@ -75,7 +75,7 @@ class ZerosTest < Minitest::Test
     7.times do |n|
       expected[n] = n == 3 ? 1 : 0
     end
-    assert_equal expected, call_method(:day_of_week, :created_at, {series: true})
+    assert_equal expected, call_method(:day_of_week, :created_at, series: true)
   end
 
   def test_hour_of_day
@@ -84,7 +84,7 @@ class ZerosTest < Minitest::Test
     24.times do |n|
       expected[n] = n == 20 ? 1 : 0
     end
-    assert_equal expected, call_method(:hour_of_day, :created_at, {series: true})
+    assert_equal expected, call_method(:hour_of_day, :created_at, series: true)
   end
 
   def test_minute_of_hour
@@ -93,7 +93,7 @@ class ZerosTest < Minitest::Test
     60.times do |n|
       expected[n] = n == 5 ? 1 : 0
     end
-    assert_equal expected, call_method(:minute_of_hour, :created_at, {series: true})
+    assert_equal expected, call_method(:minute_of_hour, :created_at, series: true)
   end
 
   def test_day_of_month
@@ -102,7 +102,7 @@ class ZerosTest < Minitest::Test
     (1..31).each do |n|
       expected[n] = n == 18 ? 1 : 0
     end
-    assert_equal expected, call_method(:day_of_month, :created_at, {series: true})
+    assert_equal expected, call_method(:day_of_month, :created_at, series: true)
   end
 
   def test_month_of_year
@@ -111,7 +111,7 @@ class ZerosTest < Minitest::Test
     (1..12).each do |n|
       expected[n] = n == 5 ? 1 : 0
     end
-    assert_equal expected, call_method(:month_of_year, :created_at, {series: true})
+    assert_equal expected, call_method(:month_of_year, :created_at, series: true)
   end
 
   def test_excludes_end
@@ -146,21 +146,21 @@ class ZerosTest < Minitest::Test
 
   private
 
-  def assert_zeros(method, created_at, keys, range_start, range_end, time_zone = nil, options = {})
+  def assert_zeros(method, created_at, keys, range_start, range_end, time_zone = nil, **options)
     create_user created_at
     expected = {}
     keys.each_with_index do |key, i|
       expected[utc.parse(key).in_time_zone(time_zone ? "Pacific Time (US & Canada)" : utc)] = i == 1 ? 1 : 0
     end
-    assert_equal expected, call_method(method, :created_at, options.merge(series: true, time_zone: time_zone ? "Pacific Time (US & Canada)" : nil, range: Time.parse(range_start)..Time.parse(range_end)))
+    assert_equal expected, call_method(method, :created_at, **options, series: true, time_zone: time_zone ? "Pacific Time (US & Canada)" : nil, range: Time.parse(range_start)..Time.parse(range_end))
   end
 
-  def assert_zeros_date(method, created_at, keys, range_start, range_end, time_zone = nil, options = {})
+  def assert_zeros_date(method, created_at, keys, range_start, range_end, time_zone = nil, **options)
     create_user created_at
     expected = {}
     keys.each_with_index do |key, i|
       expected[Date.parse(key)] = i == 1 ? 1 : 0
     end
-    assert_equal expected, call_method(method, :created_at, options.merge(series: true, time_zone: time_zone ? "Pacific Time (US & Canada)" : nil, range: Time.parse(range_start)..Time.parse(range_end)))
+    assert_equal expected, call_method(method, :created_at, **options, series: true, time_zone: time_zone ? "Pacific Time (US & Canada)" : nil, range: Time.parse(range_start)..Time.parse(range_end))
   end
 end
