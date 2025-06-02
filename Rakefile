@@ -35,8 +35,6 @@ task :profile do
   require "groupdate"
   require "ruby-prof"
 
-  # RubyProf.measure_mode = RubyProf::ALLOCATIONS
-
   ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
   ActiveSupport.to_time_preserves_timezone = :zone
 
@@ -52,7 +50,8 @@ task :profile do
     User.create!(created_at: now - n.days)
   end
 
-  result = RubyProf::Profile.profile do
+  measure_mode = RubyProf::WALL_TIME # RubyProf::ALLOCATIONS
+  result = RubyProf::Profile.profile(measure_mode: measure_mode) do
     User.group_by_day(:created_at).count
   end
 
