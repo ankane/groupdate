@@ -180,8 +180,6 @@ class DayStartTest < Minitest::Test
   # invalid
 
   def test_too_small
-    skip "call_method expects different error message" if sqlite?
-
     error = assert_raises(ArgumentError) do
       call_method(:day, :created_at, day_start: -1)
     end
@@ -189,8 +187,6 @@ class DayStartTest < Minitest::Test
   end
 
   def test_too_large
-    skip "call_method expects different error message" if sqlite?
-
     error = assert_raises(ArgumentError) do
       call_method(:day, :created_at, day_start: 24)
     end
@@ -198,8 +194,6 @@ class DayStartTest < Minitest::Test
   end
 
   def test_bad_method
-    skip "call_method expects different error message" if sqlite?
-
     error = assert_raises(ArgumentError) do
       call_method(:minute, :created_at, day_start: 24)
     end

@@ -74,8 +74,6 @@ class WeekStartTest < Minitest::Test
   # invalid
 
   def test_invalid_week
-    skip "call_method expects different error message" if sqlite?
-
     error = assert_raises(ArgumentError) do
       call_method(:week, :created_at, week_start: "bad")
     end
@@ -83,8 +81,6 @@ class WeekStartTest < Minitest::Test
   end
 
   def test_invalid_day_of_week
-    skip "call_method expects different error message" if sqlite?
-
     error = assert_raises(ArgumentError) do
       call_method(:day_of_week, :created_at, week_start: "bad")
     end
