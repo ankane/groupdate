@@ -42,6 +42,10 @@ module Groupdate
     end
 
     def round_time(time)
+      self.class.round_time(time, period, time_zone, day_start, @week_start_key, n_seconds)
+    end
+
+    def self.round_time(time, period, time_zone, day_start, week_start_key, n_seconds)
       if period == :custom
         return time_zone.at((time.to_time.to_i / n_seconds) * n_seconds)
       end
@@ -65,7 +69,7 @@ module Groupdate
         when :day
           time.beginning_of_day
         when :week
-          time.beginning_of_week(@week_start_key)
+          time.beginning_of_week(week_start_key)
         when :month
           time.beginning_of_month
         when :quarter
@@ -77,7 +81,7 @@ module Groupdate
         when :minute_of_hour
           time.min
         when :day_of_week
-          time.days_to_week_start(@week_start_key)
+          time.days_to_week_start(week_start_key)
         when :day_of_month
           time.day
         when :month_of_year
@@ -297,7 +301,7 @@ module Groupdate
       options.key?(:series) ? options[:series] : series_default
     end
 
-    def utc
+    def self.utc
       @utc ||= ActiveSupport::TimeZone["Etc/UTC"]
     end
   end

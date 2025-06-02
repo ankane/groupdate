@@ -43,7 +43,6 @@ module Groupdate
 
         if !@time_zone.utc_offset.zero? || !day_start.zero? || period == :quarter
           setup_function
-          day_start = self.day_start != 0 ? self.day_start / 3600.0 : nil
           week_start = period == :week ? Groupdate::Magic::DAYS[self.week_start].to_s : nil
           query = ["groupdate(?, #{column}, ?, ?, ?)", period, @time_zone.tzinfo.name, day_start, week_start]
         end
@@ -64,14 +63,12 @@ module Groupdate
             if value.nil?
               func.result = nil
             else
-              options = {time_zone: time_zone}
-              options[:day_start] = day_start if day_start
-              options[:week_start] = week_start if week_start
-              result = [value].group_by_period(period, **options) { |v| utc.parse(v) }.keys[0]
-              if result.is_a?(Time)
-                result = result.in_time_zone(utc).strftime("%Y-%m-%d %H:%M:%S")
-              elsif result.is_a?(Date)
+              week_start = :sunday if period == "day_of_week"
+              result = SeriesBuilder.round_time(value, period.to_sym, ActiveSupport::TimeZone[time_zone], day_start, week_start&.to_sym, nil)
+              if %w[day week month quarter year].include?(period)
                 result = result.strftime("%Y-%m-%d")
+              elsif result.is_a?(Time)
+                result = result.in_time_zone(utc).strftime("%Y-%m-%d %H:%M:%S")
               end
               func.result = result
             end
