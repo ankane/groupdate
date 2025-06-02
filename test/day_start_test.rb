@@ -174,7 +174,6 @@ class DayStartTest < Minitest::Test
   end
 
   def test_decimal_hour_of_day
-    skip if sqlite?
     assert_result :hour_of_day, 23, "2013-05-04 02:29:59", false, day_start: 2.5
   end
 
