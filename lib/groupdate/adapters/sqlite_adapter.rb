@@ -66,7 +66,7 @@ module Groupdate
             else
               # cast_result handles week_start for day_of_week
               week_start = :sunday if period == "day_of_week"
-              result = SeriesBuilder.round_time(utc.parse(value), period.to_sym, ActiveSupport::TimeZone[time_zone], day_start, week_start&.to_sym, nil)
+              result = SeriesBuilder.round_time(utc.parse(value), period.to_sym, ActiveSupport::TimeZone[time_zone], day_start.to_i, week_start&.to_sym, nil)
               if %w[day week month quarter year].include?(period)
                 result = result.strftime("%Y-%m-%d")
               elsif result.is_a?(Time)
