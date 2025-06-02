@@ -15,12 +15,11 @@ class DatabaseTest < Minitest::Test
   end
 
   def test_where_after
-    skip if sqlite?
-
     create_user "2013-05-01"
     create_user "2013-05-02"
     expected = {Date.parse("2013-05-02") => 1}
-    assert_equal expected, User.group_by_day(:created_at).where("created_at > ?", "2013-05-01").count
+    value = sqlite? ? "2013-05-01 00:00:00" : "2013-05-01"
+    assert_equal expected, User.group_by_day(:created_at).where("created_at > ?", value).count
   end
 
   def test_not_modified
