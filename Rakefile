@@ -38,6 +38,7 @@ task :profile do
   # RubyProf.measure_mode = RubyProf::ALLOCATIONS
 
   ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
+  ActiveSupport.to_time_preserves_timezone = :zone
 
   ActiveRecord::Migration.create_table :users, force: true do |t|
     t.datetime :created_at
@@ -51,10 +52,10 @@ task :profile do
     User.create!(created_at: now - n.days)
   end
 
-  result = RubyProf.profile do
+  result = RubyProf::Profile.profile do
     User.group_by_day(:created_at).count
   end
 
   printer = RubyProf::GraphPrinter.new(result)
-  printer.print(STDOUT, {})
+  printer.print(STDOUT, min_percent: 2)
 end
