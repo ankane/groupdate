@@ -154,9 +154,12 @@ class RangeTest < Minitest::Test
   end
 
   def with_tz(tz)
-    ENV["TZ"] = tz
-    yield
-  ensure
-    ENV["TZ"] = "UTC"
+    previous_tz = ENV["TZ"]
+    begin
+      ENV["TZ"] = tz
+      yield
+    ensure
+      ENV["TZ"] = previous_tz
+    end
   end
 end
