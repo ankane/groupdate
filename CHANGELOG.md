@@ -1,4 +1,4 @@
-## 6.7.0 (unreleased)
+## 6.7.0 (2025-06-02)
 
 - Added time zone support for SQLite
 - Added `day_start` support for SQLite
