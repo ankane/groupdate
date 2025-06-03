@@ -46,6 +46,7 @@ module Groupdate
         return time_zone.at((time.to_time.to_i / n_seconds) * n_seconds)
       end
 
+      # TODO avoid calling to_time on dates
       self.class.round_time(time.to_time, period, time_zone, day_start, @week_start_key)
     end
 
