@@ -170,7 +170,7 @@ User.group_by_hour_of_day(:created_at, format: "%-l %P").count
 # }
 ```
 
-Takes a `String`, which is passed to [strftime](http://strfti.me/), or a `Symbol`, which is looked up by `I18n.localize` in `i18n` scope 'time.formats', or a `Proc`.  You can pass a locale with the `locale` option.
+Takes a `String`, which is passed to [strftime](https://www.strfti.me/), or a `Symbol`, which is looked up by `I18n.localize` in `i18n` scope 'time.formats', or a `Proc`.  You can pass a locale with the `locale` option.
 
 ### Series
 
