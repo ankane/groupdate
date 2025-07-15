@@ -86,8 +86,6 @@ class RangeTest < Minitest::Test
   # beginless range
 
   def test_beginless
-    skip unless beginless_range_supported?
-
     create_user "2013-05-01"
     create_user "2013-05-04 12:00:00"
     create_user "2013-06-01"
@@ -101,8 +99,6 @@ class RangeTest < Minitest::Test
   end
 
   def test_beginless_exclude_end
-    skip unless beginless_range_supported?
-
     create_user "2013-05-01"
     create_user "2013-06-01"
     expected = {
@@ -114,13 +110,7 @@ class RangeTest < Minitest::Test
   end
 
   def test_beginless_empty
-    skip unless beginless_range_supported?
-
     assert_empty call_method(:day, :created_at, series: true, range: eval('..Date.parse("2013-05-04")'))
-  end
-
-  def beginless_range_supported?
-    RUBY_VERSION.to_f >= 2.7
   end
 
   # endless range
