@@ -9,7 +9,6 @@ ADAPTERS.each do |adapter|
 
     Rake::TestTask.new(adapter => "env:#{adapter}") do |t|
       t.description = "Run tests for #{adapter}"
-      t.libs << "test"
       exclude = adapter == "enumerable" ? /associations|column|database|multiple_group/ : /enumerable/
       t.test_files = FileList["test/**/*_test.rb"].exclude(exclude)
     end
