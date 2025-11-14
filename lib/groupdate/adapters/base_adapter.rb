@@ -3,7 +3,7 @@ module Groupdate
     class BaseAdapter
       attr_reader :period, :column, :day_start, :week_start, :n_seconds
 
-      def initialize(relation, column:, period:, time_zone:, time_range:, week_start:, day_start:, n_seconds:, adapter_name: nil)
+      def initialize(relation, column:, period:, time_zone:, time_range:, week_start:, day_start:, n_seconds:, adapter_name: nil, timezone_aware_column: false)
         @relation = relation
         @column = column
         @period = period
@@ -13,9 +13,13 @@ module Groupdate
         @day_start = day_start
         @n_seconds = n_seconds
         @adapter_name = adapter_name
+        @timezone_aware_column = timezone_aware_column
 
-        if ActiveRecord.default_timezone == :local
-          raise Groupdate::Error, "ActiveRecord.default_timezone must be :utc to use Groupdate"
+        # Only require UTC default_timezone for non-timezone-aware columns
+        # Timezone-aware columns (like timestamptz in PostgreSQL) store timezone
+        # information and work correctly regardless of default_timezone setting
+        if ActiveRecord.default_timezone == :local && !timezone_aware_column
+          raise Groupdate::Error, "ActiveRecord.default_timezone must be :utc to use Groupdate, or use a timezone-aware column type like timestamp with time zone (PostgreSQL)"
         end
       end
 

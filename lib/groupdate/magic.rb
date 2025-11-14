@@ -210,6 +210,7 @@ module Groupdate
 
         # very important
         column = validate_column(field)
+        timezone_aware = timezone_aware_column?(relation, field)
         column = resolve_column(relation, column)
 
         # generate ActiveRecord relation
@@ -223,7 +224,8 @@ module Groupdate
             week_start: magic.week_start,
             day_start: magic.day_start,
             n_seconds: magic.n_seconds,
-            adapter_name: adapter_name
+            adapter_name: adapter_name,
+            timezone_aware_column: timezone_aware
           ).generate
 
         # add Groupdate info
@@ -254,6 +256,32 @@ module Groupdate
           node = relation.send(:relation).send(:arel_columns, [column]).first
           node = Arel::Nodes::SqlLiteral.new(node) if node.is_a?(String)
           relation.connection_pool.with_connection { |c| c.visitor.accept(node, Arel::Collectors::SQLString.new).value }
+        end
+
+        # checks if a column is timezone-aware (e.g., timestamptz in PostgreSQL)
+        # timezone-aware columns store timezone information and don't require
+        # ActiveRecord.default_timezone to be :utc
+        def timezone_aware_column?(relation, field)
+          return false unless field.is_a?(Symbol) || (field.is_a?(String) && /\A\w+\z/.match?(field))
+
+          column_name = field.to_s.split('.').last
+
+          # Get the model class - handle both ActiveRecord::Relation and Class
+          klass = relation.respond_to?(:klass) ? relation.klass : relation
+
+          if klass.column_names.include?(column_name)
+            column = klass.columns_hash[column_name]
+            # Check for timezone-aware types
+            # PostgreSQL: timestamptz (displays as "timestamp with time zone")
+            # SQL Server: datetimeoffset
+            # Other databases may have similar types
+            return true if column.sql_type =~ /timestamp with time zone|datetimeoffset/i
+          end
+
+          false
+        rescue
+          # If we can't determine the column type, assume it's not timezone-aware
+          false
         end
       end
 
