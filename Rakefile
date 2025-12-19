@@ -36,8 +36,10 @@ task :profile do
   ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
   ActiveSupport.to_time_preserves_timezone = :zone
 
-  ActiveRecord::Migration.create_table :users, force: true do |t|
-    t.datetime :created_at
+  ActiveRecord::Schema.define do
+    create_table :users, force: true do |t|
+      t.datetime :created_at
+    end
   end
 
   class User < ActiveRecord::Base
