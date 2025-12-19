@@ -34,7 +34,6 @@ task :profile do
   require "ruby-prof"
 
   ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
-  ActiveSupport.to_time_preserves_timezone = :zone
 
   ActiveRecord::Schema.define do
     create_table :users, force: true do |t|
