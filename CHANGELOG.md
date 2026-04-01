@@ -1,3 +1,7 @@
+## 6.8.0 (unreleased)
+
+- Dropped support for Ruby < 3.3 and Active Record < 7.2
+
 ## 6.7.0 (2025-06-02)
 
 - Added time zone support for SQLite
