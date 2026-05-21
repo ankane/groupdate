@@ -1,8 +1,0 @@
-source "https://rubygems.org"
-
-gemspec path: ".."
-
-gem "rake"
-gem "minitest"
-gem "activerecord", "~> 7.2.0"
-gem "activerecord7-redshift-adapter-pennylane"

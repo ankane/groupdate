@@ -11,7 +11,7 @@ The simplest way to group by:
 
 :cake: Get the entire series - **the other best part**
 
-Supports PostgreSQL, MySQL, MariaDB, SQLite, and Redshift, plus arrays and hashes
+Supports PostgreSQL, MySQL, MariaDB, and SQLite, plus arrays and hashes
 
 :cupid: Goes hand in hand with [Chartkick](https://www.chartkick.com)
 

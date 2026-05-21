@@ -1,3 +1,7 @@
+## 7.0.0 (unreleased)
+
+- Dropped support for Redshift
+
 ## 6.8.0 (2026-04-04)
 
 - Dropped support for Ruby < 3.3 and Active Record < 7.2

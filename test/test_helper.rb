@@ -66,10 +66,6 @@ class Minitest::Test
     ENV["ADAPTER"] == "mysql"
   end
 
-  def redshift?
-    ENV["ADAPTER"] == "redshift"
-  end
-
   def create_user(created_at, score = 1)
     created_at = created_at.utc.to_s if created_at.is_a?(Time)
 
@@ -96,10 +92,6 @@ class Minitest::Test
       end
 
       user.save!
-
-      # hack for Redshift adapter, which doesn't return id on creation...
-      user = User.last if user.id.nil?
-
       user.update_columns(created_at: nil, created_on: nil) if created_at.nil?
     end
 

@@ -87,8 +87,6 @@ class ColumnTest < Minitest::Test
   def now_function
     if sqlite?
       "datetime('now')"
-    elsif redshift?
-      "GETDATE()"
     else
       "NOW()"
     end

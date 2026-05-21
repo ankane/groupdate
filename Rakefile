@@ -1,7 +1,7 @@
 require "bundler/gem_tasks"
 require "rake/testtask"
 
-ADAPTERS = %w(postgresql mysql trilogy sqlite enumerable redshift)
+ADAPTERS = %w(postgresql mysql trilogy sqlite enumerable)
 
 ADAPTERS.each do |adapter|
   namespace :test do
@@ -15,10 +15,9 @@ ADAPTERS.each do |adapter|
   end
 end
 
-desc "Run all adapter tests besides redshift"
+desc "Run all adapter tests"
 task :test do
   ADAPTERS.each do |adapter|
-    next if adapter == "redshift"
     next if ["postgresql", "mysql", "trilogy"].include?(adapter) && RUBY_ENGINE == "jruby"
     Rake::Task["test:#{adapter}"].invoke
   end
