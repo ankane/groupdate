@@ -63,4 +63,20 @@ class EnumerableTest < Minitest::Test
     user_b = create_user("2014-01-22 00:04:56")
     assert_equal 145, [user_a, user_b].group_by_minute(series: true, n: 10, &:created_at).size
   end
+
+  def test_enumerable_last_complete_periods
+    now = Time.now.utc
+    current_month = Time.utc(now.year, now.month, 1)
+    older = create_user(current_month - 3.months + 1.day)
+    second_previous = create_user(current_month - 2.months + 1.day)
+    previous = create_user(current_month - 1.month + 1.day)
+
+    result = [older, second_previous, previous].group_by_month(
+      last: 2,
+      current: false,
+      time_zone: "Etc/UTC"
+    ) { |user| user.created_at }
+
+    assert_equal [(current_month - 2.months).to_date, (current_month - 1.month).to_date], result.keys
+  end
 end
