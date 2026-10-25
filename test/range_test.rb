@@ -95,7 +95,7 @@ class RangeTest < Minitest::Test
       Date.parse("2013-05-03") => 0,
       Date.parse("2013-05-04") => 1
     }
-    assert_equal expected, call_method(:day, :created_at, series: true, range: eval('..Date.parse("2013-05-04")'))
+    assert_equal expected, call_method(:day, :created_at, series: true, range: ..Date.parse("2013-05-04"))
   end
 
   def test_beginless_exclude_end
@@ -106,11 +106,11 @@ class RangeTest < Minitest::Test
       Date.parse("2013-05-02") => 0,
       Date.parse("2013-05-03") => 0
     }
-    assert_equal expected, call_method(:day, :created_at, series: true, range: eval('...Date.parse("2013-05-04")'))
+    assert_equal expected, call_method(:day, :created_at, series: true, range: ...Date.parse("2013-05-04"))
   end
 
   def test_beginless_empty
-    assert_empty call_method(:day, :created_at, series: true, range: eval('..Date.parse("2013-05-04")'))
+    assert_empty call_method(:day, :created_at, series: true, range: ..Date.parse("2013-05-04"))
   end
 
   # endless range
@@ -123,11 +123,11 @@ class RangeTest < Minitest::Test
       Date.parse("2013-05-02") => 0,
       Date.parse("2013-05-03") => 1
     }
-    assert_equal expected, call_method(:day, :created_at, series: true, range: eval('Date.parse("2013-05-01")..'))
+    assert_equal expected, call_method(:day, :created_at, series: true, range: Date.parse("2013-05-01")..)
   end
 
   def test_endless_empty
-    assert_empty call_method(:day, :created_at, series: true, range: eval('Date.parse("2013-05-01")..'))
+    assert_empty call_method(:day, :created_at, series: true, range: Date.parse("2013-05-01")..)
   end
 
   # beginless and endless range
