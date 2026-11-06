@@ -254,11 +254,17 @@ users.group_by_day { |u| u.created_at }.to_h { |k, v| [k, v.count] }
 
 ### For MySQL and MariaDB
 
-[Time zone support](https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html) must be installed on the server.
+[Time zone support](https://dev.mysql.com/doc/refman/9.7/en/time-zone-support.html) must be installed on the server.
+
+For MySQL, use:
 
 ```sh
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
-# or
+```
+
+For MariaDB, use:
+
+```sh
 mariadb-tzinfo-to-sql /usr/share/zoneinfo | mariadb -u root mysql
 ```
 
