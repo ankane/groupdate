@@ -258,6 +258,8 @@ users.group_by_day { |u| u.created_at }.to_h { |k, v| [k, v.count] }
 
 ```sh
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
+# or
+mariadb-tzinfo-to-sql /usr/share/zoneinfo | mariadb -u root mysql
 ```
 
 You can confirm it worked with:
